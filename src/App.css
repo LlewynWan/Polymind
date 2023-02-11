@@ -36,3 +36,13 @@
     transform: rotate(360deg);
   }
 }
+
+::-moz-selection { /* Code for Firefox */
+  /* color: white; */
+  background: #BADBFF;
+}
+
+::selection {
+  /* color: white; */
+  background: #BADBFF;
+}
