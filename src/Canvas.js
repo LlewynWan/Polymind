@@ -161,13 +161,25 @@ export function Canvas(props)
                     color={"#748B97"}
                     isNull={node.text === ""}
                     text={node.text}
-                    onResize={(scaleBy) => {
+                    onScale={(scaleBy) => {
                         setNodes(prevState => {
                             return prevState.map(state => {
                                 let tmp = state;
                                 if (tmp.id === node.id) {
                                     tmp.scaleX = scaleBy;
                                     tmp.scaleY = scaleBy;
+                                }
+                                return tmp;
+                            });
+                        });
+                    }}
+                    onResize={(offsetW,offsetH) => {
+                        setNodes(prevState => {
+                            return prevState.map(state => {
+                                let tmp = state;
+                                if (tmp.id === node.id) {
+                                    tmp.width += offsetW;
+                                    tmp.height += offsetH;
                                 }
                                 return tmp;
                             });
@@ -198,7 +210,17 @@ export function Canvas(props)
                                 return tmp;
                             });
                         })}
-                    isSelected={node.selected}/> : null : null
+                    isSelected={node.selected}
+                    onOverflow={(scrollHeight)=>{
+                        setNodes(prevState =>{
+                            return prevState.map(state => {
+                                let tmp = state;
+                                if (tmp.id === node.id)
+                                    tmp.height = scrollHeight;
+                                return tmp;
+                            });
+                        })
+                    }}/> : null : null
                 })
             }
             </Group>

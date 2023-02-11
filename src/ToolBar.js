@@ -28,7 +28,9 @@ export function ToolBar({
         onAddStickyNote(e.target.x()+x+180, e.target.y()+y, 145, 110);
 
         stickyNoteRef.current.setAttrs({
-            x: 12, y: 12, width: 60, height: 60
+            x: 12, y: 12, width: 60, height: 60,
+            shadowOffsetY: 0,
+            shadowOpacity: 0.5
         });
         dummyStickyNoteRef2.current.setAttrs({
             x: 5, y: 5
@@ -168,11 +170,11 @@ export function ToolBar({
             if (!isHoverStickyNotes) {
                 setIsHoverStickyNotes(true)
                 stickyNoteRef.current.to({
-                    x: -10,
-                    y: -100,
+                    x: -18,
+                    y: -75,
                     width: 125,
                     height: 125,
-                    duration: 0.25,
+                    duration: 0.15,
                 });
             }
         }}
@@ -184,7 +186,7 @@ export function ToolBar({
                     y: 19,
                     width: 60,
                     height: 60,
-                    duration: 0.25
+                    duration: 0.15
                 });
             }
         }}
@@ -236,23 +238,42 @@ export function ToolBar({
                     width: 180,
                     height: 180,
                     shadowOffsetY: 7,
-                    shadowBlur: 5,
                     shadowOpacity: 0.2
                 });
             }}
             onDragEnd={handleStickyNodeDragEnd}/>
         </Group>
 
-        <Group x={350} y={height/2}>
+        <Group x={330} y={0}
+        clipX={-window.innerWidth}
+        clipY={-window.innerHeight}
+        clipWidth={window.innerWidth*2}
+        clipHeight={height+window.innerHeight}
+        onMouseEnter={(e)=>{
+            e.target.to({
+                y: height / 2,
+                radiusX: 64,
+                radiusY: 35,
+                duration: 0.15
+            })
+        }}
+        onMouseLeave={(e)=>{
+            e.target.to({
+                y: height / 2 + 15,
+                radiusX: 40,
+                radiusY: 40,
+                duration: 0.15
+            })
+        }}>
             <Ellipse
             x={0}
-            y={0}
-            radiusX={35}
-            radiusY={20}
+            y={height/2+25}
+            radiusX={40}
+            radiusY={40}
             stroke={"gray"}
             strokeWidth={0.5}
             fill={"#FADADD"}
-            opacity={0.75}
+            opacity={0.85}
             />
         </Group>
         </Group>

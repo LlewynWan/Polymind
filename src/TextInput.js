@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Html } from "react-konva-utils";
 
 function getStyle(width, height, fontSize) {
@@ -9,6 +9,7 @@ function getStyle(width, height, fontSize) {
     border: "none",
     padding: "0px",
     margin: "0px",
+    marginTop: "-1px",
     background: "none",
     outline: "none",
     resize: "none",
@@ -36,21 +37,32 @@ export function TextInput({
   value,
   onChange,
   onKeyDown,
+  onOverflow
 }) {
   const style = getStyle(width, height, fontSize);
+  const textareaRef = useRef(null);
+  const [textareaHeight, setTextareaHeight] = useState(0);
 
-  useEffect(() => {
-    const textarea = document.getElementById(id);
-    textarea.focus();
-  }, []);
+  useEffect (() => {
+    if (textareaRef.current !== null) {
+      setTextareaHeight(textareaRef.current.scrollHeight);
+    }
+  }, [textareaRef, value]);
 
   return (
     <Html groupProps={{ x, y }} divProps={{ style: { opacity: 1 } }}>
       <textarea
         id={id}
         value={value}
-        onChange={onChange}
+        ref={textareaRef}
+        onChange={(e)=>{
+          onChange(e);
+          if (textareaRef.current.scrollHeight > textareaHeight) {
+            onOverflow(textareaRef.current.scrollHeight);
+          }
+        }}
         onKeyDown={onKeyDown}
+        autoFocus={true}
         style={style}
       />
     </Html>

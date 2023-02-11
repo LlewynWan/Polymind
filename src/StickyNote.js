@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { Group, Rect, Image, Text, Transformer } from "react-konva";
+import { Group, Rect, Circle, Text, Transformer } from "react-konva";
 
 import { TextInput } from "./TextInput"
 
@@ -17,6 +17,7 @@ export function StickyNote({
   height,
   scaleX,
   scaleY,
+  onScale,
   onResize,
   fontSize,
   isNull,
@@ -25,13 +26,24 @@ export function StickyNote({
   onTextChange,
   onDragStart,
   onDragEnd,
+  onOverflow,
   draggable=true
 }) {
   const [isEditing, setIsEditing] = useState(false);
   const [isHover, setIsHover] = useState(false);
+  const [isDragging, setIsDragging] = useState(false);
+  const [isResizing, setIsResizing] = useState(false);
+  const [initialPointer, setInitialPointer] = useState({x:0,y:0});
 
   const nodeRef = useRef(null);
   const transformerRef= useRef(null);
+
+  const anchorPosition = [
+    {x: (width + 35)*scaleX / 2, y: -20},
+    {x: -20, y: (height + 70)*scaleY / 2},
+    {x: (width + 35)*scaleX / 2, y: height*scaleY + 90},
+    {x: width*scaleX + 55, y: (height + 70)*scaleY / 2}
+  ]
 
   useEffect(() => {
     if (!isSelected && isEditing) {
@@ -42,7 +54,7 @@ export function StickyNote({
       transformerRef.current.nodes([nodeRef.current]);
       transformerRef.current.getLayer().batchDraw();
     }
-  }, [isSelected, isEditing]);
+  }, [isSelected, width, height, scaleX, scaleY, isEditing, transformerRef]);
 
   const transformer = isSelected && !isEditing ? (
     <Transformer
@@ -50,14 +62,13 @@ export function StickyNote({
       rotateEnabled={false}
       flipEnabled={false}
       borderStroke={"#0096FF"}
-      borderStrokeWidth={4}
+      borderStrokeWidth={3.5}
       anchorStroke={"#0096FF"}
-      anchorStrokeWidth={2}
+      anchorStrokeWidth={1.5}
       anchorSize={12}
       anchorCornerRadius={2}
       enabledAnchors={["top-left", "top-right",
-      "bottom-left",
-      "bottom-right"]}
+      "bottom-left", "bottom-right"]}
       boundBoxFunc={(oldBox, newBox) => {
         newBox.width = Math.max(30, newBox.width);
         return newBox;
@@ -77,9 +88,21 @@ export function StickyNote({
 
   return (
     <>
-    <Group x={x} y={y} draggable={draggable}
-    onDragStart={onDragStart}
-    onDragEnd={onDragEnd}
+    <Group
+     x={x} y={y} draggable={draggable}
+     onDragStart={(e)=>{
+       setIsDragging(true);
+       if (onDragStart)
+         onDragStart(e);
+     }}
+     onDragEnd={(e)=>{
+       setIsDragging(false);
+       if (onDragEnd)
+         onDragEnd(e);
+     }}>
+    <Group
+    x={0}
+    y={0}
     onMouseEnter={() => setIsHover(true)}
     onMouseLeave={() => setIsHover(false)}
     ref={nodeRef}
@@ -87,7 +110,7 @@ export function StickyNote({
     scaleX={scaleX}
     scaleY={scaleY}
     onTransformEnd={(e)=>{
-      onResize(e.target.scaleX());
+      onScale(e.target.scaleX());
     }}>
       <Rect
         x={0}
@@ -130,6 +153,7 @@ export function StickyNote({
         onChange={handleTextChange}
         onKeyDown={handleEscapeKeys}
         value={text}
+        onOverflow={onOverflow}
       /> :
       <Text
         x={20}
@@ -147,17 +171,70 @@ export function StickyNote({
         }}
         perfectDrawEnabled={false}
       />}
-      {/* <Image
-        x={4+width}
-        y={32+height}
-        width={27}
-        height={33}
-        image={deleteIcon}
-        visible={isHover}
-        onMouseEnter={(e) => onHoverIcon(e)}
-        onMouseLeave={(e) => onUnhoverIcon(e)}
-        onClick={onDeleteIconClick}
-      /> */}
+    </Group>
+    <Group x={0} y={0} visible={isSelected && !isEditing}>
+    {anchorPosition.map((anchor,index)=>{
+        return <Circle
+        key={index}
+        x={anchor.x}
+        y={anchor.y}
+        radius={5}
+        stroke={"#0096FF"}
+        strokeWidth={1}
+        fill={"white"}
+        opacity={isDragging?0.12:0.75}
+        onMouseEnter={(e)=>{
+          const stage = e.target.getStage();
+          const type = (index%2 === 0) ? "ns-resize" : "ew-resize";
+          stage.container().style.cursor = type;
+        }}
+        onMouseLeave={(e)=>{
+          const stage = e.target.getStage();
+          stage.container().style.cursor = "default"
+          setIsResizing(false);
+        }}
+        onMouseDown={(e)=>{
+          e.cancelBubble = true;
+          setIsResizing(true);
+          const position = e.target.getStage().getPointerPosition();
+          setInitialPointer({x: position.x, y: position.y})
+        }}
+        onMouseMove={(e)=>{
+          e.cancelBubble = true;
+          const newPosition = e.target.getStage().getPointerPosition();
+          if (isResizing) {
+            var offsetW = 40;
+            var offsetH = 32;
+            if (index % 2 == 1) {
+              offsetH = 0;
+            } else {
+              offsetW = 0;
+            }
+            if (newPosition.x < initialPointer.x && index == 3) {
+              offsetW *= -1;
+            }
+            if (newPosition.x > initialPointer.x && index == 1) {
+              offsetW *= -1;
+            }
+            if (newPosition.y > initialPointer.y && index == 0) {
+              offsetH *= -1;
+            }
+            if (newPosition.y < initialPointer.y && index == 2) {
+              offsetH *= -1;
+            }
+            onResize(offsetW, offsetH);
+          }
+          if (newPosition.x !== initialPointer.x || newPosition.y !== initialPointer.y) {
+            setIsResizing(false);
+          }
+        }}
+        onMouseUp={(e)=>{
+          e.cancelBubble = true;
+          setIsResizing(false);
+        }}
+        />
+      })}
+    </Group>
     </Group>
     {transformer}
     </>
