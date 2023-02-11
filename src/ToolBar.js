@@ -166,13 +166,13 @@ export function ToolBar({
         <Group x={180} y={0}
         onMouseEnter={()=>{
             if (!isHoverStickyNotes) {
-                setIsHoverStickyNotes(true);
+                setIsHoverStickyNotes(true)
                 stickyNoteRef.current.to({
                     x: -10,
                     y: -100,
                     width: 125,
                     height: 125,
-                    duration: 0.3
+                    duration: 0.25,
                 });
             }
         }}
@@ -184,7 +184,7 @@ export function ToolBar({
                     y: 19,
                     width: 60,
                     height: 60,
-                    duration: 0.3
+                    duration: 0.25
                 });
             }
         }}

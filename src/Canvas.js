@@ -153,12 +153,26 @@ export function Canvas(props)
                     id={node.id}
                     x={node.x}
                     y={node.y}
+                    scaleX={node.scaleX}
+                    scaleY={node.scaleY}
                     width={node.width}
                     height={node.height}
                     fontSize={18}
                     color={"#748B97"}
                     isNull={node.text === ""}
                     text={node.text}
+                    onResize={(scaleBy) => {
+                        setNodes(prevState => {
+                            return prevState.map(state => {
+                                let tmp = state;
+                                if (tmp.id === node.id) {
+                                    tmp.scaleX = scaleBy;
+                                    tmp.scaleY = scaleBy;
+                                }
+                                return tmp;
+                            });
+                        });
+                    }}
                     onClick={(e)=>{
                         e.cancelBubble = true;
                         setNodes(
@@ -229,7 +243,9 @@ export function Canvas(props)
                 onAddStickyNote={(x, y, width, height)=>{
                     setNodes(prevState => {
                         let tmp = {id: numNodes, type: "sticky_note",
-                        x, y, width: width, height: height,
+                        x: (x-canvasX)/canvasScale, y: (y-canvasY)/canvasScale,
+                        width: width, height: height,
+                        scaleX: 1/canvasScale, scaleY: 1/canvasScale,
                         selected: false, text: "", display: true};
                         return [...prevState, tmp];
                     });

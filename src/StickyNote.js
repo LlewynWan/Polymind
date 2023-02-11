@@ -15,6 +15,9 @@ export function StickyNote({
   text,
   width,
   height,
+  scaleX,
+  scaleY,
+  onResize,
   fontSize,
   isNull,
   onClick,
@@ -80,7 +83,12 @@ export function StickyNote({
     onMouseEnter={() => setIsHover(true)}
     onMouseLeave={() => setIsHover(false)}
     ref={nodeRef}
-    onClick={onClick}>
+    onClick={onClick}
+    scaleX={scaleX}
+    scaleY={scaleY}
+    onTransformEnd={(e)=>{
+      onResize(e.target.scaleX());
+    }}>
       <Rect
         x={0}
         y={0}
