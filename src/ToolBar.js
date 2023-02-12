@@ -11,6 +11,8 @@ export function ToolBar({
     height,
     color,
     visible,
+    onHover,
+    onUnhover,
     isArrowIconClicked,
     onArrowIconClick,
     isDoubleArrowIconClicked,
@@ -48,17 +50,19 @@ export function ToolBar({
         });
         dummyStickyNoteRef1.current.to({
             x: 5, y: 5,
-            duration: 0.4,
+            duration: 0.55,
         });
         dummyStickyNoteRef2.current.to({
             x: 12, y: 12,
-            duration: 0.5
+            duration: 0.45
         })
     }
 
 
     return (
-        <Group x={x} y={y} visible={visible}>
+        <Group x={x} y={y} visible={visible}
+        onMouseEnter={onHover}
+        onMouseLeave={onUnhover}>
         <Rect
         x={0}
         y={0}
@@ -69,7 +73,7 @@ export function ToolBar({
         opacity={0.9}
         perfectDrawEnabled={false}
         shadowColor={"black"}
-        shadowOffsetY={0}
+        shadowOffsetY={2.5}
         shadowOffsetX={0}
         strokeWidth={0.25}
         stroke={"gray"}
@@ -229,6 +233,8 @@ export function ToolBar({
             fill={"#748B97"}
             draggable={true}
             onDragStart={(e)=>{
+                const stage = e.target.getStage();
+                stage.container().style.cursor = "grabbing";
                 stickyNoteRef.current.setAttrs({
                     width: 180,
                     height: 180,
@@ -236,7 +242,11 @@ export function ToolBar({
                     shadowOpacity: 0.2
                 });
             }}
-            onDragEnd={handleStickyNodeDragEnd}/>
+            onDragEnd={(e)=>{
+                const stage = e.target.getStage();
+                stage.container().style.cursor = "default";
+                handleStickyNodeDragEnd(e);
+            }}/>
         </Group>
 
         <Group x={330} y={0}
@@ -266,7 +276,12 @@ export function ToolBar({
             radiusX={40}
             radiusY={40}
             stroke={"gray"}
-            strokeWidth={0.5}
+            strokeWidth={0.25}
+            shadowColor={"gray"}
+            shadowOffsetY={5}
+            shadowOffsetX={5}
+            shadowBlur={5}
+            shadowOpacity={0.25}
             fill={"#FADADD"}
             opacity={0.85}
             />

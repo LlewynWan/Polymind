@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React, { useContext, useEffect } from "react";
 import { HotKeys } from "react-hotkeys";
 import { Stage, Layer, Group } from "react-konva";
 
@@ -29,8 +29,8 @@ async function PromptGPT()
 
 export function Canvas(props)
 {
-    const {nodes, numNodes, promptCards, mainPrompter,
-        setNodes, setNumNodes, setPromptCards, setMainPrompter} = useContext(GlobalContext);
+    const {nodes, numNodes, edges, promptCards, mainPrompter,
+        setNodes, setNumNodes, setEdges, setPromptCards, setMainPrompter} = useContext(GlobalContext);
 
     const [dimensions, setDimensions] = React.useState({
         height: window.innerHeight,
@@ -40,12 +40,24 @@ export function Canvas(props)
     const [canvasX, setCanvasX] = React.useState(0);
     const [canvasY, setCanvasY] = React.useState(0);
     const [canvasScale, setCanvasScale] = React.useState(1);
-    const layerRef = React.useRef();
+    const stageRef = React.useRef(null);
+    const layerRef = React.useRef(null);
 
     const [isDrawingArrow, setIsDrawingArrow] = React.useState(false);
     const [isDrawingDoubleArrow, setIsDrawingDoubleArrow] = React.useState(false);
 
+    const [isHoverToolBar, setIsHoverToolBar] = React.useState(false);
     const [toolBarVisibility, setToolBarVisibility] = React.useState(true);
+
+    useEffect(() => {
+        if (!isHoverToolBar && stageRef) {
+            stageRef.current.container().style.cursor =
+            (isDrawingArrow || isDrawingDoubleArrow) ? "crosshair"
+            : "default";
+        } else {
+            stageRef.current.container().style.cursor = "default";
+        }
+    }, [isDrawingArrow, isDrawingDoubleArrow, isHoverToolBar]);
 
     const UnselectAll = (e) => {
         setNodes(prevState => {
@@ -93,7 +105,6 @@ export function Canvas(props)
     }
 
     const handleStageMouseDown = e => {
-        console.log("shit");
         e.cancelBubble=true;
     }
 
@@ -145,6 +156,7 @@ export function Canvas(props)
     onWheel={handleStageWheel}
     onClick={UnselectAll}
     onMouseDown={handleStageMouseDown}
+    ref={stageRef}
     >
         <Layer
         x={canvasX}
@@ -278,6 +290,8 @@ export function Canvas(props)
                 width={500}
                 height={60}
                 color={"white"}
+                onHover={()=>setIsHoverToolBar(true)}
+                onUnhover={()=>setIsHoverToolBar(false)}
                 visible={toolBarVisibility}
                 isArrowIconClicked={isDrawingArrow}
                 onArrowIconClick={(e)=>{

@@ -186,6 +186,7 @@ export function StickyNote({
     {anchorPosition.map((anchor,index)=>{
         return (
         <Group
+        key={index}
         x={anchor.x}
         y={anchor.y}
         scaleX={1/canvasScale}
@@ -220,42 +221,45 @@ export function StickyNote({
           }
         }}
         onMouseDown={(e)=>{
+          console.log("shit");
           e.cancelBubble = true;
           setIsResizing(true);
           const position = e.target.getStage().getPointerPosition();
           setInitialPointer({x: position.x, y: position.y})
         }}
         onMouseMove={(e)=>{
-          e.cancelBubble = true;
-          const newPosition = e.target.getStage().getPointerPosition();
-          if (isResizing) {
-            var offsetW = (newPosition.x !== initialPointer.x) ? 40 : 0;
-            var offsetH = (newPosition.y !== initialPointer.y) ? 32 : 0;
-            var offsetX = (index===1 && newPosition.x !== initialPointer.x) ? -40 : 0;
-            var offsetY = (index===0 && newPosition.y !== initialPointer.y) ? -32 : 0;
-            if (index % 2 == 1) {
-              offsetH = 0;
-            } else {
-              offsetW = 0;
+          if (!isConnecting) {
+            e.cancelBubble = true;
+            const newPosition = e.target.getStage().getPointerPosition();
+            if (isResizing) {
+              var offsetW = (newPosition.x !== initialPointer.x) ? 40 : 0;
+              var offsetH = (newPosition.y !== initialPointer.y) ? 32 : 0;
+              var offsetX = (index===1 && newPosition.x !== initialPointer.x) ? -40 : 0;
+              var offsetY = (index===0 && newPosition.y !== initialPointer.y) ? -32 : 0;
+              if (index % 2 == 1) {
+                offsetH = 0;
+              } else {
+                offsetW = 0;
+              }
+              if (newPosition.x < initialPointer.x && index === 3) {
+                offsetW *= -1;
+              }
+              if (newPosition.x > initialPointer.x && index === 1) {
+                offsetW *= -1;
+                offsetX *= -1;
+              }
+              if (newPosition.y > initialPointer.y && index === 0) {
+                offsetH *= -1;
+                offsetY *= -1;
+              }
+              if (newPosition.y < initialPointer.y && index === 2) {
+                offsetH *= -1;
+              }
+              onResize(offsetW, offsetH, offsetX*scaleX, offsetY*scaleY);
             }
-            if (newPosition.x < initialPointer.x && index === 3) {
-              offsetW *= -1;
+            if (newPosition.x !== initialPointer.x || newPosition.y !== initialPointer.y) {
+              setIsResizing(false);
             }
-            if (newPosition.x > initialPointer.x && index === 1) {
-              offsetW *= -1;
-              offsetX *= -1;
-            }
-            if (newPosition.y > initialPointer.y && index === 0) {
-              offsetH *= -1;
-              offsetY *= -1;
-            }
-            if (newPosition.y < initialPointer.y && index === 2) {
-              offsetH *= -1;
-            }
-            onResize(offsetW, offsetH, offsetX*scaleX, offsetY*scaleY);
-          }
-          if (newPosition.x !== initialPointer.x || newPosition.y !== initialPointer.y) {
-            setIsResizing(false);
           }
         }}
         onMouseUp={(e)=>{
