@@ -177,7 +177,7 @@ export function ToolBar({
                     y: -75,
                     width: 125,
                     height: 125,
-                    duration: 0.15,
+                    duration: 0.2,
                 });
             }
         }}
@@ -189,7 +189,7 @@ export function ToolBar({
                     y: 19,
                     width: 60,
                     height: 60,
-                    duration: 0.15
+                    duration: 0.2
                 });
             }
         }}
@@ -257,7 +257,7 @@ export function ToolBar({
                 y: height / 2,
                 radiusX: 64,
                 radiusY: 35,
-                duration: 0.15
+                duration: 0.25
             })
         }}
         onMouseLeave={(e)=>{
@@ -265,7 +265,7 @@ export function ToolBar({
                 y: height / 2 + 15,
                 radiusX: 40,
                 radiusY: 40,
-                duration: 0.15
+                duration: 0.4
             })
         }}>
             <Ellipse
