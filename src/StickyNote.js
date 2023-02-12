@@ -17,6 +17,7 @@ export function StickyNote({
   height,
   scaleX,
   scaleY,
+  isConnecting,
   onScale,
   canvasScale,
   onResize,
@@ -92,7 +93,8 @@ export function StickyNote({
   return (
     <>
     <Group
-     x={x} y={y} draggable={draggable}
+     x={x} y={y}
+     draggable={draggable}
      onDragStart={(e)=>{
        setIsDragging(true);
        if (onDragStart)
@@ -106,8 +108,6 @@ export function StickyNote({
     <Group
     x={0}
     y={0}
-    onMouseEnter={() => setIsHover(true)}
-    onMouseLeave={() => setIsHover(false)}
     ref={nodeRef}
     onClick={onClick}
     scaleX={scaleX}
@@ -181,28 +181,43 @@ export function StickyNote({
         perfectDrawEnabled={false}
       />}
     </Group>
-    <Group x={0} y={0} visible={isSelected && !isEditing && !isTransforming}>
+    <Group x={0} y={0}
+    visible={(isConnecting && isHover) || (isSelected && !isEditing && !isTransforming)}>
     {anchorPosition.map((anchor,index)=>{
-        return <Circle
-        key={index}
+        return (
+        <Group
         x={anchor.x}
         y={anchor.y}
         scaleX={1/canvasScale}
-        scaleY={1/canvasScale}
+        scaleY={1/canvasScale}>
+        <Circle
+        key={index+4}
         radius={5}
         stroke={"#0096FF"}
         strokeWidth={1}
         fill={"white"}
         opacity={isDragging?0.12:0.75}
+        />
+        <Circle
+        key={index}
+        radius={20}
+        stroke={"#0096FF"}
+        strokeWidth={0}
+        fill={"transparent"}
+        opacity={isDragging?0.12:0.75}
         onMouseEnter={(e)=>{
-          const stage = e.target.getStage();
-          const type = (index%2 === 0) ? "ns-resize" : "ew-resize";
-          stage.container().style.cursor = type;
+          if (!isConnecting) {
+            const stage = e.target.getStage();
+            const type = (index%2 === 0) ? "ns-resize" : "ew-resize";
+            stage.container().style.cursor = type;
+          }
         }}
         onMouseLeave={(e)=>{
-          const stage = e.target.getStage();
-          stage.container().style.cursor = "default"
-          setIsResizing(false);
+          if (!isConnecting) {
+            const stage = e.target.getStage();
+            stage.container().style.cursor = "default"
+            setIsResizing(false);
+          }
         }}
         onMouseDown={(e)=>{
           e.cancelBubble = true;
@@ -214,10 +229,10 @@ export function StickyNote({
           e.cancelBubble = true;
           const newPosition = e.target.getStage().getPointerPosition();
           if (isResizing) {
-            var offsetW = 40;
-            var offsetH = 32;
-            var offsetX = (index===1) ? -40 : 0;
-            var offsetY = (index===0) ? -32 : 0;
+            var offsetW = (newPosition.x !== initialPointer.x) ? 40 : 0;
+            var offsetH = (newPosition.y !== initialPointer.y) ? 32 : 0;
+            var offsetX = (index===1 && newPosition.x !== initialPointer.x) ? -40 : 0;
+            var offsetY = (index===0 && newPosition.y !== initialPointer.y) ? -32 : 0;
             if (index % 2 == 1) {
               offsetH = 0;
             } else {
@@ -248,8 +263,19 @@ export function StickyNote({
           setIsResizing(false);
         }}
         />
+        </Group>)
       })}
     </Group>
+    <Rect
+    x={-30/canvasScale}
+    y={-30/canvasScale}
+    width={(width+35)*scaleX+60/canvasScale}
+    height={(height+70)*scaleY+60/canvasScale}
+    onMouseEnter={() => setIsHover(true)}
+    onMouseLeave={() => setIsHover(false)}
+    fill="transparent"
+    visible={isConnecting}
+    />
     </Group>
     {transformer}
     </>

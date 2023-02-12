@@ -42,6 +42,9 @@ export function Canvas(props)
     const [canvasScale, setCanvasScale] = React.useState(1);
     const layerRef = React.useRef();
 
+    const [isDrawingArrow, setIsDrawingArrow] = React.useState(false);
+    const [isDrawingDoubleArrow, setIsDrawingDoubleArrow] = React.useState(false);
+
     const [toolBarVisibility, setToolBarVisibility] = React.useState(true);
 
     const UnselectAll = (e) => {
@@ -87,6 +90,11 @@ export function Canvas(props)
         const offsetY = (position.y - canvasY) * (scaleBy - 1);
         setCanvasX(canvasX - offsetX);
         setCanvasY(canvasY - offsetY);
+    }
+
+    const handleStageMouseDown = e => {
+        console.log("shit");
+        e.cancelBubble=true;
     }
 
     const setPrompterPosition = (e, id) => {
@@ -136,13 +144,15 @@ export function Canvas(props)
     style={{ backgroundColor: "#F5F6FC" }}
     onWheel={handleStageWheel}
     onClick={UnselectAll}
+    onMouseDown={handleStageMouseDown}
     >
         <Layer
         x={canvasX}
         y={canvasY}
         scaleX={canvasScale}
         scaleY={canvasScale}
-        ref={layerRef}>
+        ref={layerRef}
+        >
             <Group>
             {
                 nodes.map((node, index) => {
@@ -162,6 +172,7 @@ export function Canvas(props)
                     color={"#748B97"}
                     isNull={node.text === ""}
                     text={node.text}
+                    isConnecting={isDrawingArrow || isDrawingDoubleArrow}
                     onScale={(newScale, newX, newY) => {
                         setNodes(prevState => {
                             return prevState.map(state => {
@@ -205,6 +216,7 @@ export function Canvas(props)
                             });
                         });
                     }}
+                    // onDragStart={(e)=>{e.cancelBubble=true}}
                     onDragEnd={(e)=>{handleDragNodeEnd(e,node.id)}}
                     onTextChange={(value)=>setNodes(
                         prevState => {
@@ -267,6 +279,19 @@ export function Canvas(props)
                 height={60}
                 color={"white"}
                 visible={toolBarVisibility}
+                isArrowIconClicked={isDrawingArrow}
+                onArrowIconClick={(e)=>{
+                    e.cancelBubble = true;
+                    if (!isDrawingArrow && isDrawingDoubleArrow)
+                        setIsDrawingDoubleArrow(false);
+                    setIsDrawingArrow(!isDrawingArrow);
+                }}
+                isDoubleArrowIconClicked={isDrawingDoubleArrow}
+                onDoubleArrowIconClick={(e)=>{
+                    if (!isDrawingDoubleArrow && isDrawingArrow)
+                        setIsDrawingArrow(false);
+                    setIsDrawingDoubleArrow(!isDrawingDoubleArrow);
+                }}
                 onAddStickyNote={(x, y, width, height)=>{
                     setNodes(prevState => {
                         let tmp = {id: numNodes, type: "sticky_note",

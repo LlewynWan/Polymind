@@ -11,12 +11,14 @@ export function ToolBar({
     height,
     color,
     visible,
+    isArrowIconClicked,
+    onArrowIconClick,
+    isDoubleArrowIconClicked,
+    onDoubleArrowIconClick,
     onAddStickyNote
 }) {
     const [isHoverArrowIcon, setIsHoverArrowIcon] = useState(false);
-    const [isArrowIconClicked, setIsArrowIconClicked] = useState(false);
     const [isHoverDoubleArrowIcon, setIsHoverDoubleArrowIcon] = useState(false);
-    const [isDoubleArrowIconClicked, setIsDoubleArrowIconClicked] = useState(false);
     const [isHoverStickyNotes, setIsHoverStickyNotes] = useState(false);
 
     const stickyNoteRef = useRef(null);
@@ -78,13 +80,7 @@ export function ToolBar({
         <Group x={25} y={height/2-25}
         onMouseEnter={()=>{setIsHoverArrowIcon(true)}}
         onMouseLeave={()=>{setIsHoverArrowIcon(false)}}
-        onClick={(e)=>{
-            e.cancelBubble=true;
-            if (!isArrowIconClicked) {
-                setIsDoubleArrowIconClicked(false);
-            }
-            setIsArrowIconClicked(!isArrowIconClicked);
-        }}
+        onClick={onArrowIconClick}
         >
             <Rect
             x={0}
@@ -100,7 +96,8 @@ export function ToolBar({
             shadowOffsetX={0}
             shadowBlur={isArrowIconClicked?5:0}
             shadowOpacity={isArrowIconClicked?0.25:0}
-            opacity={isArrowIconClicked?0.6:0.2}
+            opacity={isArrowIconClicked?0.75:
+                isHoverArrowIcon?0.27:0.2}
             />
             <Line
             points={[5,25,45,25]}
@@ -121,13 +118,7 @@ export function ToolBar({
         <Group x={100} y={height/2-25}
         onMouseEnter={()=>{setIsHoverDoubleArrowIcon(true)}}
         onMouseLeave={()=>{setIsHoverDoubleArrowIcon(false)}}
-        onClick={(e)=>{
-            e.cancelBubble=true;
-            if (!isDoubleArrowIconClicked) {
-                setIsArrowIconClicked(false);
-            }
-            setIsDoubleArrowIconClicked(!isDoubleArrowIconClicked);
-        }}
+        onClick={onDoubleArrowIconClick}
         >
             <Rect
             x={0}
@@ -143,7 +134,8 @@ export function ToolBar({
             shadowOffsetX={0}
             shadowBlur={isDoubleArrowIconClicked?5:0}
             shadowOpacity={isDoubleArrowIconClicked?0.25:0}
-            opacity={isDoubleArrowIconClicked?0.6:0.2}
+            opacity={isDoubleArrowIconClicked?0.75:
+                isHoverDoubleArrowIcon?0.27:0.2}
             />
             <Line
             points={[5,25,45,25]}
