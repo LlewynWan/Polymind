@@ -157,29 +157,34 @@ export function Canvas(props)
                     scaleY={node.scaleY}
                     width={node.width}
                     height={node.height}
+                    canvasScale={canvasScale}
                     fontSize={18}
                     color={"#748B97"}
                     isNull={node.text === ""}
                     text={node.text}
-                    onScale={(scaleBy) => {
+                    onScale={(newScale, newX, newY) => {
                         setNodes(prevState => {
                             return prevState.map(state => {
                                 let tmp = state;
                                 if (tmp.id === node.id) {
-                                    tmp.scaleX = scaleBy;
-                                    tmp.scaleY = scaleBy;
+                                    tmp.scaleX = newScale;
+                                    tmp.scaleY = newScale;
+                                    tmp.x = newX;
+                                    tmp.y = newY;
                                 }
                                 return tmp;
                             });
                         });
                     }}
-                    onResize={(offsetW,offsetH) => {
+                    onResize={(offsetW,offsetH, offsetX, offsetY) => {
                         setNodes(prevState => {
                             return prevState.map(state => {
                                 let tmp = state;
                                 if (tmp.id === node.id) {
                                     tmp.width += offsetW;
                                     tmp.height += offsetH;
+                                    tmp.x += offsetX;
+                                    tmp.y += offsetY;
                                 }
                                 return tmp;
                             });

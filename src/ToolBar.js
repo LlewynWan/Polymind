@@ -41,13 +41,16 @@ export function ToolBar({
 
         stickyNoteRef.current.to({
             x: 19, y: 19,
+            duration: 0.12,
             onFinish: ()=>setIsHoverStickyNotes(false)
         });
         dummyStickyNoteRef1.current.to({
-            x: 5, y: 5
+            x: 5, y: 5,
+            duration: 0.4,
         });
         dummyStickyNoteRef2.current.to({
-            x: 12, y: 12
+            x: 12, y: 12,
+            duration: 0.5
         })
     }
 
@@ -93,7 +96,7 @@ export function ToolBar({
             strokeWidth={2}
             fill={isArrowIconClicked?"#010203":
             isHoverArrowIcon?"#D5D5D5":"#D9CBA6"}
-            shadowOffsetY={5}
+            shadowOffsetY={0}
             shadowOffsetX={0}
             shadowBlur={isArrowIconClicked?5:0}
             shadowOpacity={isArrowIconClicked?0.25:0}
@@ -136,7 +139,7 @@ export function ToolBar({
             isHoverDoubleArrowIcon?"#D5D5D5":"#D9CBA6"}
             stroke={"#010203"}
             strokeWidth={2}
-            shadowOffsetY={5}
+            shadowOffsetY={0}
             shadowOffsetX={0}
             shadowBlur={isDoubleArrowIconClicked?5:0}
             shadowOpacity={isDoubleArrowIconClicked?0.25:0}

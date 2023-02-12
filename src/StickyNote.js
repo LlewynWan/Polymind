@@ -18,6 +18,7 @@ export function StickyNote({
   scaleX,
   scaleY,
   onScale,
+  canvasScale,
   onResize,
   fontSize,
   isNull,
@@ -34,15 +35,16 @@ export function StickyNote({
   const [isDragging, setIsDragging] = useState(false);
   const [isResizing, setIsResizing] = useState(false);
   const [initialPointer, setInitialPointer] = useState({x:0,y:0});
+  const [isTransforming, setIsTransforming] = useState(false);
 
   const nodeRef = useRef(null);
   const transformerRef= useRef(null);
 
   const anchorPosition = [
-    {x: (width + 35)*scaleX / 2, y: -20},
-    {x: -20, y: (height + 70)*scaleY / 2},
-    {x: (width + 35)*scaleX / 2, y: height*scaleY + 90},
-    {x: width*scaleX + 55, y: (height + 70)*scaleY / 2}
+    {x: (width + 35)*scaleX / 2, y: -20/canvasScale},
+    {x: -20/canvasScale, y: (height + 70)*scaleY / 2},
+    {x: (width + 35)*scaleX / 2, y: (height + 70)*scaleY + 20/canvasScale},
+    {x: (width + 35)*scaleX + 20/canvasScale, y: (height + 70)*scaleY / 2}
   ]
 
   useEffect(() => {
@@ -54,7 +56,8 @@ export function StickyNote({
       transformerRef.current.nodes([nodeRef.current]);
       transformerRef.current.getLayer().batchDraw();
     }
-  }, [isSelected, width, height, scaleX, scaleY, isEditing, transformerRef]);
+  }, [isSelected, width, height, scaleX, scaleY, canvasScale,
+    isEditing, transformerRef]);
 
   const transformer = isSelected && !isEditing ? (
     <Transformer
@@ -109,8 +112,14 @@ export function StickyNote({
     onClick={onClick}
     scaleX={scaleX}
     scaleY={scaleY}
+    onTransformStart={()=>setIsTransforming(true)}
     onTransformEnd={(e)=>{
-      onScale(e.target.scaleX());
+      const newScale = e.target.scaleX();
+      onScale(newScale,
+      e.target.x()+x,
+      e.target.y()+y);
+      e.target.setAttrs({x:0,y:0});
+      setIsTransforming(false);
     }}>
       <Rect
         x={0}
@@ -172,12 +181,14 @@ export function StickyNote({
         perfectDrawEnabled={false}
       />}
     </Group>
-    <Group x={0} y={0} visible={isSelected && !isEditing}>
+    <Group x={0} y={0} visible={isSelected && !isEditing && !isTransforming}>
     {anchorPosition.map((anchor,index)=>{
         return <Circle
         key={index}
         x={anchor.x}
         y={anchor.y}
+        scaleX={1/canvasScale}
+        scaleY={1/canvasScale}
         radius={5}
         stroke={"#0096FF"}
         strokeWidth={1}
@@ -205,24 +216,28 @@ export function StickyNote({
           if (isResizing) {
             var offsetW = 40;
             var offsetH = 32;
+            var offsetX = (index===1) ? -40 : 0;
+            var offsetY = (index===0) ? -32 : 0;
             if (index % 2 == 1) {
               offsetH = 0;
             } else {
               offsetW = 0;
             }
-            if (newPosition.x < initialPointer.x && index == 3) {
+            if (newPosition.x < initialPointer.x && index === 3) {
               offsetW *= -1;
             }
-            if (newPosition.x > initialPointer.x && index == 1) {
+            if (newPosition.x > initialPointer.x && index === 1) {
               offsetW *= -1;
+              offsetX *= -1;
             }
-            if (newPosition.y > initialPointer.y && index == 0) {
+            if (newPosition.y > initialPointer.y && index === 0) {
+              offsetH *= -1;
+              offsetY *= -1;
+            }
+            if (newPosition.y < initialPointer.y && index === 2) {
               offsetH *= -1;
             }
-            if (newPosition.y < initialPointer.y && index == 2) {
-              offsetH *= -1;
-            }
-            onResize(offsetW, offsetH);
+            onResize(offsetW, offsetH, offsetX*scaleX, offsetY*scaleY);
           }
           if (newPosition.x !== initialPointer.x || newPosition.y !== initialPointer.y) {
             setIsResizing(false);
