@@ -179,6 +179,8 @@ export function Canvas(props)
                     scaleY={node.scaleY}
                     width={node.width}
                     height={node.height}
+                    canvasX={canvasX}
+                    canvasY={canvasY}
                     canvasScale={canvasScale}
                     fontSize={18}
                     color={"#748B97"}

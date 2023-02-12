@@ -19,6 +19,8 @@ export function StickyNote({
   scaleY,
   isConnecting,
   onScale,
+  canvasX,
+  canvasY,
   canvasScale,
   onResize,
   fontSize,
@@ -37,6 +39,7 @@ export function StickyNote({
   const [isResizing, setIsResizing] = useState(false);
   const [initialPointer, setInitialPointer] = useState({x:0,y:0});
   const [isTransforming, setIsTransforming] = useState(false);
+  const [minIndex, setMinIndex] = useState(-1);
 
   const nodeRef = useRef(null);
   const transformerRef= useRef(null);
@@ -59,6 +62,13 @@ export function StickyNote({
     }
   }, [isSelected, width, height, scaleX, scaleY, canvasScale,
     isEditing, transformerRef]);
+
+  const pointer2CanvasPosition = (pointerPosition) => {
+    const posX = (pointerPosition.x - canvasX) / canvasScale;
+    const posY = (pointerPosition.y -  canvasY) / canvasScale;
+    return {x: posX, y: posY};
+  }
+
 
   const transformer = isSelected && !isEditing ? (
     <Transformer
@@ -196,7 +206,7 @@ export function StickyNote({
         radius={5}
         stroke={"#0096FF"}
         strokeWidth={1}
-        fill={"white"}
+        fill={(isHover && minIndex==index) ? "#0096FF" : "white"}
         opacity={isDragging?0.12:0.75}
         />
         <Circle
@@ -276,9 +286,24 @@ export function StickyNote({
     width={(width+35)*scaleX+60/canvasScale}
     height={(height+70)*scaleY+60/canvasScale}
     onMouseEnter={() => setIsHover(true)}
-    onMouseLeave={() => setIsHover(false)}
+    onMouseLeave={() => {
+      setIsHover(false);
+      setMinIndex(-1);
+    }}
     fill="transparent"
     visible={isConnecting}
+    onMouseMove={(e)=>{
+      if (isHover) {
+        const pointerPosition = e.target.getStage().getPointerPosition();
+        const canvasPosition = pointer2CanvasPosition(pointerPosition);
+        const distance = anchorPosition.map((position)=>{
+          return Math.sqrt((canvasPosition.x-(x+position.x))**2
+          + (canvasPosition.y-(y+position.y))**2)
+        });
+        const minIndex = distance.indexOf(Math.min(...distance));
+        setMinIndex(minIndex);
+      }
+    }}
     />
     </Group>
     {transformer}
