@@ -1,6 +1,6 @@
 import React, { useContext, useEffect } from "react";
 import { HotKeys } from "react-hotkeys";
-import { Stage, Layer, Group } from "react-konva";
+import { Stage, Layer, Group, Line } from "react-konva";
 
 import { StickyNote } from "./StickyNote";
 import { Prompter } from "./Prompter";
@@ -45,11 +45,32 @@ export function Canvas(props)
 
     const [isDrawingArrow, setIsDrawingArrow] = React.useState(false);
     const [isDrawingDoubleArrow, setIsDrawingDoubleArrow] = React.useState(false);
+    const [arrowFrom, setArrowFrom] = React.useState({id: -1, anchor: -1});
+    const [arrowTo, setArrowTo] = React.useState({id: -1, anchor: -1});
+    const [isMultiSelecting, setIsMultiSelecting] = React.useState(false);
 
     const [isHoverToolBar, setIsHoverToolBar] = React.useState(false);
     const [toolBarVisibility, setToolBarVisibility] = React.useState(true);
 
+    const [pointerOnCanvasPosition, setPointerOnCanvasPosition] = React.useState({});
+
+    const pointer2CanvasPosition = (pointerPosition) => {
+        const posX = (pointerPosition.x - canvasX) / canvasScale;
+        const posY = (pointerPosition.y -  canvasY) / canvasScale;
+        return {x: posX, y: posY};
+    }
+
     useEffect(() => {
+        const pointerMoveInterval = setInterval(() => {
+            if (stageRef) {
+                const pointerPosition = stageRef.current.getPointerPosition();
+                if (pointerPosition) {
+                    const onCanvasPosition = pointer2CanvasPosition(pointerPosition);
+                    setPointerOnCanvasPosition(onCanvasPosition)
+                }
+            }
+        }, 100);
+
         if (!isHoverToolBar && stageRef) {
             stageRef.current.container().style.cursor =
             (isDrawingArrow || isDrawingDoubleArrow) ? "crosshair"
@@ -57,7 +78,13 @@ export function Canvas(props)
         } else {
             stageRef.current.container().style.cursor = "default";
         }
+
+        if (!isDrawingArrow && !isDrawingDoubleArrow) {
+            setArrowFrom({id: -1, anchor: -1});
+            setArrowTo({id: -1, anchor: -1});
+        }
     }, [isDrawingArrow, isDrawingDoubleArrow, isHoverToolBar]);
+
 
     const UnselectAll = (e) => {
         setNodes(prevState => {
@@ -67,6 +94,9 @@ export function Canvas(props)
                 return tmp;
             });
         });
+
+        setIsDrawingArrow(false);
+        setIsDrawingDoubleArrow(false);
     };
     
     const keyMap = {
@@ -105,7 +135,10 @@ export function Canvas(props)
     }
 
     const handleStageMouseDown = e => {
-        e.cancelBubble=true;
+        e.cancelBubble = true;
+        if (!isDrawingArrow && !isDrawingDoubleArrow) {
+            setIsMultiSelecting(true);
+        }
     }
 
     const setPrompterPosition = (e, id) => {
@@ -186,6 +219,7 @@ export function Canvas(props)
                     color={"#748B97"}
                     isNull={node.text === ""}
                     text={node.text}
+                    draggable={!isDrawingArrow && !isDrawingDoubleArrow}
                     isConnecting={isDrawingArrow || isDrawingDoubleArrow}
                     onScale={(newScale, newX, newY) => {
                         setNodes(prevState => {
@@ -214,6 +248,14 @@ export function Canvas(props)
                                 return tmp;
                             });
                         });
+                    }}
+                    onConnected={(e, anchor)=>{
+                        e.cancelBubble = true;
+                        if (e.evt.button===0 && e.evt.type==="mousedown") {
+                            setArrowFrom({id: node.id, anchor: anchor});
+                        } else if (e.evt.button===0 && e.evt.type==="mouseup") {
+                            setArrowTo({id: node.id, anchor: anchor});
+                        }
                     }}
                     onClick={(e)=>{
                         e.cancelBubble = true;
@@ -253,6 +295,18 @@ export function Canvas(props)
                         })
                     }}/> : null : null
                 })
+            }
+            {
+            arrowFrom.id!==-1 ?
+            <Line
+            points={[nodes[arrowFrom.id].x, nodes[arrowFrom.id].y,
+            pointerOnCanvasPosition.x,
+            pointerOnCanvasPosition.y]}
+            stroke={"black"}
+            tension={0}
+            pointerLength={10}
+            pointerWidth={12}
+            /> : null
             }
             </Group>
         </Layer>
@@ -304,6 +358,7 @@ export function Canvas(props)
                 }}
                 isDoubleArrowIconClicked={isDrawingDoubleArrow}
                 onDoubleArrowIconClick={(e)=>{
+                    e.cancelBubble = true;
                     if (!isDrawingDoubleArrow && isDrawingArrow)
                         setIsDrawingArrow(false);
                     setIsDrawingDoubleArrow(!isDrawingDoubleArrow);

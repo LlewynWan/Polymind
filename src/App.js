@@ -14,7 +14,7 @@ const initialState = {
       // {id: 3, type: "sticky_note", x: window.innerWidth/12+6, y: window.innerHeight/10+6, scaleX: 1, scaleY: 1, width: 150, height: 120, selected: false, text: "", display: true},
       // {id: 4, type: "sticky_note", x: window.innerWidth/12+8, y: window.innerHeight/10+8, scaleX: 1, scaleY: 1, width: 150, height: 120, selected: false, text: "", display: true}
   ],
-  num_nodes: 5,
+  num_nodes: 0,
   edges: [],
   prompt_cards: [
       {id: 0, x: window.innerWidth*0.75, y: window.innerHeight*0.08, scale: 1, width: 400, height: 120, text: "prompt suggestion", display: true},

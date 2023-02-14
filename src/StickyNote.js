@@ -26,6 +26,7 @@ export function StickyNote({
   fontSize,
   isNull,
   onClick,
+  onConnected,
   isSelected,
   onTextChange,
   onDragStart,
@@ -39,7 +40,7 @@ export function StickyNote({
   const [isResizing, setIsResizing] = useState(false);
   const [initialPointer, setInitialPointer] = useState({x:0,y:0});
   const [isTransforming, setIsTransforming] = useState(false);
-  const [minIndex, setMinIndex] = useState(-1);
+  const [anchorIndex, setAnchorIndex] = useState(-1);
 
   const nodeRef = useRef(null);
   const transformerRef= useRef(null);
@@ -206,7 +207,7 @@ export function StickyNote({
         radius={5}
         stroke={"#0096FF"}
         strokeWidth={1}
-        fill={(isHover && minIndex==index) ? "#0096FF" : "white"}
+        fill={(isHover && anchorIndex==index) ? "#0096FF" : "white"}
         opacity={isDragging?0.12:0.75}
         />
         <Circle
@@ -288,9 +289,11 @@ export function StickyNote({
     onMouseEnter={() => setIsHover(true)}
     onMouseLeave={() => {
       setIsHover(false);
-      setMinIndex(-1);
+      setAnchorIndex(-1);
     }}
     fill="transparent"
+    onMouseDown={(e)=>{onConnected(e,anchorIndex)}}
+    onMouseUp={(e)=>{onConnected(e,anchorIndex)}}
     visible={isConnecting}
     onMouseMove={(e)=>{
       if (isHover) {
@@ -301,7 +304,7 @@ export function StickyNote({
           + (canvasPosition.y-(y+position.y))**2)
         });
         const minIndex = distance.indexOf(Math.min(...distance));
-        setMinIndex(minIndex);
+        setAnchorIndex(minIndex);
       }
     }}
     />
