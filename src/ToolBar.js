@@ -106,16 +106,16 @@ export function ToolBar({
             <Line
             points={[5,25,45,25]}
             stroke={isArrowIconClicked?"white":"black"}
-            tension={0}
-            pointerLength={10}
-            pointerWidth={12}
+            // tension={0}
+            // pointerLength={10}
+            // pointerWidth={12}
             />
             <Line
             points={[38,18,45,25,38,32]}
             stroke={isArrowIconClicked?"white":"black"}
-            tension={0}
-            pointerLength={10}
-            pointerWidth={12}
+            // tension={0}
+            // pointerLength={10}
+            // pointerWidth={12}
             />
         </Group>
 
@@ -144,23 +144,23 @@ export function ToolBar({
             <Line
             points={[5,25,45,25]}
             stroke={isDoubleArrowIconClicked?"white":"black"}
-            tension={0}
-            pointerLength={10}
-            pointerWidth={12}
+            // tension={0}
+            // pointerLength={10}
+            // pointerWidth={12}
             />
             <Line
             points={[38,18,45,25,38,32]}
             stroke={isDoubleArrowIconClicked?"white":"black"}
-            tension={0}
-            pointerLength={10}
-            pointerWidth={12}
+            // tension={0}
+            // pointerLength={10}
+            // pointerWidth={12}
             />
             <Line
             points={[12,18,5,25,12,32]}
             stroke={isDoubleArrowIconClicked?"white":"black"}
-            tension={0}
-            pointerLength={10}
-            pointerWidth={12}
+            // tension={0}
+            // pointerLength={10}
+            // pointerWidth={12}
             />
         </Group>
 

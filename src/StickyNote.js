@@ -26,10 +26,13 @@ export function StickyNote({
   fontSize,
   isNull,
   onClick,
+  onConnectingHover,
+  onConnectingUnhover,
   onConnected,
   isSelected,
   onTextChange,
   onDragStart,
+  onDragMove,
   onDragEnd,
   onOverflow,
   draggable=true
@@ -111,6 +114,7 @@ export function StickyNote({
        if (onDragStart)
          onDragStart(e);
      }}
+     onDragMove={onDragMove}
      onDragEnd={(e)=>{
        setIsDragging(false);
        if (onDragEnd)
@@ -124,6 +128,14 @@ export function StickyNote({
     scaleX={scaleX}
     scaleY={scaleY}
     onTransformStart={()=>setIsTransforming(true)}
+    onTransform={(e)=>{
+      const newScale = e.target.scaleX();
+      onScale(newScale,
+      e.target.x()+x,
+      e.target.y()+y);
+      e.target.setAttrs({x:0,y:0});
+      setIsTransforming(false);
+    }}
     onTransformEnd={(e)=>{
       const newScale = e.target.scaleX();
       onScale(newScale,
@@ -207,7 +219,7 @@ export function StickyNote({
         radius={5}
         stroke={"#0096FF"}
         strokeWidth={1}
-        fill={(isHover && anchorIndex==index) ? "#0096FF" : "white"}
+        fill={(isHover && anchorIndex===index) ? "#0096FF" : "white"}
         opacity={isDragging?0.12:0.75}
         />
         <Circle
@@ -247,7 +259,7 @@ export function StickyNote({
               var offsetH = (newPosition.y !== initialPointer.y) ? 32 : 0;
               var offsetX = (index===1 && newPosition.x !== initialPointer.x) ? -40 : 0;
               var offsetY = (index===0 && newPosition.y !== initialPointer.y) ? -32 : 0;
-              if (index % 2 == 1) {
+              if (index % 2 === 1) {
                 offsetH = 0;
               } else {
                 offsetW = 0;
@@ -286,10 +298,22 @@ export function StickyNote({
     y={-30/canvasScale}
     width={(width+35)*scaleX+60/canvasScale}
     height={(height+70)*scaleY+60/canvasScale}
-    onMouseEnter={() => setIsHover(true)}
-    onMouseLeave={() => {
+    onMouseEnter={(e) => {
+      setIsHover(true);
+      const pointerPosition = e.target.getStage().getPointerPosition();
+      const canvasPosition = pointer2CanvasPosition(pointerPosition);
+      const distance = anchorPosition.map((position)=>{
+        return Math.sqrt((canvasPosition.x-(x+position.x))**2
+        + (canvasPosition.y-(y+position.y))**2)
+      });
+      const minIndex = distance.indexOf(Math.min(...distance));
+      setAnchorIndex(minIndex);
+      onConnectingHover(e,minIndex);
+    }}
+    onMouseLeave={(e) => {
       setIsHover(false);
       setAnchorIndex(-1);
+      onConnectingUnhover(e);
     }}
     fill="transparent"
     onMouseDown={(e)=>{onConnected(e,anchorIndex)}}
@@ -305,6 +329,7 @@ export function StickyNote({
         });
         const minIndex = distance.indexOf(Math.min(...distance));
         setAnchorIndex(minIndex);
+        onConnectingHover(e,minIndex);
       }
     }}
     />
