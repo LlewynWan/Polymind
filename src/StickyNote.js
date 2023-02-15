@@ -196,7 +196,7 @@ export function StickyNote({
         fill="black"
         fontFamily="sans-serif"
         fontSize={fontSize}
-        onClick={()=>{
+        onClick={(e)=>{
           if (isSelected) {
             setIsEditing(true);
           }

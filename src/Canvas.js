@@ -335,7 +335,7 @@ export function Canvas(props)
     onWheel={handleStageWheel}
     onClick={UnselectAll}
     onMouseDown={handleStageMouseDown}
-    onMouseUp={UnselectAll}
+    // onMouseUp={UnselectAll}
     ref={stageRef}
     >
         <Layer

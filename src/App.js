@@ -17,10 +17,11 @@ const initialState = {
   num_nodes: 0,
   arrows: [],
   prompt_cards: [
-      {id: 0, x: window.innerWidth*0.75, y: window.innerHeight*0.08, scale: 1, width: 400, height: 120, text: "prompt suggestion", display: true},
-      {id: 1, x: window.innerWidth*0.75, y: window.innerHeight*0.08+175, scale: 1, width: 400, height: 120, text: "prompt suggestion", display: true},
-      {id: 2, x: window.innerWidth*0.75, y: window.innerHeight*0.08+350, scale: 1, width: 400, height: 120, text: "prompt suggestion", display: true},
-      {id: 3, x: window.innerWidth*0.75, y: window.innerHeight*0.08+525, scale: 1, width: 400, height: 120, text: "prompt suggestion", display: true}
+      {id: 0, x: window.innerWidth*0.75, y: window.innerHeight*0.05, scale: 1, width: 400, height: 120, text: "prompt suggestion", display: true},
+      {id: 1, x: window.innerWidth*0.75, y: window.innerHeight*0.05+175, scale: 1, width: 400, height: 120, text: "prompt suggestion", display: true},
+      {id: 2, x: window.innerWidth*0.75, y: window.innerHeight*0.05+350, scale: 1, width: 400, height: 120, text: "prompt suggestion", display: true},
+      {id: 3, x: window.innerWidth*0.75, y: window.innerHeight*0.05+525, scale: 1, width: 400, height: 120, text: "prompt suggestion", display: true},
+      {id: 3, x: window.innerWidth*0.75, y: window.innerHeight*0.05+700, scale: 1, width: 400, height: 120, text: "prompt suggestion", display: true}
   ],
   main_prompter: {x: window.innerWidth*0.3, y: window.innerHeight*0.95, scale: 1, width: 640, height: 180, prompt: "Main Prompter",}
 }
