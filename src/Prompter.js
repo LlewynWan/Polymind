@@ -1,7 +1,10 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useContext } from "react";
 
 import { Rect, Group,Text } from "react-konva";
 import { TextInput } from "./TextInput";
+
+import { PrompterContext } from "./state";
+
 
 const RETURN_KEY = 13;
 const ESCAPE_KEY = 27;
@@ -26,8 +29,8 @@ export function Prompter({
     const [isHover, setIsHover] = useState(false);
     const [isEditing, setIsEditing] = useState(false);
 
-    const prompterRef = useRef(null);
-
+    const {promptCardsRef} = useContext(PrompterContext);
+ 
     useEffect(() => {
         if (!isPrompting && isEditing) {
             setIsEditing(false);
@@ -48,19 +51,20 @@ export function Prompter({
         <Group
         x={x}
         y={y}
+        id={id}
         onMouseEnter={(e) => {
             setIsHover(true)
             if (onHover) {
-                onHover(prompterRef.current);
+                onHover(promptCardsRef.current[id].current);
             }
         }}
         onMouseLeave={(e) => {
             setIsHover(false)
             if (onUnhover) {
-                onUnhover(prompterRef.current);
+                onUnhover(promptCardsRef.current[id].current);
             }
         }}
-        ref={prompterRef}
+        ref={promptCardsRef.current[id]}
         draggable={draggable}
         onDragStart={onDragStart}
         onDragEnd={onDragEnd}

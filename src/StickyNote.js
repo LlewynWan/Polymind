@@ -1,6 +1,7 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useContext, useState, useEffect, useRef } from "react";
 import { Group, Rect, Circle, Text, Transformer } from "react-konva";
 
+import { CanvasContext } from "./state";
 import { TextInput } from "./TextInput"
 
 const RETURN_KEY = 13;
@@ -19,9 +20,6 @@ export function StickyNote({
   scaleY,
   isConnecting,
   onScale,
-  canvasX,
-  canvasY,
-  canvasScale,
   onResize,
   fontSize,
   isNull,
@@ -48,6 +46,8 @@ export function StickyNote({
   const nodeRef = useRef(null);
   const transformerRef= useRef(null);
 
+  const {canvasX, canvasY, canvasScale} = useContext(CanvasContext);
+
   const anchorPosition = [
     {x: (width + 35)*scaleX / 2, y: -20/canvasScale},
     {x: -20/canvasScale, y: (height + 70)*scaleY / 2},
@@ -64,6 +64,7 @@ export function StickyNote({
       transformerRef.current.nodes([nodeRef.current]);
       transformerRef.current.getLayer().batchDraw();
     }
+    console.log(canvasScale);
   }, [isSelected, width, height, scaleX, scaleY, canvasScale,
     isEditing, transformerRef]);
 

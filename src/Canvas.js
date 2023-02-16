@@ -1,5 +1,7 @@
-import React, { useContext, useEffect } from "react";
+import React, { createRef, useContext, useEffect, useState } from "react";
 import { HotKeys } from "react-hotkeys";
+
+import Konva from "konva";
 import { Stage, Layer, Group, Line } from "react-konva";
 
 import { StickyNote } from "./StickyNote";
@@ -7,8 +9,9 @@ import { Prompter } from "./Prompter";
 import { ToolBar } from "./ToolBar";
 import { Keyword } from "./Keyword"
 
-import { GlobalContext } from "./state";
+import { GlobalContext, CanvasContext, PrompterContext } from "./state";
 import { Configuration, OpenAIApi } from "openai"
+
 
 async function PromptGPT()
 {
@@ -27,21 +30,21 @@ async function PromptGPT()
 }
 
 
-export function Canvas(props)
+export function Canvas({dimensions})
 {
     const {nodes, numNodes, arrows, promptCards, mainPrompter,
         setNodes, setNumNodes, setArrows, setPromptCards, setMainPrompter} = useContext(GlobalContext);
-
-    const [dimensions, setDimensions] = React.useState({
-        height: window.innerHeight,
-        width: window.innerWidth
-    });
 
     const [canvasX, setCanvasX] = React.useState(0);
     const [canvasY, setCanvasY] = React.useState(0);
     const [canvasScale, setCanvasScale] = React.useState(1);
     const stageRef = React.useRef(null);
     const layerRef = React.useRef(null);
+    const promptCardsRef = React.useRef([]);
+    if (promptCardsRef.current.length !== promptCards.length+1) {
+        promptCardsRef.current = Array(promptCards.length+1).fill()
+        .map((_,i)=>promptCardsRef.current[i] || createRef());
+    }
 
     const [isDrawingArrow, setIsDrawingArrow] = React.useState(false);
     const [isDrawingDoubleArrow, setIsDrawingDoubleArrow] = React.useState(false);
@@ -61,6 +64,49 @@ export function Canvas(props)
         return [posX, posY];
     }
 
+    const updatePromptCards = (prompt) => {
+        promptCardsRef.current[promptCards.length].current.to({
+            y: dimensions.height*0.05,
+            opacity: 0.25,
+            duration: 0.75,
+            easing: Konva.Easings.EaseInOut,
+            onFinish: ()=>{
+                promptCardsRef.current[promptCards.length].current.to({
+                    opacity: 1,
+                    duration: 0.15,
+                    easing: Konva.Easings.EaseIn,
+                    onFinish: ()=> {
+                        setPromptCards(prevState=>{
+                            return prevState.map((state)=>{
+                                let tmp = state;
+                                if (tmp.id === promptCards.length) {
+                                    tmp.y = dimensions.height*0.05;
+                                    tmp.id = 1;
+                                } else {
+                                    tmp.y += 175;
+                                    tmp.id += 1;
+                                }
+                                return tmp;
+                            })
+                        })
+                    }
+                });
+            }
+        });
+
+        promptCardsRef.current.map((promptCardRef,index)=>{
+            if (index !== 0) {
+                if (index !== promptCards.length) {
+                    promptCardRef.current.to({
+                        y: promptCardRef.current.y()+175,
+                        duration: 0.1+(5-index)*0.15,
+                        easing: Konva.Easings.EaseOut,
+                    })
+                }
+            }
+        });
+    }
+
     useEffect(() => {
         if (pointerTracker.current) {
             clearInterval(pointerTracker.current);
@@ -73,7 +119,6 @@ export function Canvas(props)
                 }
             }
         }, 120);
-
 
         if (!isHoverToolBar && stageRef) {
             stageRef.current.container().style.cursor =
@@ -89,7 +134,7 @@ export function Canvas(props)
         }
 
         return () => clearInterval(pointerTracker);
-    }, [canvasScale, isDrawingArrow, isDrawingDoubleArrow, isHoverToolBar]);
+    }, [dimensions, canvasScale, isDrawingArrow, isDrawingDoubleArrow, isHoverToolBar]);
 
 
     const UnselectAll = (e) => {
@@ -279,16 +324,18 @@ export function Canvas(props)
             [node.x + (node.width + 35)*node.scaleX + 40/canvasScale, node.y + (node.height + 70)*node.scaleY / 2]
         ]
 
+        const pointerOnCanvasPosition = pointer2CanvasPosition(pointerPosition);
+
         const [anchorX,anchorY] = anchorOffset[anchor];
         const dx = (anchor%2)*parseInt(2*(anchor/2-1));
         const dy = ((anchor+1)%2)*parseInt(2*(anchor/2-0.5));
-        if (dx !== 0 && (pointerPosition.x-anchorX)*dx > 0
-        || (dx === 0) && (pointerPosition.y-anchorY)*dy < 0) {
-            return [anchorX, anchorY, pointerPosition.x, anchorY,
-                pointerPosition.x, pointerPosition.y];
+        if (dx !== 0 && (pointerOnCanvasPosition[0]-anchorX)*dx > 0
+        || (dx === 0) && (pointerOnCanvasPosition[1]-anchorY)*dy < 0) {
+            return [anchorX, anchorY, pointerOnCanvasPosition[0], anchorY,
+                pointerOnCanvasPosition[0], pointerOnCanvasPosition[1]];
         } else {
-            return [anchorX, anchorY, anchorX, pointerPosition.y,
-                pointerPosition.x, pointerPosition.y];
+            return [anchorX, anchorY, anchorX, pointerOnCanvasPosition[1],
+                pointerOnCanvasPosition[0], pointerOnCanvasPosition[1]];
         }
     }
 
@@ -335,7 +382,7 @@ export function Canvas(props)
     onWheel={handleStageWheel}
     onClick={UnselectAll}
     onMouseDown={handleStageMouseDown}
-    // onMouseUp={UnselectAll}
+    onMouseUp={updatePromptCards}
     ref={stageRef}
     >
         <Layer
@@ -346,6 +393,7 @@ export function Canvas(props)
         ref={layerRef}
         >
             <Group>
+            <CanvasContext.Provider value={{canvasX, canvasY, canvasScale}}>
             {
                 nodes.map((node, index) => {
                     return node.display ?
@@ -359,9 +407,6 @@ export function Canvas(props)
                     scaleY={node.scaleY}
                     width={node.width}
                     height={node.height}
-                    canvasX={canvasX}
-                    canvasY={canvasY}
-                    canvasScale={canvasScale}
                     fontSize={18}
                     color={"#748B97"}
                     isNull={node.text === ""}
@@ -509,11 +554,13 @@ export function Canvas(props)
                 />)
                 : null
             }
+            </CanvasContext.Provider>
             </Group>
         </Layer>
         <Layer>
             <Group>
-                {promptCards.map((prompt_card, index)=>{
+            <PrompterContext.Provider value={{promptCardsRef}}>
+                {promptCards.map((prompt_card)=>{
                     return prompt_card.display ?
                     <Prompter
                     key={prompt_card.id}
@@ -527,20 +574,21 @@ export function Canvas(props)
                     onDragEnd={(e) => setPrompterPosition(e, prompt_card.id)}
                     /> : null
                 })}
-            </Group>
-            <Prompter
+                <Prompter
                 x={mainPrompter.x}
                 y={mainPrompter.y}
                 width={mainPrompter.width}
                 height={mainPrompter.height}
                 fontSize={18}
                 text={mainPrompter.prompt}
-                id={"MainPrompter"}
+                id={0}
                 onHover={onMainPrompterHover}
                 onUnhover={onMainPrompterUnhover}
                 // onTextChange={(value)=>{setGlobalState("prompt",value);}}
                 draggable={false}
-            />
+                />
+            </PrompterContext.Provider>
+            </Group>
             <ToolBar
                 x={mainPrompter.x+mainPrompter.width/2-250}
                 y={mainPrompter.y-70}
