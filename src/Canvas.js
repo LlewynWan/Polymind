@@ -72,11 +72,11 @@ export function Canvas({dimensions})
         promptCardsRef.current.map((promptCardRef,index)=>{
             if (index !== 0) {
                 if (index !== lastPromptCardIndex) {
-                    const indexOffset = index > promptCardIndex ?
-                    index-promptCardIndex : 6-(promptCardIndex-index);
+                    const indexOffset = index >= promptCardIndex ?
+                    index-promptCardIndex+1 : 6-(promptCardIndex-index);
                     promptCardRef.current.to({
                         y: promptCardRef.current.y()+175,
-                        duration: 0.1+(5-indexOffset-1)*0.15,
+                        duration: 0.1+(5-indexOffset)*0.15,
                         easing: Konva.Easings.EaseInOut,
                     })
                 }
@@ -96,25 +96,16 @@ export function Canvas({dimensions})
                     onFinish: ()=> {
                         // promptCardsRef.current.splice(1, 0, promptCardsRef.current.pop());
                         setPromptCards(prevState=>{
-                            prevState.splice(0,0,prevState.pop());
+                            // prevState.splice(0,0,prevState.pop());
                             return prevState.map((state,index)=>{
-                                state.y = dimensions.height*0.05 + 175*index;
+                                if (index+1 === lastPromptCardIndex) {
+                                    state.text = prompt;
+                                }
+                                // state.y = dimensions.height*0.05 + 175*index;
                                 return state;
                             });
                         });
-                        setPromptCardIndex(promptCardIndex===5?1:promptCardIndex+1);
-                        // var tmp = promptCardsRef.current[1];
-                        // for (var i = 1; i < promptCards.length; i++) {
-                        //     promptCardsRef.current[i] = promptCardsRef.current[i+1];
-                        // }
-                        // promptCardsRef.current[-1] = tmp;
-
-                        // promptCardsRef.current
-                        //     .splice(1, 0, promptCardsRef.current[0])
-                        //     .push(promptCardsRef.current[1])
-                        //     .shift().shift()
-                        // console.log(promptCardsRef.current)
-                        // promptCardsRef.current.splice(1, 0, promptCardsRef.current.pop());
+                        setPromptCardIndex(lastPromptCardIndex);
                     }
                 });
             }
@@ -122,8 +113,7 @@ export function Canvas({dimensions})
     }
 
     useEffect(() => {
-        console.log(promptCards)
-        console.log(promptCardsRef.current)
+        // console.log(promptCards)
         if (pointerTracker.current) {
             clearInterval(pointerTracker.current);
         }
@@ -399,7 +389,7 @@ export function Canvas({dimensions})
     onWheel={handleStageWheel}
     onClick={UnselectAll}
     onMouseDown={handleStageMouseDown}
-    onDblClick={()=>updatePromptCards("shit")}
+    onDblClick={()=>updatePromptCards("hello")}
     ref={stageRef}
     >
         <Layer
