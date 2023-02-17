@@ -29,13 +29,18 @@ export function Prompter({
     const [isHover, setIsHover] = useState(false);
     const [isEditing, setIsEditing] = useState(false);
 
+    const prompterRef = useRef(null);
     const {promptCardsRef} = useContext(PrompterContext);
  
     useEffect(() => {
         if (!isPrompting && isEditing) {
             setIsEditing(false);
         }
-      }, [isPrompting, isEditing]);
+
+        if (prompterRef.current) {
+            promptCardsRef.current[id] = prompterRef;
+        }
+      }, [prompterRef, isPrompting, isEditing]);
 
     function handleEscapeKeys(e) {
         if ((e.keyCode === RETURN_KEY && !e.shiftKey) || e.keyCode === ESCAPE_KEY) {
@@ -51,7 +56,6 @@ export function Prompter({
         <Group
         x={x}
         y={y}
-        id={id}
         onMouseEnter={(e) => {
             setIsHover(true)
             if (onHover) {
@@ -64,7 +68,7 @@ export function Prompter({
                 onUnhover(promptCardsRef.current[id].current);
             }
         }}
-        ref={promptCardsRef.current[id]}
+        ref={prompterRef}
         draggable={draggable}
         onDragStart={onDragStart}
         onDragEnd={onDragEnd}

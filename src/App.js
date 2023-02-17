@@ -22,11 +22,11 @@ function App() {
     num_nodes: 0,
     arrows: [],
     prompt_cards: [
-        {id: 1, x: dimensions.width*0.75, y: dimensions.height*0.05, scale: 1, width: 400, height: 120, text: "prompt suggestion", display: true},
-        {id: 2, x: dimensions.width*0.75, y: dimensions.height*0.05+175, scale: 1, width: 400, height: 120, text: "prompt suggestion", display: true},
-        {id: 3, x: dimensions.width*0.75, y: dimensions.height*0.05+350, scale: 1, width: 400, height: 120, text: "prompt suggestion", display: true},
-        {id: 4, x: dimensions.width*0.75, y: dimensions.height*0.05+525, scale: 1, width: 400, height: 120, text: "prompt suggestion", display: true},
-        {id: 5, x: dimensions.width*0.75, y: dimensions.height*0.05+700, scale: 1, width: 400, height: 120, text: "prompt suggestion", display: true}
+        {x: dimensions.width*0.75, y: dimensions.height*0.05, scale: 1, width: 400, height: 120, text: "prompt suggestion 1", display: true},
+        {x: dimensions.width*0.75, y: dimensions.height*0.05+175, scale: 1, width: 400, height: 120, text: "prompt suggestion 2", display: true},
+        {x: dimensions.width*0.75, y: dimensions.height*0.05+350, scale: 1, width: 400, height: 120, text: "prompt suggestion 3", display: true},
+        {x: dimensions.width*0.75, y: dimensions.height*0.05+525, scale: 1, width: 400, height: 120, text: "prompt suggestion 4", display: true},
+        {x: dimensions.width*0.75, y: dimensions.height*0.05+700, scale: 1, width: 400, height: 120, text: "prompt suggestion 5", display: true}
     ],
     main_prompter: {x: dimensions.width*0.3, y: dimensions.height*0.95, scale: 1, width: 640, height: 180, prompt: "Main Prompter",}
   }
@@ -51,10 +51,10 @@ function App() {
         return tmp;
       })
       setPromptCards(prevState=>{
-        return prevState.map((state)=>{
+        return prevState.map((state,index)=>{
           let tmp = state;
           tmp.x = window.innerWidth*0.75;
-          tmp.y = window.innerHeight*0.05+175*(tmp.id-1);
+          tmp.y = window.innerHeight*0.05+175*(index);
           return tmp;
         });
       });
