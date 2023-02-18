@@ -24,7 +24,7 @@ export function PanelItem({
                 x: 20, y: 0,
                 width: width,
                 height: height,
-                duration: duration
+                duration: duration,
             })
         }
         if (textRef) {
@@ -33,10 +33,9 @@ export function PanelItem({
                 x: 28, y: 8,
                 width: width,
                 height: height-16,
-                onFinish: ()=>{
-                    console.log(text);
-                    textRef.current.setAttrs({text: text})
-                },
+                // onFinish: ()=>{
+                //     textRef.current.setAttrs({text: text})
+                // },
                 duration: duration
             })
         }
@@ -64,9 +63,9 @@ export function PanelItem({
                 x: 28, y: 8,
                 width: 200,
                 height: 16,
-                onFinish: ()=>{
-                    textRef.current.setAttrs({text: text})
-                },
+                // onFinish: ()=>{
+                //     textRef.current.setAttrs({text: text})
+                // },
                 duration: duration
             })
         }

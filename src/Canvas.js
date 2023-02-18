@@ -2,6 +2,7 @@ import React, { createRef, useContext, useEffect, useState } from "react";
 import { HotKeys } from "react-hotkeys";
 
 import Konva from "konva";
+import { MyLine } from "./MyLine";
 import { Stage, Layer, Group, Line } from "react-konva";
 
 import { StickyNote } from "./StickyNote";
@@ -542,7 +543,7 @@ export function Canvas({dimensions})
             />
             {arrows.map((arrow,index)=>{
                 return (
-                <Line
+                <MyLine
                 key={index}
                 points={[
                     ...calcAnchorPosition(arrow.from_anchor, nodes[arrow.from_id]),
@@ -560,7 +561,7 @@ export function Canvas({dimensions})
             {
                 arrowFrom.id!==-1 ? (
                 arrowTo.id===-1 ?
-                <Line
+                <MyLine
                 points={[
                     ...calcAnchorPosition(arrowFrom.anchor,nodes[arrowFrom.id]),
                     ...findPathBetweenNodeAndPointer(arrowFrom.anchor,nodes[arrowFrom.id]),
@@ -569,7 +570,7 @@ export function Canvas({dimensions})
                 listening={false}
                 strokeWidth={2/canvasScale}
                 /> :
-                <Line
+                <MyLine
                 points={[
                     ...calcAnchorPosition(arrowFrom.anchor,nodes[arrowFrom.id]),
                     ...findPathBetweenNodes(arrowFrom.anchor,arrowTo.anchor,
