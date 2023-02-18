@@ -1,7 +1,7 @@
 import React, { useContext, useRef, useState } from "react";
-import { Group, Rect, Text } from "react-konva";
+import { Group, Rect, Text, Circle } from "react-konva";
 
-import { GlobalContext } from "./state";
+import { PanelItem } from "./PanelItem";
 
 
 export function PromptPanel({
@@ -13,10 +13,6 @@ export function PromptPanel({
     prompts,
     visible
 }) {
-    const [isHover, setIsHover] = React.useState(
-        Array(prompts.length).fill(false)
-    );
-
     const middle = parseInt(Math.round(prompts.length / 2)) - 1;
     
     return (
@@ -26,40 +22,13 @@ export function PromptPanel({
         visible={visible}
         >
             {prompts.map((prompt,index)=>{
-            return <Group
+            return <PanelItem
             key={index}
-            x={-24*Math.abs(middle-index)}
-            y={(height+5)*(index-middle)}
-            opacity={isHover[index]?0.75:0.5}
-            onMouseEnter={(e)=>setIsHover([
-                ...isHover.slice(0,index), true, ...isHover.slice(index+1)
-            ])}
-            onMouseLeave={(e)=>setIsHover([
-                ...isHover.slice(0,index), false, ...isHover.slice(index+1)
-            ])}
-            >
-            <Rect
-            x={0}
-            y={0}
-            fill={"#888A7C"}
-            stroke={"#010203"}
-            strokeWidth={0.25}
-            cornerRadius={7}
+            x={-25*Math.abs(middle-index)}
+            y={(height+2.5)*(index-middle)}
             width={width}
             height={height}
-            />
-            <Text
-            x={8}
-            y={8}
-            text={prompt}
-            width={width}
-            height={height}
-            fontSize={fontSize}
-            fill={"black"}
-            fontStyle={"italic bold"}
-            fontFamily={"sans-serif"}
-            />
-            </Group>
+            text={prompt}/>
             })}
         </Group>
     )

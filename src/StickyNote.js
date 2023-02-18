@@ -64,7 +64,6 @@ export function StickyNote({
       transformerRef.current.nodes([nodeRef.current]);
       transformerRef.current.getLayer().batchDraw();
     }
-    console.log(canvasScale);
   }, [isSelected, width, height, scaleX, scaleY, canvasScale,
     isEditing, transformerRef]);
 
@@ -245,7 +244,6 @@ export function StickyNote({
           }
         }}
         onMouseDown={(e)=>{
-          console.log("shit");
           e.cancelBubble = true;
           setIsResizing(true);
           const position = e.target.getStage().getPointerPosition();

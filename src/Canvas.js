@@ -321,7 +321,6 @@ export function Canvas({dimensions})
             }
         }
         if (from.dy*to.dx !== 0) {
-            console.log((to.y-from.y)*from.dy, (to.x-from.x)*to.dx)
             if ((to.y-from.y)*from.dy < 0 || (to.x-from.x)*to.dx > 0) {
                 points = [to.x, from.y]
             } else {
