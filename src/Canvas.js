@@ -57,6 +57,9 @@ export function Canvas({dimensions})
     const [isHoverToolBar, setIsHoverToolBar] = React.useState(false);
     const [toolBarVisibility, setToolBarVisibility] = React.useState(true);
 
+    const [promptPanelPosition, setPromptPanelPosition] = React.useState({});
+    const [promptPanelVisibility, setPromptPanelVisibility] = React.useState(false);
+
     const pointerTracker = React.useRef(null);
     const [pointerPosition, setPointerPosition] = React.useState({x:-1, y:-1});
 
@@ -114,7 +117,6 @@ export function Canvas({dimensions})
     }
 
     useEffect(() => {
-        // console.log(promptCards)
         if (pointerTracker.current) {
             clearInterval(pointerTracker.current);
         }
@@ -155,6 +157,7 @@ export function Canvas({dimensions})
 
         setIsDrawingArrow(false);
         setIsDrawingDoubleArrow(false);
+        setPromptPanelVisibility(false);
     };
     
     const keyMap = {
@@ -209,6 +212,11 @@ export function Canvas({dimensions})
         if (!isDrawingArrow && !isDrawingDoubleArrow) {
             setIsMultiSelecting(true);
         }
+    }
+
+    const promptPanelPopup = () => {
+        setPromptPanelVisibility(true);
+        setPromptPanelPosition(pointerPosition);
     }
 
     const setPrompterPosition = (e, id) => {
@@ -399,6 +407,7 @@ export function Canvas({dimensions})
         scaleX={canvasScale}
         scaleY={canvasScale}
         ref={layerRef}
+        opacity={promptPanelVisibility ? 0.75 : 1}
         >
             <Group>
             <CanvasContext.Provider value={{canvasX, canvasY, canvasScale}}>
@@ -478,6 +487,7 @@ export function Canvas({dimensions})
                             setIsDrawingArrow(false);
                             setArrowFrom({id: -1, anchor: -1});
                             setArrowTo({id: -1, anchor: -1});
+                            promptPanelPopup();
                         }
                     }}
                     onClick={(e)=>{
@@ -520,6 +530,17 @@ export function Canvas({dimensions})
                     }}/> : null : null
                 })
             }
+            <Keyword
+            x={500}
+            y={500}
+            width={100}
+            height={50}
+            fontSize={20}
+            color={"#CED8DF"}
+            id={100}
+            text={"Keyword"}
+            isNull={false}
+            />
             {arrows.map((arrow,index)=>{
                 return (
                 <Line
@@ -562,18 +583,6 @@ export function Canvas({dimensions})
                 />)
                 : null
             }
-            <PromptPanel
-            x={750}
-            y={500}
-            width={320}
-            height={40}
-            fontSize={12}
-            prompts={["prompt_1",
-            "Brainstorm keywords related to \"recursive\"",
-            "What are some potential subtopics related to \"recursive\" in the context of \"prewriting\"?",
-            "How is \"unstructured\" related to \"prewriting\"?",
-            "prompt_5"]}
-            />
             </CanvasContext.Provider>
             </Group>
         </Layer>
@@ -609,6 +618,19 @@ export function Canvas({dimensions})
                 />
             </PrompterContext.Provider>
             </Group>
+            <PromptPanel
+            x={promptPanelPosition.x}
+            y={promptPanelPosition.y}
+            width={300}
+            height={40}
+            fontSize={12}
+            visible={promptPanelVisibility}
+            prompts={["prompt_1",
+            "Brainstorm keywords related to \"recursive\"",
+            "What are some potential subtopics related to \"recursive\" in the context of \"prewriting\"?",
+            "How is \"unstructured\" related to \"prewriting\"?",
+            "prompt_5"]}
+            />
             <ToolBar
                 x={mainPrompter.x+mainPrompter.width/2-250}
                 y={mainPrompter.y-70}
@@ -644,17 +666,6 @@ export function Canvas({dimensions})
                     setNumNodes(numNodes+1);
                 }}
             />
-        <Keyword
-        x={500}
-        y={500}
-        width={100}
-        height={50}
-        fontSize={20}
-        color={"#CED8DF"}
-        id={100}
-        text={"Keyword"}
-        isNull={false}
-        />
         </Layer>
     </Stage>
     </HotKeys>

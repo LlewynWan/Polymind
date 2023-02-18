@@ -10,7 +10,8 @@ export function PromptPanel({
     width,
     height,
     fontSize,
-    prompts
+    prompts,
+    visible
 }) {
     const [isHover, setIsHover] = React.useState(
         Array(prompts.length).fill(false)
@@ -22,13 +23,14 @@ export function PromptPanel({
         <Group
         x={x}
         y={y}
+        visible={visible}
         >
             {prompts.map((prompt,index)=>{
             return <Group
             key={index}
             x={-24*Math.abs(middle-index)}
             y={(height+5)*(index-middle)}
-            opacity={isHover[index]?0.5:0.25}
+            opacity={isHover[index]?0.75:0.5}
             onMouseEnter={(e)=>setIsHover([
                 ...isHover.slice(0,index), true, ...isHover.slice(index+1)
             ])}
@@ -39,10 +41,10 @@ export function PromptPanel({
             <Rect
             x={0}
             y={0}
-            fill={"#D3D3D3"}
+            fill={"#888A7C"}
             stroke={"#010203"}
             strokeWidth={0.25}
-            cornerRadius={10}
+            cornerRadius={7}
             width={width}
             height={height}
             />
