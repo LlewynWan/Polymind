@@ -8,6 +8,7 @@ import { StickyNote } from "./StickyNote";
 import { Prompter } from "./Prompter";
 import { ToolBar } from "./ToolBar";
 import { Keyword } from "./Keyword"
+import { PromptPanel } from "./PromptPanel";
 
 import { GlobalContext, CanvasContext, PrompterContext } from "./state";
 import { Configuration, OpenAIApi } from "openai"
@@ -561,6 +562,18 @@ export function Canvas({dimensions})
                 />)
                 : null
             }
+            <PromptPanel
+            x={750}
+            y={500}
+            width={320}
+            height={40}
+            fontSize={12}
+            prompts={["prompt_1",
+            "Brainstorm keywords related to \"recursive\"",
+            "What are some potential subtopics related to \"recursive\" in the context of \"prewriting\"?",
+            "How is \"unstructured\" related to \"prewriting\"?",
+            "prompt_5"]}
+            />
             </CanvasContext.Provider>
             </Group>
         </Layer>
