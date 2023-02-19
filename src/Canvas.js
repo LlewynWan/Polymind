@@ -407,7 +407,7 @@ export function Canvas({dimensions})
         scaleX={canvasScale}
         scaleY={canvasScale}
         ref={layerRef}
-        opacity={promptPanelVisibility ? 0.75 : 1}
+        opacity={promptPanelVisibility ? 0.5 : 1}
         >
             <Group>
             <CanvasContext.Provider value={{canvasX, canvasY, canvasScale}}>
