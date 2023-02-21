@@ -10,26 +10,26 @@ import { Prompter } from "./Prompter";
 import { ToolBar } from "./ToolBar";
 import { Keyword } from "./Keyword"
 import { PromptPanel } from "./PromptPanel";
+import { PromptGPT } from "./GPT_utils";
 
 import { GlobalContext, CanvasContext, PrompterContext } from "./state";
-import { Configuration, OpenAIApi } from "openai"
 
 
-async function PromptGPT()
-{
-    const configuration = new Configuration({
-        apiKey: process.env.OPENAI_API_KEY,
-      });
-    const openai = new OpenAIApi(configuration);
-    const response = await openai.createCompletion({
-        model: "text-davinci-003",
-        prompt: "Say this is a test",
-        temperature: 0,
-        max_tokens: 7,
-      });
+// async function PromptGPT()
+// {
+//     const configuration = new Configuration({
+//         apiKey: process.env.OPENAI_API_KEY,
+//       });
+//     const openai = new OpenAIApi(configuration);
+//     const response = await openai.createCompletion({
+//         model: "text-davinci-003",
+//         prompt: "Say this is a test",
+//         temperature: 0,
+//         max_tokens: 7,
+//       });
     
-    return response;
-}
+//     return response;
+// }
 
 
 export function Canvas({dimensions})
@@ -94,22 +94,29 @@ export function Canvas({dimensions})
             duration: 0.75,
             easing: Konva.Easings.EaseOut,
             onFinish: ()=>{
-                promptCardsRef.current[lastPromptCardIndex].current.to({
-                    opacity: 1,
-                    duration: 0.2,
-                    easing: Konva.Easings.EaseIn,
-                    onFinish: ()=> {
-                        // promptCardsRef.current.splice(1, 0, promptCardsRef.current.pop());
+                PromptGPT("Life is short,",
+                    100,
+                    (text)=>{
                         setPromptCards(prevState=>{
                             // prevState.splice(0,0,prevState.pop());
                             return prevState.map((state,index)=>{
                                 if (index+1 === lastPromptCardIndex) {
-                                    state.text = prompt;
+                                    state.text = 'Life is short,'+text;
                                 }
                                 // state.y = dimensions.height*0.05 + 175*index;
                                 return state;
                             });
                         });
+                    });
+                            
+                promptCardsRef.current[lastPromptCardIndex].current.to({
+                    opacity: 1,
+                    duration: 0.5,
+                    easing: Konva.Easings.EaseIn,
+                    onFinish: ()=> {
+                        // promptCardsRef.current.splice(1, 0, promptCardsRef.current.pop());
+                        
+                        
                         setPromptCardIndex(lastPromptCardIndex);
                     }
                 });
@@ -345,8 +352,8 @@ export function Canvas({dimensions})
         const [anchorX,anchorY] = anchorOffset[anchor];
         const dx = (anchor%2)*parseInt(2*(anchor/2-1));
         const dy = ((anchor+1)%2)*parseInt(2*(anchor/2-0.5));
-        if (dx !== 0 && (pointerOnCanvasPosition[0]-anchorX)*dx > 0
-        || (dx === 0) && (pointerOnCanvasPosition[1]-anchorY)*dy < 0) {
+        if ((dx !== 0 && (pointerOnCanvasPosition[0]-anchorX)*dx > 0)
+        || ((dx === 0) && (pointerOnCanvasPosition[1]-anchorY)*dy < 0)) {
             return [anchorX, anchorY, pointerOnCanvasPosition[0], anchorY,
                 pointerOnCanvasPosition[0], pointerOnCanvasPosition[1]];
         } else {
