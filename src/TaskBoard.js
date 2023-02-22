@@ -51,6 +51,7 @@ export function TaskBoard({
             height={125}
             color={"orange"}
             goal={"Brainstorm"}
+            outputType={"Keyword"}
             />
             <TaskCard
             x={25}
@@ -59,6 +60,7 @@ export function TaskBoard({
             height={125}
             color={"purple"}
             goal={"Summarise"}
+            outputType={"Concept"}
             />
             <TaskCard
             x={25}
@@ -67,6 +69,7 @@ export function TaskBoard({
             height={125}
             color={"green"}
             goal={"Clarify"}
+            outputType={"Sticky Note"}
             />
             <TaskCard
             x={25}
@@ -75,6 +78,7 @@ export function TaskBoard({
             height={125}
             color={"#E75480"}
             goal={"Draft"}
+            outputType={"Sticky Note"}
             />
         </Group>
     )

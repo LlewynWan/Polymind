@@ -7,7 +7,8 @@ export function TaskCard({
     width,
     height,
     color,
-    goal
+    goal,
+    outputType
 })
 {
     const [isHover, setIsHover] = useState(false);
@@ -43,6 +44,24 @@ export function TaskCard({
                 />
                 <Text
                 text={goal}
+                fontSize={16}
+                fontStyle={"bold"}
+                fontFamily={"sans-serif"}
+                fill={"white"}
+                padding={5}/>
+            </Label>
+            <Label
+            x={10}
+            y={40}
+            >
+                <Tag
+                fill={outputType==="Sticky Note" ? "#002275"
+                : outputType==="Concept" ? "#444EAA"
+                : outputType==="Keyword" ? "#9999FF" : "black"}
+                cornerRadius={5}
+                />
+                <Text
+                text={outputType}
                 fontSize={16}
                 fontStyle={"bold"}
                 fontFamily={"sans-serif"}
