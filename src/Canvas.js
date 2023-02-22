@@ -9,6 +9,7 @@ import { StickyNote } from "./StickyNote";
 import { Prompter } from "./Prompter";
 import { ToolBar } from "./ToolBar";
 import { Keyword } from "./Keyword"
+import { TaskBoard } from "./TaskBoard";
 import { PromptPanel } from "./PromptPanel";
 import { PromptGPT } from "./GPT_utils";
 
@@ -94,20 +95,20 @@ export function Canvas({dimensions})
             duration: 0.75,
             easing: Konva.Easings.EaseOut,
             onFinish: ()=>{
-                PromptGPT("Life is short,",
-                    100,
-                    (text)=>{
-                        setPromptCards(prevState=>{
-                            // prevState.splice(0,0,prevState.pop());
-                            return prevState.map((state,index)=>{
-                                if (index+1 === lastPromptCardIndex) {
-                                    state.text = 'Life is short,'+text;
-                                }
-                                // state.y = dimensions.height*0.05 + 175*index;
-                                return state;
-                            });
-                        });
-                    });
+                // PromptGPT("Life is short,",
+                //     100,
+                //     (text)=>{
+                //         setPromptCards(prevState=>{
+                //             // prevState.splice(0,0,prevState.pop());
+                //             return prevState.map((state,index)=>{
+                //                 if (index+1 === lastPromptCardIndex) {
+                //                     state.text = 'Life is short,'+text;
+                //                 }
+                //                 // state.y = dimensions.height*0.05 + 175*index;
+                //                 return state;
+                //             });
+                //         });
+                //     });
                             
                 promptCardsRef.current[lastPromptCardIndex].current.to({
                     opacity: 1,
@@ -594,9 +595,15 @@ export function Canvas({dimensions})
             </Group>
         </Layer>
         <Layer>
+            <TaskBoard
+            x={dimensions.width-375}
+            y={25}
+            width={320}
+            height={dimensions.height-50}/>
+
             <Group>
             <PrompterContext.Provider value={{promptCardsRef}}>
-                {promptCards.map((prompt_card,index)=>{
+                {/* {promptCards.map((prompt_card,index)=>{
                     return prompt_card.display ?
                     <Prompter
                     key={index+1}
@@ -609,7 +616,7 @@ export function Canvas({dimensions})
                     text={prompt_card.text}
                     onDragEnd={(e) => setPrompterPosition(e, index)}
                     /> : null
-                })}
+                })} */}
                 <Prompter
                 id={0}
                 x={mainPrompter.x}

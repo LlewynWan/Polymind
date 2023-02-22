@@ -197,6 +197,7 @@ export function StickyNote({
         fontFamily="sans-serif"
         fontSize={fontSize}
         onClick={(e)=>{
+          console.log(e.target.getClientRect())
           if (isSelected) {
             setIsEditing(true);
           }

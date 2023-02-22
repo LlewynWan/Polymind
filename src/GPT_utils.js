@@ -3,6 +3,7 @@ import { Configuration, OpenAIApi } from "openai"
 export async function PromptGPT(prompt, maxTokens, handleResponse)
 {
     const requestOptions = {
+        // mode: 'no-cors',
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -21,7 +22,6 @@ export async function PromptGPT(prompt, maxTokens, handleResponse)
       fetch('https://api.openai.com/v1/engines/text-davinci-003/completions', requestOptions)
           .then(response => response.json())
           .then(data => {
-            console.log(data)
             handleResponse(data.choices[0].text)
         }).catch(err => {
           console.log("Ran out of tokens for today! Try tomorrow!");
