@@ -25,10 +25,10 @@ export function TaskBoard({
             width={width}
             height={height}
             cornerRadius={10}
-            fill={"#0C2557"}
-            opacity={0.32}
-            strokeWidth={0.5}
-            stroke={"gray"}
+            fill={"#D3D3D3"}
+            opacity={0.6}
+            strokeWidth={0.32}
+            stroke={"#010203"}
             // shadowColor={"black"}
             // shadowOffsetY={2.5}
             // shadowOffsetX={0}

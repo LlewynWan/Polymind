@@ -26,8 +26,8 @@ export function TaskCard({
             height={height}
             cornerRadius={10}
             fill={"#F7F7F7"}
-            strokeWidth={0.25}
-            stroke={"black"}
+            strokeWidth={0.12}
+            stroke={"#010203"}
             shadowColor={"black"}
             shadowOffsetY={2.5}
             shadowOffsetX={0}
