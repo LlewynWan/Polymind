@@ -9,6 +9,7 @@ import { StickyNote } from "./StickyNote";
 import { Prompter } from "./Prompter";
 import { ToolBar } from "./ToolBar";
 import { Keyword } from "./Keyword"
+import { TaskPrompt } from "./TaskPrompt";
 import { TaskBoard } from "./TaskBoard";
 import { PromptPanel } from "./PromptPanel";
 import { PromptGPT } from "./GPT_utils";
@@ -61,6 +62,10 @@ export function Canvas({dimensions})
 
     const [promptPanelPosition, setPromptPanelPosition] = React.useState({});
     const [promptPanelVisibility, setPromptPanelVisibility] = React.useState(false);
+
+    // const followerProcess = React.useRef(null);
+    // const [followerPositionQueue, setFollowerPositionQueue] = React.useState([]);
+    const [isFollowerModeEnabled, setIsFollowerModeEnabled] = React.useState(true);
 
     const pointerTracker = React.useRef(null);
     const [pointerPosition, setPointerPosition] = React.useState({x:-1, y:-1});
@@ -126,17 +131,17 @@ export function Canvas({dimensions})
     }
 
     useEffect(() => {
-        if (pointerTracker.current) {
+        if (pointerTracker && pointerTracker.current) {
             clearInterval(pointerTracker.current);
         }
         pointerTracker.current = setInterval(() => {
-            if (stageRef) {
+            if (stageRef && stageRef.current) {
                 const position = stageRef.current.getPointerPosition();
                 if (position) {
                     setPointerPosition(position);
                 }
             }
-        }, 120);
+        }, 20);
 
         if (!isHoverToolBar && stageRef) {
             stageRef.current.container().style.cursor =
@@ -152,7 +157,9 @@ export function Canvas({dimensions})
         }
 
         return () => clearInterval(pointerTracker);
-    }, [dimensions, canvasScale, isDrawingArrow, isDrawingDoubleArrow, isHoverToolBar]);
+    }, [dimensions, canvasScale,
+        isDrawingArrow, isDrawingDoubleArrow,
+        isHoverToolBar, isFollowerModeEnabled]);
 
 
     const UnselectAll = (e) => {
@@ -452,19 +459,22 @@ export function Canvas({dimensions})
                             });
                         });
                     }}
-                    onResize={(offsetW,offsetH, offsetX, offsetY) => {
-                        setNodes(prevState => {
-                            return prevState.map(state => {
-                                let tmp = state;
-                                if (tmp.id === node.id) {
-                                    tmp.width += offsetW;
-                                    tmp.height += offsetH;
-                                    tmp.x += offsetX;
-                                    tmp.y += offsetY;
-                                }
-                                return tmp;
-                            });
-                        });
+                    onResize={(offsetW, offsetH, offsetX, offsetY) => {
+                        if (node.height + offsetH >= 14
+                            && node.width + offsetW >= 105) {
+                                setNodes(prevState => {
+                                    return prevState.map(state => {
+                                        let tmp = state;
+                                        if (tmp.id === node.id) {
+                                            tmp.width += offsetW;
+                                            tmp.height += offsetH;
+                                            tmp.x += offsetX;
+                                            tmp.y += offsetY;
+                                        }
+                                        return tmp;
+                                    });
+                                });
+                            }   
                     }}
                     onConnectingHover={(e,anchor)=>{
                         if (arrowFrom.id !== -1) {
@@ -601,8 +611,31 @@ export function Canvas({dimensions})
             width={320}
             height={dimensions.height-50}/>
 
-            <Group>
-            <PrompterContext.Provider value={{promptCardsRef}}>
+            <TaskPrompt
+                x={100}
+                y={100}
+                width={200}
+                height={100}
+                color={"orange"}
+                fontSize={16}
+                text={"Brainstorm a list of keywords related to \"Interaction\""}/>
+
+            {/* <Group>
+            {followerPositionQueue.map((position,index)=>{
+                return <TaskPrompt
+                key={index}
+                x={position.x}
+                y={position.y}
+                width={200}
+                height={100}
+                color={"orange"}
+                fontSize={16}
+                text={"Brainstorm a list of keywords related to \"Interaction\""}/>
+            })}
+            </Group>   */}
+
+            {/* <Group> */}
+            {/* <PrompterContext.Provider value={{promptCardsRef}}> */}
                 {/* {promptCards.map((prompt_card,index)=>{
                     return prompt_card.display ?
                     <Prompter
@@ -617,7 +650,7 @@ export function Canvas({dimensions})
                     onDragEnd={(e) => setPrompterPosition(e, index)}
                     /> : null
                 })} */}
-                <Prompter
+                {/* <Prompter
                 id={0}
                 x={mainPrompter.x}
                 y={mainPrompter.y}
@@ -629,10 +662,10 @@ export function Canvas({dimensions})
                 onUnhover={onMainPrompterUnhover}
                 // onTextChange={(value)=>{setGlobalState("prompt",value);}}
                 draggable={false}
-                />
-            </PrompterContext.Provider>
-            </Group>
-            <PromptPanel
+                /> */}
+            {/* </PrompterContext.Provider> */}
+            {/* </Group> */}
+            {/* <PromptPanel
             x={promptPanelPosition.x}
             y={promptPanelPosition.y}
             width={300}
@@ -644,7 +677,7 @@ export function Canvas({dimensions})
             "What are some potential subtopics related to \"recursive\" in the context of \"prewriting\"?",
             "How is \"unstructured\" related to \"prewriting\"?",
             "prompt_5"]}
-            />
+            /> */}
             <ToolBar
                 x={mainPrompter.x+mainPrompter.width/2-250}
                 y={mainPrompter.y-70}
