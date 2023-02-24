@@ -49,7 +49,7 @@ export function TaskBoard({
             y={100}
             width={width-50}
             height={150}
-            color={"orange"}
+            color={"#FFB347"}
             goal={"Brainstorm"}
             outputType={"Keyword"}
             />
@@ -58,7 +58,7 @@ export function TaskBoard({
             y={265}
             width={width-50}
             height={150}
-            color={"purple"}
+            color={"#966FD6"}
             goal={"Summarise"}
             outputType={"Concept"}
             />
@@ -67,7 +67,7 @@ export function TaskBoard({
             y={430}
             width={width-50}
             height={150}
-            color={"green"}
+            color={"#71C562"}
             goal={"Clarify"}
             outputType={"Sticky Note"}
             />
@@ -76,7 +76,7 @@ export function TaskBoard({
             y={595}
             width={width-50}
             height={150}
-            color={"#E75480"}
+            color={"#FB6B89"}
             goal={"Draft"}
             outputType={"Sticky Note"}
             />

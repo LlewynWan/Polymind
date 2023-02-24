@@ -95,9 +95,9 @@ export function TaskCard({
             y={95}
             >
                 <Tag
-                fill={outputType==="Sticky Note" ? "#002275"
-                : outputType==="Concept" ? "#444EAA"
-                : outputType==="Keyword" ? "#9999FF" : "black"}
+                fill={outputType==="Sticky Note" ? "#003A6B"
+                : outputType==="Concept" ? "#5880A2"
+                : outputType==="Keyword" ? "#AFC6D9" : "black"}
                 cornerRadius={5}
                 pointerDirection={"left"}
                 // pointerWidth={5}

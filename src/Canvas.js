@@ -443,6 +443,24 @@ export function Canvas({dimensions})
     // onDblClick={toggleFollowerMode}
     ref={stageRef}
     >
+        <Layer>
+        {taskPrompts.map((taskPrompt,index)=>{
+                const node = nodes.filter(node=>node.id===taskPrompt.node_id);
+                const position = node.length === 0 ? [0,0] :
+                canvas2PointerPosition({x: node[0].x, y: node[0].y});
+                console.log(position)
+                return <TaskPrompt
+                key={index}
+                x={position[0]}
+                y={position[1]-25}
+                width={180}
+                height={21}
+                color={"#FFB347"}
+                fontSize={12}
+                text={taskPrompt.prompt}/>
+            })}
+        </Layer>
+        
         <Layer
         x={canvasX}
         y={canvasY}
@@ -637,22 +655,6 @@ export function Canvas({dimensions})
             y={25}
             width={320}
             height={dimensions.height-50}/>
-
-            {taskPrompts.map((taskPrompt,index)=>{
-                const node = nodes.filter(node=>node.id===taskPrompt.node_id);
-                const position = node.length === 0 ? [0,0] :
-                canvas2PointerPosition({x: node[0].x, y: node[0].y});
-                console.log(position)
-                return <TaskPrompt
-                key={index}
-                x={position[0]}
-                y={position[1]-25}
-                width={180}
-                height={21}
-                color={"orange"}
-                fontSize={12}
-                text={taskPrompt.prompt}/>
-            })}
 
             {/* {followerPositionQueue.map((position,index)=>{
                 return <TaskPrompt
