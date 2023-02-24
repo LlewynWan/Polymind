@@ -21,6 +21,9 @@ function App() {
     ],
     num_nodes: 0,
     arrows: [],
+    task_prompts: [
+      {node_id: 0, task_id: 0, prompt: "Brainstorm a list of keywords related to \"Interaction\""}
+    ],
     prompt_cards: [
         {x: dimensions.width*0.75, y: dimensions.height*0.05, scale: 1, width: 400, height: 120, text: "prompt suggestion 1", display: true},
         {x: dimensions.width*0.75, y: dimensions.height*0.05+175, scale: 1, width: 400, height: 120, text: "prompt suggestion 2", display: true},
@@ -36,6 +39,7 @@ function App() {
   const [arrows, setArrows] = React.useState(initialState.arrows);
   const [promptCards, setPromptCards] = React.useState(initialState.prompt_cards);
   const [mainPrompter, setMainPrompter] = React.useState(initialState.main_prompter);
+  const [taskPrompts, setTaskPrompts] = React.useState(initialState.task_prompts)
 
 
   useEffect(() => {
@@ -65,8 +69,8 @@ function App() {
   return (
     <div className="container fullscreen" id="fullsccreen">
       <GlobalContext.Provider value={{
-        nodes, numNodes, arrows, promptCards, mainPrompter,
-        setNodes, setNumNodes, setArrows, setPromptCards, setMainPrompter
+        nodes, numNodes, arrows, promptCards, mainPrompter, taskPrompts,
+        setNodes, setNumNodes, setArrows, setTaskPrompts, setPromptCards, setMainPrompter
       }}>
         <Canvas dimensions={dimensions}/>
       </GlobalContext.Provider>

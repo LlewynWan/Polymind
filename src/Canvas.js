@@ -37,7 +37,8 @@ import { GlobalContext, CanvasContext, PrompterContext } from "./state";
 export function Canvas({dimensions})
 {
     const {nodes, numNodes, arrows, promptCards, mainPrompter,
-        setNodes, setNumNodes, setArrows, setPromptCards, setMainPrompter} = useContext(GlobalContext);
+        setNodes, setNumNodes, setArrows, taskPrompts, setTaskPrompts,
+        setPromptCards, setMainPrompter} = useContext(GlobalContext);
 
     const [canvasX, setCanvasX] = React.useState(0);
     const [canvasY, setCanvasY] = React.useState(0);
@@ -65,7 +66,7 @@ export function Canvas({dimensions})
 
     // const followerProcess = React.useRef(null);
     // const [followerPositionQueue, setFollowerPositionQueue] = React.useState([]);
-    const [isFollowerModeEnabled, setIsFollowerModeEnabled] = React.useState(true);
+    // const [isFollowerModeEnabled, setIsFollowerModeEnabled] = React.useState(false);
 
     const pointerTracker = React.useRef(null);
     const [pointerPosition, setPointerPosition] = React.useState({x:-1, y:-1});
@@ -75,6 +76,57 @@ export function Canvas({dimensions})
         const posY = (position.y -  canvasY) / canvasScale;
         return [posX, posY];
     }
+
+    const canvas2PointerPosition = (position) => {
+        const posX = position.x * canvasScale + canvasX;
+        const posY = position.y * canvasScale + canvasY;
+        return [posX, posY];
+    }
+
+    useEffect(() => {
+        if (pointerTracker && pointerTracker.current) {
+            clearInterval(pointerTracker.current);
+        }
+        pointerTracker.current = setInterval(() => {
+            if (stageRef && stageRef.current) {
+                const position = stageRef.current.getPointerPosition();
+                if (position) {
+                    setPointerPosition(position);
+                }
+            }
+        }, 20);
+
+        if (!isHoverToolBar && stageRef) {
+            stageRef.current.container().style.cursor =
+            (isDrawingArrow || isDrawingDoubleArrow) ? "crosshair"
+            : "default";
+        } else {
+            stageRef.current.container().style.cursor = "default";
+        }
+
+        if (!isDrawingArrow && !isDrawingDoubleArrow) {
+            setArrowFrom({id: -1, anchor: -1});
+            setArrowTo({id: -1, anchor: -1});
+        }
+
+        return () => clearInterval(pointerTracker);
+    }, [dimensions, canvasScale,
+        isDrawingArrow, isDrawingDoubleArrow, isHoverToolBar]);
+
+
+    const UnselectAll = (e) => {
+        setNodes(prevState => {
+            return prevState.map((state)=>{
+                let tmp = state;
+                tmp.selected = false;
+                return tmp;
+            });
+        });
+
+        setIsDrawingArrow(false);
+        setIsDrawingDoubleArrow(false);
+        setPromptPanelVisibility(false);
+    };
 
     const [promptCardIndex, setPromptCardIndex] = React.useState(1);
 
@@ -129,53 +181,28 @@ export function Canvas({dimensions})
             }
         });
     }
-
-    useEffect(() => {
-        if (pointerTracker && pointerTracker.current) {
-            clearInterval(pointerTracker.current);
-        }
-        pointerTracker.current = setInterval(() => {
-            if (stageRef && stageRef.current) {
-                const position = stageRef.current.getPointerPosition();
-                if (position) {
-                    setPointerPosition(position);
-                }
-            }
-        }, 20);
-
-        if (!isHoverToolBar && stageRef) {
-            stageRef.current.container().style.cursor =
-            (isDrawingArrow || isDrawingDoubleArrow) ? "crosshair"
-            : "default";
-        } else {
-            stageRef.current.container().style.cursor = "default";
-        }
-
-        if (!isDrawingArrow && !isDrawingDoubleArrow) {
-            setArrowFrom({id: -1, anchor: -1});
-            setArrowTo({id: -1, anchor: -1});
-        }
-
-        return () => clearInterval(pointerTracker);
-    }, [dimensions, canvasScale,
-        isDrawingArrow, isDrawingDoubleArrow,
-        isHoverToolBar, isFollowerModeEnabled]);
-
-
-    const UnselectAll = (e) => {
-        setNodes(prevState => {
-            return prevState.map((state)=>{
-                let tmp = state;
-                tmp.selected = false;
-                return tmp;
-            });
-        });
-
-        setIsDrawingArrow(false);
-        setIsDrawingDoubleArrow(false);
-        setPromptPanelVisibility(false);
-    };
     
+    // const toggleFollowerMode = () => {
+    //     if (!isFollowerModeEnabled) {
+    //         followerProcess.current = setInterval(() => {
+    //             const position = stageRef.current.getPointerPosition();
+    //             if (position) {
+    //                 followerPositionQueue.push({
+    //                     x: position.x+(Math.random()-0.8)*40,
+    //                     y: position.y+(Math.random()-0.8)*40})
+    //             }
+    //             if (followerPositionQueue.length === 6) {
+    //                 followerPositionQueue.shift();
+    //             }
+    //             setFollowerPositionQueue(followerPositionQueue);
+    //         }, 200);
+    //     } else {
+    //         clearInterval(followerProcess.current);
+    //         setFollowerPositionQueue([]);
+    //     }
+    //     setIsFollowerModeEnabled(!isFollowerModeEnabled)
+    // }
+
     const keyMap = {
         UNSELECT_ALL: "escape",
     };
@@ -413,7 +440,7 @@ export function Canvas({dimensions})
     onWheel={handleStageWheel}
     onClick={UnselectAll}
     onMouseDown={handleStageMouseDown}
-    onDblClick={()=>updatePromptCards("hello")}
+    // onDblClick={toggleFollowerMode}
     ref={stageRef}
     >
         <Layer
@@ -600,7 +627,7 @@ export function Canvas({dimensions})
                 strokeWidth={2/canvasScale}
                 />)
                 : null
-            }
+            } 
             </CanvasContext.Provider>
             </Group>
         </Layer>
@@ -611,15 +638,34 @@ export function Canvas({dimensions})
             width={320}
             height={dimensions.height-50}/>
 
-            <TaskPrompt
-                x={100}
-                y={100}
-                width={200}
-                height={100}
+            {taskPrompts.map((taskPrompt,index)=>{
+                const node = nodes.filter(node=>node.id===taskPrompt.node_id);
+                const position = node.length === 0 ? [0,0] :
+                canvas2PointerPosition({x: node[0].x, y: node[0].y});
+                console.log(position)
+                return <TaskPrompt
+                key={index}
+                x={position[0]}
+                y={position[1]-25}
+                width={180}
+                height={21}
                 color={"orange"}
-                fontSize={16}
-                text={"Brainstorm a list of keywords related to \"Interaction\""}/>
+                fontSize={12}
+                text={taskPrompt.prompt}/>
+            })}
 
+            {/* {followerPositionQueue.map((position,index)=>{
+                return <TaskPrompt
+                key={index}
+                x={position.x}
+                y={position.y}
+                width={120}
+                height={20}
+                color={"orange"}
+                fontSize={10}
+                text={"Brainstorm a list of keywords related to \"Interaction\""}/>
+            })} */}
+            
             {/* <Group>
             {followerPositionQueue.map((position,index)=>{
                 return <TaskPrompt
