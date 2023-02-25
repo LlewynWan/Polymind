@@ -13,6 +13,7 @@ function App() {
   });
   const initialState = {
     nodes: [
+        {id: 10, type: "keyword", x: window.innerWidth/12, y: window.innerHeight/10, fontSize: 20, scaleX: 1, scaleY: 1, selected: false, text: "", display: true}
         // {id: 0, type: "sticky_note", x: window.innerWidth/12, y: window.innerHeight/10, scaleX: 1, scaleY: 1, width: 150, height: 120, selected: false, text: "", display: true},
         // {id: 1, type: "sticky_note", x: window.innerWidth/12+2, y: window.innerHeight/10+2, scaleX: 1, scaleY: 1, width: 150, height: 120, selected: false, text: "", display: true},
         // {id: 2, type: "sticky_note", x: window.innerWidth/12+4, y: window.innerHeight/10+4, scaleX: 1, scaleY: 1, width: 150, height: 120, selected: false, text: "", display: true},

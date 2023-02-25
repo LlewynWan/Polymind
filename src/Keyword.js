@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { Group, Rect, Image, Text, Transformer } from "react-konva";
+import { Group, Rect, Label, Text, Tag, Transformer } from "react-konva";
 
 import { TextInput } from "./TextInput"
 
@@ -8,21 +8,18 @@ const ESCAPE_KEY = 27;
 
 
 export function Keyword({
-  id,
   x,
   y,
   color,
   text,
-  width,
-  height,
   fontSize,
+  padding,
   isNull,
   onClick,
   isSelected,
   onTextChange,
   onDragStart,
   onDragEnd,
-  onDeleteIconClick,
   draggable=true
 }) {
   const [isEditing, setIsEditing] = useState(false);
@@ -48,10 +45,10 @@ export function Keyword({
       rotateEnabled={false}
       flipEnabled={false}
       borderStroke={"#0096FF"}
-      borderStrokeWidth={4}
+      borderStrokeWidth={3.5}
       anchorStroke={"#0096FF"}
-      anchorStrokeWidth={2}
-      anchorSize={12}
+      anchorStrokeWidth={1.5}
+      anchorSize={10}
       anchorCornerRadius={2}
       enabledAnchors={["top-left", "top-right",
       "bottom-left",
@@ -95,7 +92,7 @@ export function Keyword({
     onMouseLeave={() => setIsHover(false)}
     ref={nodeRef}
     onClick={onClick}>
-      <Rect
+      {/* <Rect
         x={0}
         y={0}
         fill={color}
@@ -106,11 +103,11 @@ export function Keyword({
         strokeWidth={0.75}
         opacity={isHover?0.3:0.15}
         perfectDrawEnabled={false}
-      />
-      <Text
-        x={15}
-        y={15}
-        text={"Add text"}
+      /> */}
+      {/* <Text
+        x={20}
+        y={30}
+        text={"Keyword"}
         fill="black"
         fontFamily="sans-serif"
         fontSize={fontSize}
@@ -123,35 +120,43 @@ export function Keyword({
           }
         }}
         perfectDrawEnabled={false}
-      />
-      {isEditing ?
-      <TextInput
-        x={15}
-        y={15}
-        id={id}
-        width={width}
-        height={height}
+      /> */}
+      <Label
+      x={0}
+      y={0}
+      >
+        <Tag
+        fill={color}
+        cornerRadius={5}
+        stroke={"gray"}
+        strokeWidth={0.75}
+        opacity={isHover?0.3:0.15}
+        visible={!isEditing}
+        />
+        {isEditing ?
+        <TextInput
+          x={padding}
+          y={padding-1}
+          fontSize={fontSize}
+          fontStyle={"bold"}
+          onChange={handleTextChange}
+          onKeyDown={handleEscapeKeys}
+          value={text}
+        /> :
+        <Text
+        text={isNull?"Keyword":text}
         fontSize={fontSize}
-        onChange={handleTextChange}
-        onKeyDown={handleEscapeKeys}
-        value={text}
-      /> :
-      <Text
-        x={15}
-        y={15}
-        width={width}
-        height={height}
-        text={text}
-        fill="black"
-        fontFamily="sans-serif"
-        fontSize={fontSize}
+        fontStyle={"bold"}
+        fontFamily={"sans-serif"}
+        fill={"black"}
+        opacity={isNull?0.5:1}
+        padding={padding}
         onClick={()=>{
           if (isSelected) {
             setIsEditing(true);
           }
-        }}
-        perfectDrawEnabled={false}
-      />}
+        }}/>}
+      </Label>
     </Group>
     {transformer}
     </>

@@ -112,6 +112,26 @@ export function TaskCard({
                 fill={"white"}
                 padding={5}/>
             </Label>
+            {/* <Label
+            x={width/2-50}
+            y={150}
+            >
+                <Tag
+                fill={"#B0B3B8"}
+                cornerRadius={5}
+                pointerDirection={"down"}
+                pointerWidth={5}
+                pointerHeight={5}
+                lineJoin={'round'}
+                />
+                <Text
+                text={"Example Prompt"}
+                fontSize={14}
+                fontStyle={"bold"}
+                fontFamily={"sans-serif"}
+                fill={"white"}
+                padding={5}/>
+            </Label> */}
         </Group>
     )
 }

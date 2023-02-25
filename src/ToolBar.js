@@ -17,10 +17,15 @@ export function ToolBar({
     onArrowIconClick,
     isDoubleArrowIconClicked,
     onDoubleArrowIconClick,
-    onAddStickyNote
+    isTextIconClicked,
+    onTextIconClick,
+    onAddStickyNote,
+    conceptOffset=325,
+    stickyNoteOffset=400,
 }) {
     const [isHoverArrowIcon, setIsHoverArrowIcon] = useState(false);
     const [isHoverDoubleArrowIcon, setIsHoverDoubleArrowIcon] = useState(false);
+    const [isHoverTextIcon, setIsHoverTextIcon] = useState(false);
     const [isHoverStickyNotes, setIsHoverStickyNotes] = useState(false);
 
     const stickyNoteRef = useRef(null);
@@ -29,7 +34,7 @@ export function ToolBar({
 
     
     const handleStickyNodeDragEnd = e => {
-        onAddStickyNote(e.target.x()+x+180, e.target.y()+y, 145, 110);
+        onAddStickyNote(e.target.x()+x+stickyNoteOffset, e.target.y()+y, 145, 110);
 
         stickyNoteRef.current.setAttrs({
             x: 12, y: 12, width: 60, height: 60,
@@ -93,7 +98,7 @@ export function ToolBar({
             width={50}
             height={50}
             stroke={"#010203"}
-            strokeWidth={2}
+            strokeWidth={1.5}
             fill={isArrowIconClicked?"#010203":
             isHoverArrowIcon?"#D5D5D5":"#D9CBA6"}
             shadowOffsetY={0}
@@ -133,7 +138,7 @@ export function ToolBar({
             fill={isDoubleArrowIconClicked?"#010203":
             isHoverDoubleArrowIcon?"#D5D5D5":"#D9CBA6"}
             stroke={"#010203"}
-            strokeWidth={2}
+            strokeWidth={1.5}
             shadowOffsetY={0}
             shadowOffsetX={0}
             shadowBlur={isDoubleArrowIconClicked?5:0}
@@ -164,7 +169,75 @@ export function ToolBar({
             />
         </Group>
 
-        <Group x={180} y={0}
+        <Group x={200} y={height/2-25}
+        onMouseEnter={()=>{setIsHoverTextIcon(true)}}
+        onMouseLeave={()=>{setIsHoverTextIcon(false)}}
+        onClick={onTextIconClick}
+        >
+            <Rect
+            x={0}
+            y={0}
+            cornerRadius={10}
+            width={50}
+            height={50}
+            fill={isTextIconClicked?"#010203":
+            isHoverTextIcon?"#D5D5D5":"white"}
+            stroke={"#010203"}
+            strokeWidth={0.75}
+            shadowOffsetY={0}
+            shadowOffsetX={0}
+            shadowBlur={isTextIconClicked?5:0}
+            shadowOpacity={isTextIconClicked?0.25:0}
+            opacity={isTextIconClicked?0.75:
+                isHoverDoubleArrowIcon?0.27:0.2}
+            />
+            <Line
+            points={[10,10,40,10]}
+            stroke={isTextIconClicked?"white":"black"}/>
+            <Line
+            points={[25,10,25,40]}
+            stroke={isTextIconClicked?"white":"black"}/>
+        </Group>
+
+        <Group x={conceptOffset} y={0}
+        clipX={-window.innerWidth}
+        clipY={-window.innerHeight}
+        clipWidth={window.innerWidth*2}
+        clipHeight={height+window.innerHeight}
+        onMouseEnter={(e)=>{
+            e.target.to({
+                y: height / 2,
+                radiusX: 64,
+                radiusY: 35,
+                duration: 0.25
+            })
+        }}
+        onMouseLeave={(e)=>{
+            e.target.to({
+                y: height / 2 + 20,
+                radiusX: 40,
+                radiusY: 40,
+                duration: 0.4
+            })
+        }}>
+            <Ellipse
+            x={0}
+            y={height/2+20}
+            radiusX={40}
+            radiusY={40}
+            stroke={"#010203"}
+            strokeWidth={0.12}
+            shadowColor={"gray"}
+            shadowOffsetY={2.5}
+            shadowOffsetX={5}
+            shadowBlur={5}
+            shadowOpacity={0.25}
+            fill={"#FADADD"}
+            opacity={0.85}
+            />
+        </Group>
+
+        <Group x={stickyNoteOffset} y={0}
         onMouseEnter={()=>{
             if (!isHoverStickyNotes) {
                 setIsHoverStickyNotes(true)
@@ -247,44 +320,6 @@ export function ToolBar({
                 stage.container().style.cursor = "default";
                 handleStickyNodeDragEnd(e);
             }}/>
-        </Group>
-
-        <Group x={330} y={0}
-        clipX={-window.innerWidth}
-        clipY={-window.innerHeight}
-        clipWidth={window.innerWidth*2}
-        clipHeight={height+window.innerHeight}
-        onMouseEnter={(e)=>{
-            e.target.to({
-                y: height / 2,
-                radiusX: 64,
-                radiusY: 35,
-                duration: 0.25
-            })
-        }}
-        onMouseLeave={(e)=>{
-            e.target.to({
-                y: height / 2 + 15,
-                radiusX: 40,
-                radiusY: 40,
-                duration: 0.4
-            })
-        }}>
-            <Ellipse
-            x={0}
-            y={height/2+25}
-            radiusX={40}
-            radiusY={40}
-            stroke={"gray"}
-            strokeWidth={0.25}
-            shadowColor={"gray"}
-            shadowOffsetY={5}
-            shadowOffsetX={5}
-            shadowBlur={5}
-            shadowOpacity={0.25}
-            fill={"#FADADD"}
-            opacity={0.85}
-            />
         </Group>
         </Group>
     )

@@ -73,7 +73,6 @@ export function StickyNote({
     return {x: posX, y: posY};
   }
 
-
   const transformer = isSelected && !isEditing ? (
     <Transformer
       ref={transformerRef}

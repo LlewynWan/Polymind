@@ -48,34 +48,34 @@ export function TaskBoard({
             x={25}
             y={100}
             width={width-50}
-            height={150}
+            height={125}
             color={"#FFB347"}
             goal={"Brainstorm"}
             outputType={"Keyword"}
             />
             <TaskCard
             x={25}
-            y={265}
+            y={250}
             width={width-50}
-            height={150}
+            height={125}
             color={"#966FD6"}
             goal={"Summarise"}
             outputType={"Concept"}
             />
             <TaskCard
             x={25}
-            y={430}
+            y={400}
             width={width-50}
-            height={150}
+            height={125}
             color={"#71C562"}
             goal={"Clarify"}
             outputType={"Sticky Note"}
             />
             <TaskCard
             x={25}
-            y={595}
+            y={550}
             width={width-50}
-            height={150}
+            height={125}
             color={"#FB6B89"}
             goal={"Draft"}
             outputType={"Sticky Note"}

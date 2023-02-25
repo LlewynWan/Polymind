@@ -54,6 +54,7 @@ export function Canvas({dimensions})
 
     const [isDrawingArrow, setIsDrawingArrow] = React.useState(false);
     const [isDrawingDoubleArrow, setIsDrawingDoubleArrow] = React.useState(false);
+    const [isAddingKeyword, setIsAddingKeyword] = React.useState(false);
     const [arrowFrom, setArrowFrom] = React.useState({id: -1, anchor: -1});
     const [arrowTo, setArrowTo] = React.useState({id: -1, anchor: -1});
     const [isMultiSelecting, setIsMultiSelecting] = React.useState(false);
@@ -125,6 +126,7 @@ export function Canvas({dimensions})
 
         setIsDrawingArrow(false);
         setIsDrawingDoubleArrow(false);
+        setIsAddingKeyword(false);
         setPromptPanelVisibility(false);
     };
 
@@ -275,6 +277,36 @@ export function Canvas({dimensions})
                 }
             })
         });
+    }
+
+    const getNodeById = (id) => {
+        return nodes.filter(node=>node.id===id)[0];
+    }
+    const onNodeSelect = (e,id) => {
+        e.cancelBubble = true;
+        setNodes(
+        prevState => {
+            return prevState.map(state => {
+                let tmp = state;
+                if (tmp.id === id) {
+                    tmp.selected = true;
+                } else {
+                    tmp.selected = false;
+                }
+                return tmp;
+            });
+        });
+    }
+    const onNodeTextChange = (value,id) => {
+        setNodes(
+            prevState => {
+                return prevState.map(state => {
+                    let tmp = state;
+                    if (tmp.id === id)
+                        tmp.text = value;
+                    return tmp;
+                });
+        })
     }
 
     const onMainPrompterHover = node => {
@@ -448,7 +480,6 @@ export function Canvas({dimensions})
                 const node = nodes.filter(node=>node.id===taskPrompt.node_id);
                 const position = node.length === 0 ? [0,0] :
                 canvas2PointerPosition({x: node[0].x, y: node[0].y});
-                console.log(position)
                 return <TaskPrompt
                 key={index}
                 x={position[0]}
@@ -460,7 +491,7 @@ export function Canvas({dimensions})
                 text={taskPrompt.prompt}/>
             })}
         </Layer>
-        
+
         <Layer
         x={canvasX}
         y={canvasY}
@@ -550,36 +581,14 @@ export function Canvas({dimensions})
                             setIsDrawingArrow(false);
                             setArrowFrom({id: -1, anchor: -1});
                             setArrowTo({id: -1, anchor: -1});
-                            promptPanelPopup();
+                            // promptPanelPopup();
                         }
                     }}
-                    onClick={(e)=>{
-                        e.cancelBubble = true;
-                        setNodes(
-                        prevState => {
-                            return prevState.map(state => {
-                                let tmp = state;
-                                if (tmp.id === node.id) {
-                                    tmp.selected = true;
-                                } else {
-                                    tmp.selected = false;
-                                }
-                                return tmp;
-                            });
-                        });
-                    }}
+                    onClick={(e)=>onNodeSelect(e,node.id)}
                     // onDragStart={(e)=>{e.cancelBubble=true}}
                     onDragMove={(e)=>{handleDragNodeMove(e,node.id)}}
                     onDragEnd={(e)=>{handleDragNodeEnd(e,node.id)}}
-                    onTextChange={(value)=>setNodes(
-                        prevState => {
-                            return prevState.map(state => {
-                                let tmp = state;
-                                if (tmp.id === node.id)
-                                    tmp.text = value;
-                                return tmp;
-                            });
-                        })}
+                    onTextChange={(value)=>onNodeTextChange(value,node.id)}
                     isSelected={node.selected}
                     onOverflow={(scrollHeight)=>{
                         setNodes(prevState =>{
@@ -590,31 +599,35 @@ export function Canvas({dimensions})
                                 return tmp;
                             });
                         })
-                    }}/> : null : null
+                    }}/> :
+                    node.type === "keyword" ?
+                    <Keyword
+                    key={node.id}
+                    x={node.x}
+                    y={node.y}
+                    fontSize={node.fontSize}
+                    color={"#CED8DF"}
+                    text={node.text}
+                    padding={10}
+                    isNull={node.text===""}
+                    isSelected={node.selected}
+                    onClick={(e)=>onNodeSelect(e,node.id)}
+                    onTextChange={(value)=>onNodeTextChange(value,node.id)}
+                    /> :
+                    node.type === "concept" ? null : null : null
                 })
             }
-            <Keyword
-            x={500}
-            y={500}
-            width={100}
-            height={50}
-            fontSize={20}
-            color={"#CED8DF"}
-            id={100}
-            text={"Keyword"}
-            isNull={false}
-            />
             {arrows.map((arrow,index)=>{
                 return (
                 <MyLine
                 key={index}
                 points={[
-                    ...calcAnchorPosition(arrow.from_anchor, nodes[arrow.from_id]),
+                    ...calcAnchorPosition(arrow.from_anchor, getNodeById(arrow.from_id)),
                     ...findPathBetweenNodes(arrow.from_anchor, arrow.to_anchor,
-                        nodes[arrow.from_id],nodes[arrow.to_id]),
+                        getNodeById(arrow.from_id),getNodeById(arrow.to_id)),
                     // ...calcAnchorOffset(arrow.from_anchor, nodes[arrow.from_id]),
                     // ...calcAnchorOffset(arrow.to_anchor, nodes[arrow.to_id]),
-                    ...calcAnchorPosition(arrow.to_anchor, nodes[arrow.to_id]),
+                    ...calcAnchorPosition(arrow.to_anchor, getNodeById(arrow.to_id)),
                 ]}
                 tension={0}
                 stroke={"gray"}
@@ -626,8 +639,8 @@ export function Canvas({dimensions})
                 arrowTo.id===-1 ?
                 <MyLine
                 points={[
-                    ...calcAnchorPosition(arrowFrom.anchor,nodes[arrowFrom.id]),
-                    ...findPathBetweenNodeAndPointer(arrowFrom.anchor,nodes[arrowFrom.id]),
+                    ...calcAnchorPosition(arrowFrom.anchor,getNodeById(arrowFrom.id)),
+                    ...findPathBetweenNodeAndPointer(arrowFrom.anchor,getNodeById(arrowFrom.id)),
                     ]}
                 stroke={"gray"}
                 listening={false}
@@ -635,10 +648,10 @@ export function Canvas({dimensions})
                 /> :
                 <MyLine
                 points={[
-                    ...calcAnchorPosition(arrowFrom.anchor,nodes[arrowFrom.id]),
+                    ...calcAnchorPosition(arrowFrom.anchor,getNodeById(arrowFrom.id)),
                     ...findPathBetweenNodes(arrowFrom.anchor,arrowTo.anchor,
-                        nodes[arrowFrom.id], nodes[arrowTo.id]),
-                    ...calcAnchorPosition(arrowTo.anchor,nodes[arrowTo.id])
+                        getNodeById(arrowFrom.id), getNodeById(arrowTo.id)),
+                    ...calcAnchorPosition(arrowTo.anchor,getNodeById(arrowTo.id))
                     ]}
                 stroke={"gray"}
                 listening={false}
@@ -727,9 +740,9 @@ export function Canvas({dimensions})
             "prompt_5"]}
             /> */}
             <ToolBar
-                x={mainPrompter.x+mainPrompter.width/2-250}
+                x={mainPrompter.x+mainPrompter.width/2-255}
                 y={mainPrompter.y-70}
-                width={500}
+                width={510}
                 height={60}
                 color={"white"}
                 onHover={()=>setIsHoverToolBar(true)}
@@ -748,6 +761,13 @@ export function Canvas({dimensions})
                     if (!isDrawingDoubleArrow && isDrawingArrow)
                         setIsDrawingArrow(false);
                     setIsDrawingDoubleArrow(!isDrawingDoubleArrow);
+                }}
+                isTextIconClicked={isAddingKeyword}
+                onTextIconClick={(e)=>{
+                    e.cancelBubble = true;
+                    setIsDrawingArrow(false);
+                    setIsDrawingDoubleArrow(false);
+                    setIsAddingKeyword(true);
                 }}
                 onAddStickyNote={(x, y, width, height)=>{
                     setNodes(prevState => {

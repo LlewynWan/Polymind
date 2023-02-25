@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { Html } from "react-konva-utils";
 
-function getStyle(width, height, fontSize) {
+function getStyle(width, height, fontSize, fontStyle) {
   const isFirefox = navigator.userAgent.toLowerCase().indexOf("firefox") > -1;
   const baseStyle = {
     width: `${width}px`,
@@ -17,6 +17,7 @@ function getStyle(width, height, fontSize) {
     fontSize: `${fontSize}px`,
     fontFamily: "sans-serif",
     lineHeight: "1",
+    fontWeight: fontStyle,
   };
   if (isFirefox) {
     return baseStyle;
@@ -34,12 +35,13 @@ export function TextInput({
   width,
   height,
   fontSize,
+  fontStyle,
   value,
   onChange,
   onKeyDown,
   onOverflow
 }) {
-  const style = getStyle(width, height, fontSize);
+  const style = getStyle(width, height, fontSize, fontStyle);
   const textareaRef = useRef(null);
   const [textareaHeight, setTextareaHeight] = useState(0);
 
