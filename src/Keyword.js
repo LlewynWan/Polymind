@@ -1,6 +1,7 @@
-import React, { useState, useEffect, useRef } from "react";
-import { Group, Rect, Label, Text, Tag, Transformer } from "react-konva";
+import React, { useState, useEffect, useRef, useContext } from "react";
+import { Group, Circle, Label, Text, Tag, Transformer } from "react-konva";
 
+import { CanvasContext } from "./state";
 import { TextInput } from "./TextInput"
 
 const RETURN_KEY = 13;
@@ -12,25 +13,50 @@ export function Keyword({
   y,
   color,
   text,
+  scaleX,
+  scaleY,
+  onScale,
   fontSize,
   padding,
   isNull,
   onClick,
   isSelected,
+  isConnecting,
   onTextChange,
   onDragStart,
+  onDragMove,
   onDragEnd,
   draggable=true
 }) {
   const [isEditing, setIsEditing] = useState(false);
   const [isHover, setIsHover] = useState(false);
+  const [isDragging, setIsDragging] = useState(false);
+  const [isTransforming, setIsTransforming] = useState(false);
+  const [anchorPosition, setAnchorPosition] = useState([]);
+  const [anchorIndex, setAnchorIndex] = useState(-1);
 
   const nodeRef = useRef(null);
   const transformerRef= useRef(null);
 
+  const {canvasX, canvasY, canvasScale} = useContext(CanvasContext);
+
+  const calcAnchorPosition = () => {
+    const clientRect = nodeRef.current.getClientRect();
+    return [
+      {x: clientRect.width/canvasScale*scaleX / 2, y: -20/canvasScale},
+      {x: -20/canvasScale, y: clientRect.height/canvasScale*scaleY / 2},
+      {x: clientRect.width/canvasScale*scaleX / 2, y: clientRect.width/canvasScale*scaleY + 20/canvasScale},
+      {x: clientRect.width/canvasScale*scaleX + 20/canvasScale, y: clientRect.width/canvasScale*scaleY / 2}
+    ]
+  }
+
   useEffect(() => {
     if (!isSelected && isEditing) {
       setIsEditing(false);
+    }
+
+    if (nodeRef.current) {
+      setAnchorPosition(calcAnchorPosition());
     }
 
     if (transformerRef.current !== null) {
@@ -85,13 +111,45 @@ export function Keyword({
 
   return (
     <>
-    <Group x={x} y={y} draggable={draggable}
-    onDragStart={onDragStart}
-    onDragEnd={onDragEnd}
+    <Group
+    x={x} y={y}
+    draggable={draggable}
+    onDragStart={(e)=>{
+      setIsDragging(true);
+      if (onDragStart)
+        onDragStart(e);
+    }}
+    onDragMove={onDragMove}
+    onDragEnd={(e)=>{
+      setIsDragging(false);
+      if (onDragEnd)
+        onDragEnd(e);
+    }}>
+    <Group x={0} y={0}
+    // draggable={draggable}
+    // onDragStart={onDragStart}
+    // onDragEnd={onDragEnd}
     onMouseEnter={() => setIsHover(true)}
     onMouseLeave={() => setIsHover(false)}
     ref={nodeRef}
-    onClick={onClick}>
+    onClick={onClick}
+    onTransformStart={()=>setIsTransforming(true)}
+    onTransform={(e)=>{
+      const newScale = e.target.scaleX();
+      onScale(newScale,
+      e.target.x()+x,
+      e.target.y()+y);
+      e.target.setAttrs({x:0,y:0});
+      // setIsTransforming(false);
+    }}
+    onTransformEnd={(e)=>{
+      const newScale = e.target.scaleX();
+      onScale(newScale,
+      e.target.x()+x,
+      e.target.y()+y);
+      e.target.setAttrs({x:0,y:0});
+      setIsTransforming(false);
+    }}>
       {/* <Rect
         x={0}
         y={0}
@@ -136,7 +194,7 @@ export function Keyword({
         {isEditing ?
         <TextInput
           x={padding}
-          y={padding-1}
+          y={padding-0.5}
           fontSize={fontSize}
           fontStyle={"bold"}
           onChange={handleTextChange}
@@ -144,7 +202,7 @@ export function Keyword({
           value={text}
         /> :
         <Text
-        text={isNull?"Keyword":text}
+        text={isNull?"Add keyword":text}
         fontSize={fontSize}
         fontStyle={"bold"}
         fontFamily={"sans-serif"}
@@ -157,6 +215,36 @@ export function Keyword({
           }
         }}/>}
       </Label>
+    </Group>
+    <Group x={0} y={0}
+    visible={(isConnecting && isHover) || (isSelected && !isEditing && !isTransforming)}>
+    {anchorPosition.map((anchor,index)=>{
+        return (
+        <Group
+        key={index}
+        x={anchor.x}
+        y={anchor.y}
+        scaleX={1/canvasScale}
+        scaleY={1/canvasScale}>
+        <Circle
+        key={index+4}
+        radius={5}
+        stroke={"#0096FF"}
+        strokeWidth={1}
+        fill={(isHover && anchorIndex===index) ? "#0096FF" : "white"}
+        opacity={isDragging?0.12:0.75}
+        />
+        <Circle
+        key={index}
+        radius={20}
+        stroke={"#0096FF"}
+        strokeWidth={0}
+        fill={"transparent"}
+        opacity={isDragging?0.12:0.75}
+        />
+        </Group>)
+      })}
+    </Group>
     </Group>
     {transformer}
     </>

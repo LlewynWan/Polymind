@@ -100,7 +100,7 @@ export function Canvas({dimensions})
         if (!isHoverToolBar && stageRef) {
             stageRef.current.container().style.cursor =
             (isDrawingArrow || isDrawingDoubleArrow) ? "crosshair"
-            : "default";
+            : isAddingKeyword ? "text" : "default";
         } else {
             stageRef.current.container().style.cursor = "default";
         }
@@ -111,8 +111,8 @@ export function Canvas({dimensions})
         }
 
         return () => clearInterval(pointerTracker);
-    }, [dimensions, canvasScale,
-        isDrawingArrow, isDrawingDoubleArrow, isHoverToolBar]);
+    }, [dimensions, canvasScale, isHoverToolBar,
+        isDrawingArrow, isDrawingDoubleArrow, isAddingKeyword]);
 
 
     const UnselectAll = (e) => {
@@ -307,6 +307,20 @@ export function Canvas({dimensions})
                     return tmp;
                 });
         })
+    }
+    const onNodeScale = (id, newScale, newX, newY) => {
+        setNodes(prevState => {
+            return prevState.map(state => {
+                let tmp = state;
+                if (tmp.id === id) {
+                    tmp.scaleX = newScale;
+                    tmp.scaleY = newScale;
+                    tmp.x = newX;
+                    tmp.y = newY;
+                }
+                return tmp;
+            });
+        });
     }
 
     const onMainPrompterHover = node => {
@@ -521,20 +535,7 @@ export function Canvas({dimensions})
                     text={node.text}
                     draggable={!isDrawingArrow && !isDrawingDoubleArrow}
                     isConnecting={isDrawingArrow || isDrawingDoubleArrow}
-                    onScale={(newScale, newX, newY) => {
-                        setNodes(prevState => {
-                            return prevState.map(state => {
-                                let tmp = state;
-                                if (tmp.id === node.id) {
-                                    tmp.scaleX = newScale;
-                                    tmp.scaleY = newScale;
-                                    tmp.x = newX;
-                                    tmp.y = newY;
-                                }
-                                return tmp;
-                            });
-                        });
-                    }}
+                    onScale={(newScale, newX, newY)=>onNodeScale(node.id, newScale, newX, newY)}
                     onResize={(offsetW, offsetH, offsetX, offsetY) => {
                         if (node.height + offsetH >= 14
                             && node.width + offsetW >= 105) {
@@ -605,6 +606,8 @@ export function Canvas({dimensions})
                     key={node.id}
                     x={node.x}
                     y={node.y}
+                    scaleX={node.scaleX}
+                    scaleY={node.scaleY}
                     fontSize={node.fontSize}
                     color={"#CED8DF"}
                     text={node.text}
@@ -613,6 +616,7 @@ export function Canvas({dimensions})
                     isSelected={node.selected}
                     onClick={(e)=>onNodeSelect(e,node.id)}
                     onTextChange={(value)=>onNodeTextChange(value,node.id)}
+                    onScale={(newScale, newX, newY)=>onNodeScale(node.id, newScale, newX, newY)}
                     /> :
                     node.type === "concept" ? null : null : null
                 })
@@ -751,15 +755,15 @@ export function Canvas({dimensions})
                 isArrowIconClicked={isDrawingArrow}
                 onArrowIconClick={(e)=>{
                     e.cancelBubble = true;
-                    if (!isDrawingArrow && isDrawingDoubleArrow)
-                        setIsDrawingDoubleArrow(false);
+                    setIsDrawingDoubleArrow(false);
+                    setIsAddingKeyword(false);
                     setIsDrawingArrow(!isDrawingArrow);
                 }}
                 isDoubleArrowIconClicked={isDrawingDoubleArrow}
                 onDoubleArrowIconClick={(e)=>{
                     e.cancelBubble = true;
-                    if (!isDrawingDoubleArrow && isDrawingArrow)
-                        setIsDrawingArrow(false);
+                    setIsDrawingArrow(false);
+                    setIsAddingKeyword(false);
                     setIsDrawingDoubleArrow(!isDrawingDoubleArrow);
                 }}
                 isTextIconClicked={isAddingKeyword}
@@ -767,7 +771,7 @@ export function Canvas({dimensions})
                     e.cancelBubble = true;
                     setIsDrawingArrow(false);
                     setIsDrawingDoubleArrow(false);
-                    setIsAddingKeyword(true);
+                    setIsAddingKeyword(!isAddingKeyword);
                 }}
                 onAddStickyNote={(x, y, width, height)=>{
                     setNodes(prevState => {

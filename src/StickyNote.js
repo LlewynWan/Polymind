@@ -133,7 +133,7 @@ export function StickyNote({
       e.target.x()+x,
       e.target.y()+y);
       e.target.setAttrs({x:0,y:0});
-      setIsTransforming(false);
+      // setIsTransforming(false);
     }}
     onTransformEnd={(e)=>{
       const newScale = e.target.scaleX();
