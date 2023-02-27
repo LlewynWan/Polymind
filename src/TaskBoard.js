@@ -78,7 +78,7 @@ export function TaskBoard({
             height={125}
             color={"#FB6B89"}
             goal={"Draft"}
-            outputType={"Sticky Note"}
+            outputType={"Section"}
             />
         </Group>
     )

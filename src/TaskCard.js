@@ -97,7 +97,7 @@ export function TaskCard({
                 <Tag
                 fill={outputType==="Sticky Note" ? "#003A6B"
                 : outputType==="Concept" ? "#5880A2"
-                : outputType==="Keyword" ? "#AFC6D9" : "black"}
+                : outputType==="Keyword" ? "#AFC6D9" : "#80D8FF"}
                 cornerRadius={5}
                 pointerDirection={"left"}
                 // pointerWidth={5}

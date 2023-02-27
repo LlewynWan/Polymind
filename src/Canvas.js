@@ -258,7 +258,6 @@ export function Canvas({dimensions})
     const handleStageClick = e => {
         if (isAddingKeyword) {
             const position = pointer2CanvasPosition(pointerPosition);
-            console.log(position)
             setNodes(prevState=>{
                 let tmp = {id: numNodes, type: "keyword",
                 x: position[0], y: position[1], fontSize: 20,
@@ -342,6 +341,31 @@ export function Canvas({dimensions})
                 return tmp;
             });
         });
+    }
+
+    const onNodeConnected = (e, id, anchor)=>{
+        e.cancelBubble = true;
+        if (e.evt.button===0 && e.evt.type==="mousedown") {
+            setArrowFrom({id: id, anchor: anchor});
+        } else if (e.evt.button===0 && e.evt.type==="mouseup") {
+            if (id !== arrowFrom.id && arrowFrom.id !== -1) {
+                if (isDrawingArrow) {
+                    setArrows(prevState=>{
+                        return [...prevState, {
+                            from_id: arrowFrom.id,
+                            from_anchor: arrowFrom.anchor,
+                            to_id: id,
+                            to_anchor: anchor
+                        }]
+                    });
+                }
+            }
+
+            setIsDrawingArrow(false);
+            setArrowFrom({id: -1, anchor: -1});
+            setArrowTo({id: -1, anchor: -1});
+            // promptPanelPopup();
+        }
     }
 
     const onMainPrompterHover = node => {
@@ -510,7 +534,15 @@ export function Canvas({dimensions})
     // onDblClick={toggleFollowerMode}
     ref={stageRef}
     >
-        <Layer>
+        {/* <Layer>
+            <TaskPrompt
+            x={nodes[0].x}
+            y={nodes[0].y-50}
+            width={180}
+            height={21}
+            color={"purple"}
+            fontSize={12}
+            text={"Provide a tldr version of [placeholder]"}/>
         {taskPrompts.map((taskPrompt,index)=>{
                 const node = nodes.filter(node=>node.id===taskPrompt.node_id);
                 const position = node.length === 0 ? [0,0] :
@@ -525,7 +557,7 @@ export function Canvas({dimensions})
                 fontSize={12}
                 text={taskPrompt.prompt}/>
             })}
-        </Layer>
+        </Layer> */}
 
         <Layer
         x={canvasX}
@@ -582,30 +614,7 @@ export function Canvas({dimensions})
                     onConnectingUnhover={(e)=>{
                         setArrowTo({id: -1, anchor: -1});
                     }}
-                    onConnected={(e, anchor)=>{
-                        e.cancelBubble = true;
-                        if (e.evt.button===0 && e.evt.type==="mousedown") {
-                            setArrowFrom({id: node.id, anchor: anchor});
-                        } else if (e.evt.button===0 && e.evt.type==="mouseup") {
-                            if (node.id !== arrowFrom.id && arrowFrom.id !== -1) {
-                                if (isDrawingArrow) {
-                                    setArrows(prevState=>{
-                                        return [...prevState, {
-                                            from_id: arrowFrom.id,
-                                            from_anchor: arrowFrom.anchor,
-                                            to_id: node.id,
-                                            to_anchor: anchor
-                                        }]
-                                    });
-                                }
-                            }
- 
-                            setIsDrawingArrow(false);
-                            setArrowFrom({id: -1, anchor: -1});
-                            setArrowTo({id: -1, anchor: -1});
-                            // promptPanelPopup();
-                        }
-                    }}
+                    onConnected={(e,anchor)=>onNodeConnected(e,node.id,anchor)}
                     onClick={(e)=>onNodeSelect(e,node.id)}
                     // onDragStart={(e)=>{e.cancelBubble=true}}
                     onDragMove={(e)=>{handleDragNodeMove(e,node.id)}}
@@ -635,11 +644,21 @@ export function Canvas({dimensions})
                     padding={10}
                     isNull={node.text===""}
                     isSelected={node.selected}
+                    isConnecting={isDrawingArrow || isDrawingDoubleArrow}
                     onClick={(e)=>onNodeSelect(e,node.id)}
                     onDragMove={(e)=>{handleDragNodeMove(e,node.id)}}
                     onDragEnd={(e)=>{handleDragNodeEnd(e,node.id)}}
                     onTextChange={(value)=>onNodeTextChange(value,node.id)}
                     onScale={(newScale, newX, newY)=>onNodeScale(node.id, newScale, newX, newY)}
+                    onConnectingHover={(e,anchor)=>{
+                        if (arrowFrom.id !== -1) {
+                            setArrowTo({id: node.id, anchor: anchor});
+                        }
+                    }}
+                    onConnectingUnhover={(e)=>{
+                        setArrowTo({id: -1, anchor: -1});
+                    }}
+                    onConnected={(e,anchor)=>onNodeConnected(e,node.id,anchor)}
                     /> :
                     node.type === "concept" ? null : null : null
                 })

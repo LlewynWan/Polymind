@@ -1,5 +1,7 @@
 import React, { useState, useEffect, useRef, useContext } from "react";
-import { Group, Circle, Label, Text, Tag, Transformer } from "react-konva";
+import { Group, Rect, Circle, Label, Text, Tag, Transformer } from "react-konva";
+
+import Konva from "konva";
 
 import { CanvasContext } from "./state";
 import { TextInput } from "./TextInput"
@@ -22,6 +24,9 @@ export function Keyword({
   onClick,
   isSelected,
   isConnecting,
+  onConnectingHover,
+  onConnectingUnhover,
+  onConnected,
   onTextChange,
   onDragStart,
   onDragMove,
@@ -30,12 +35,14 @@ export function Keyword({
 }) {
   const [isEditing, setIsEditing] = useState(false);
   const [isHover, setIsHover] = useState(false);
+  const [isHoverBoundingBox, setIsHoverBoundingBox] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
   const [isTransforming, setIsTransforming] = useState(false);
   const [anchorPosition, setAnchorPosition] = useState([]);
   const [anchorIndex, setAnchorIndex] = useState(-1);
 
   const nodeRef = useRef(null);
+  const labelRef = useRef(null);
   const transformerRef= useRef(null);
 
   const {canvasX, canvasY, canvasScale} = useContext(CanvasContext);
@@ -48,6 +55,12 @@ export function Keyword({
       {x: clientRect.width/canvasScale / 2, y: clientRect.height/canvasScale + 15/canvasScale},
       {x: clientRect.width/canvasScale + 15/canvasScale, y: clientRect.height/canvasScale / 2}
     ]
+  }
+
+  const pointer2CanvasPosition = (pointerPosition) => {
+    const posX = (pointerPosition.x - canvasX) / canvasScale;
+    const posY = (pointerPosition.y -  canvasY) / canvasScale;
+    return {x: posX, y: posY};
   }
 
   useEffect(() => {
@@ -96,19 +109,6 @@ export function Keyword({
     onTextChange(e.currentTarget.value);
   }
 
-  function onHoverIcon(e) {
-    e.target.to({
-      scaleX: 1.1,
-      scaleY: 1.1
-    });
-  };
-  function onUnhoverIcon(e) {
-    e.target.to({
-      scaleX: 1,
-      scaleY: 1
-    });
-  };
-
   return (
     <>
     <Group
@@ -125,6 +125,60 @@ export function Keyword({
       if (onDragEnd)
         onDragEnd(e);
     }}>
+    {/* <Group
+    x={10}
+    y={-20}>
+      <Circle
+      x={0}
+      y={0}
+      radius={5}
+      fill={"orange"}
+      />
+      <Circle
+      x={15}
+      y={0}
+      radius={5}
+      fill={"purple"}
+      onClick={()=>{
+        labelRef.current.to({scaleX: 1, scaleY: 1, duration: 0.25,
+          easing: Konva.Easings.EaseOut});
+      }}
+      />
+      <Circle
+      x={30}
+      y={0}
+      radius={5}
+      fill={"green"}
+      />
+      <Circle
+      x={45}
+      y={0}
+      radius={5}
+      fill={"pink"}
+      />
+      <Label
+      x={15}
+      y={-5}
+      scaleX={0}
+      scaleY={0}
+      ref={labelRef}>
+        <Tag
+        fill={"purple"}
+        cornerRadius={5}
+        pointerDirection={"down"}
+        pointerWidth={5}
+        pointerHeight={5}
+        />
+        <Text
+        text={"Provide a tldr version of [placeholder]"}
+        fontSize={12}
+        fontStyle={"bold"}
+        fontFamily={"sans-serif"}
+        fill={"white"}
+        // opacity={isNull?0.5:1}
+        padding={5}/>
+      </Label>
+    </Group> */}
     <Group x={0} y={0}
     // draggable={draggable}
     // onDragStart={onDragStart}
@@ -219,7 +273,7 @@ export function Keyword({
       </Label>
     </Group>
     <Group x={0} y={0}
-    visible={(isConnecting && isHover) || (isSelected && !isEditing && !isTransforming)}>
+    visible={(isConnecting && isHoverBoundingBox) || (isSelected && !isEditing && !isTransforming)}>
     {anchorPosition.map((anchor,index)=>{
         return (
         <Group
@@ -233,7 +287,7 @@ export function Keyword({
         radius={4}
         stroke={"#0096FF"}
         strokeWidth={1}
-        fill={(isHover && anchorIndex===index) ? "#0096FF" : "white"}
+        fill={(isHoverBoundingBox && anchorIndex===index) ? "#0096FF" : "white"}
         opacity={isDragging?0.12:0.75}
         />
         <Circle
@@ -247,6 +301,47 @@ export function Keyword({
         </Group>)
       })}
     </Group>
+    {anchorPosition.length>0 ?
+    <Rect
+    x={-20/canvasScale}
+    y={-20/canvasScale}
+    width={anchorPosition[3].x-anchorPosition[1].x+10}
+    height={anchorPosition[2].y-anchorPosition[0].y+10}
+    onMouseEnter={(e) => {
+      setIsHoverBoundingBox(true);
+      const pointerPosition = e.target.getStage().getPointerPosition();
+      const canvasPosition = pointer2CanvasPosition(pointerPosition);
+      const distance = anchorPosition.map((position)=>{
+        return Math.sqrt((canvasPosition.x-(x+position.x))**2
+        + (canvasPosition.y-(y+position.y))**2)
+      });
+      const minIndex = distance.indexOf(Math.min(...distance));
+      setAnchorIndex(minIndex);
+      onConnectingHover(e,minIndex);
+    }}
+    onMouseLeave={(e) => {
+      setIsHoverBoundingBox(false);
+      setAnchorIndex(-1);
+      onConnectingUnhover(e);
+    }}
+    fill="transparent"
+    onMouseDown={(e)=>{onConnected(e,anchorIndex)}}
+    onMouseUp={(e)=>{onConnected(e,anchorIndex)}}
+    visible={isConnecting}
+    onMouseMove={(e)=>{
+      if (isHoverBoundingBox) {
+        const pointerPosition = e.target.getStage().getPointerPosition();
+        const canvasPosition = pointer2CanvasPosition(pointerPosition);
+        const distance = anchorPosition.map((position)=>{
+          return Math.sqrt((canvasPosition.x-(x+position.x))**2
+          + (canvasPosition.y-(y+position.y))**2)
+        });
+        const minIndex = distance.indexOf(Math.min(...distance));
+        setAnchorIndex(minIndex);
+        onConnectingHover(e,minIndex);
+      }
+    }}
+    />: null}
     </Group>
     {transformer}
     </>
