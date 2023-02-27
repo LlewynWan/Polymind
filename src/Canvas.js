@@ -261,7 +261,7 @@ export function Canvas({dimensions})
             console.log(position)
             setNodes(prevState=>{
                 let tmp = {id: numNodes, type: "keyword",
-                x: position[0], y: position[1],
+                x: position[0], y: position[1], fontSize: 20,
                 scaleX: 1/canvasScale, scaleY: 1/canvasScale,
                 selected: true, text: "", display: true};
                 return [...prevState, tmp];
