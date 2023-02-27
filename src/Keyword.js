@@ -43,10 +43,10 @@ export function Keyword({
   const calcAnchorPosition = () => {
     const clientRect = nodeRef.current.getClientRect();
     return [
-      {x: clientRect.width/canvasScale*scaleX / 2, y: -20/canvasScale},
-      {x: -20/canvasScale, y: clientRect.height/canvasScale*scaleY / 2},
-      {x: clientRect.width/canvasScale*scaleX / 2, y: clientRect.width/canvasScale*scaleY + 20/canvasScale},
-      {x: clientRect.width/canvasScale*scaleX + 20/canvasScale, y: clientRect.width/canvasScale*scaleY / 2}
+      {x: clientRect.width/canvasScale / 2, y: -15/canvasScale},
+      {x: -15/canvasScale, y: clientRect.height/canvasScale / 2},
+      {x: clientRect.width/canvasScale / 2, y: clientRect.height/canvasScale + 15/canvasScale},
+      {x: clientRect.width/canvasScale + 15/canvasScale, y: clientRect.height/canvasScale / 2}
     ]
   }
 
@@ -57,13 +57,13 @@ export function Keyword({
 
     if (nodeRef.current) {
       setAnchorPosition(calcAnchorPosition());
-    }
+    }  
 
     if (transformerRef.current !== null) {
       transformerRef.current.nodes([nodeRef.current]);
       transformerRef.current.getLayer().batchDraw();
     }
-  }, [isSelected, isEditing]);
+  }, [isSelected, isEditing, scaleX, scaleY, canvasScale]);
 
   const transformer = isSelected && !isEditing ? (
     <Transformer
@@ -74,13 +74,13 @@ export function Keyword({
       borderStrokeWidth={3.5}
       anchorStroke={"#0096FF"}
       anchorStrokeWidth={1.5}
-      anchorSize={10}
+      anchorSize={8}
       anchorCornerRadius={2}
       enabledAnchors={["top-left", "top-right",
       "bottom-left",
       "bottom-right"]}
       boundBoxFunc={(oldBox, newBox) => {
-        newBox.width = Math.max(30, newBox.width);
+        newBox.width = Math.max(12, newBox.width);
         return newBox;
       }}
     />
@@ -129,6 +129,8 @@ export function Keyword({
     // draggable={draggable}
     // onDragStart={onDragStart}
     // onDragEnd={onDragEnd}
+    scaleX={scaleX}
+    scaleY={scaleY}
     onMouseEnter={() => setIsHover(true)}
     onMouseLeave={() => setIsHover(false)}
     ref={nodeRef}
@@ -228,7 +230,7 @@ export function Keyword({
         scaleY={1/canvasScale}>
         <Circle
         key={index+4}
-        radius={5}
+        radius={4}
         stroke={"#0096FF"}
         strokeWidth={1}
         fill={(isHover && anchorIndex===index) ? "#0096FF" : "white"}

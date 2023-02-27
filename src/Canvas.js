@@ -115,7 +115,7 @@ export function Canvas({dimensions})
         isDrawingArrow, isDrawingDoubleArrow, isAddingKeyword]);
 
 
-    const UnselectAll = (e) => {
+    const UnselectAllNodes = () => {
         setNodes(prevState => {
             return prevState.map((state)=>{
                 let tmp = state;
@@ -123,6 +123,9 @@ export function Canvas({dimensions})
                 return tmp;
             });
         });
+    }
+    const UnselectAll = () => {
+        UnselectAllNodes();
 
         setIsDrawingArrow(false);
         setIsDrawingDoubleArrow(false);
@@ -250,6 +253,24 @@ export function Canvas({dimensions})
         const offsetY = (position.y - canvasY) * (scaleBy - 1);
         setCanvasX(canvasX - offsetX);
         setCanvasY(canvasY - offsetY);
+    }
+
+    const handleStageClick = e => {
+        if (isAddingKeyword) {
+            const position = pointer2CanvasPosition(pointerPosition);
+            console.log(position)
+            setNodes(prevState=>{
+                let tmp = {id: numNodes, type: "keyword",
+                x: position[0], y: position[1],
+                scaleX: 1/canvasScale, scaleY: 1/canvasScale,
+                selected: true, text: "", display: true};
+                return [...prevState, tmp];
+            });
+            setNumNodes(numNodes+1);
+            setIsAddingKeyword(false);
+        } else {
+            UnselectAll();
+        }
     }
 
     const handleStageMouseDown = e => {
@@ -484,7 +505,7 @@ export function Canvas({dimensions})
     height={dimensions.height}
     style={{ backgroundColor: "#F5F6FC" }}
     onWheel={handleStageWheel}
-    onClick={UnselectAll}
+    onClick={handleStageClick}
     onMouseDown={handleStageMouseDown}
     // onDblClick={toggleFollowerMode}
     ref={stageRef}
@@ -615,6 +636,8 @@ export function Canvas({dimensions})
                     isNull={node.text===""}
                     isSelected={node.selected}
                     onClick={(e)=>onNodeSelect(e,node.id)}
+                    onDragMove={(e)=>{handleDragNodeMove(e,node.id)}}
+                    onDragEnd={(e)=>{handleDragNodeEnd(e,node.id)}}
                     onTextChange={(value)=>onNodeTextChange(value,node.id)}
                     onScale={(newScale, newX, newY)=>onNodeScale(node.id, newScale, newX, newY)}
                     /> :
@@ -755,6 +778,7 @@ export function Canvas({dimensions})
                 isArrowIconClicked={isDrawingArrow}
                 onArrowIconClick={(e)=>{
                     e.cancelBubble = true;
+                    UnselectAllNodes();
                     setIsDrawingDoubleArrow(false);
                     setIsAddingKeyword(false);
                     setIsDrawingArrow(!isDrawingArrow);
@@ -762,6 +786,7 @@ export function Canvas({dimensions})
                 isDoubleArrowIconClicked={isDrawingDoubleArrow}
                 onDoubleArrowIconClick={(e)=>{
                     e.cancelBubble = true;
+                    UnselectAllNodes();
                     setIsDrawingArrow(false);
                     setIsAddingKeyword(false);
                     setIsDrawingDoubleArrow(!isDrawingDoubleArrow);
@@ -769,6 +794,7 @@ export function Canvas({dimensions})
                 isTextIconClicked={isAddingKeyword}
                 onTextIconClick={(e)=>{
                     e.cancelBubble = true;
+                    UnselectAllNodes();
                     setIsDrawingArrow(false);
                     setIsDrawingDoubleArrow(false);
                     setIsAddingKeyword(!isAddingKeyword);
