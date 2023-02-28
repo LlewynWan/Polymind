@@ -42,6 +42,8 @@ export function Keyword({
   const [anchorPosition, setAnchorPosition] = useState([]);
   const [anchorIndex, setAnchorIndex] = useState(-1);
 
+  const [textInputHeight, setTextInputHeight] = useState(20);
+
   const nodeRef = useRef(null);
   const labelRef = useRef(null);
   const transformerRef= useRef(null);
@@ -253,11 +255,14 @@ export function Keyword({
         <TextInput
           x={padding}
           y={padding-0.5}
+          width={window.innerWidth}
+          height={textInputHeight}
           fontSize={fontSize}
           fontStyle={"bold"}
           onChange={handleTextChange}
           onKeyDown={handleEscapeKeys}
           value={text}
+          onOverflow={(scrollHeight)=>setTextInputHeight(scrollHeight)}
         /> :
         <Text
         text={isNull?"Add keyword":text}

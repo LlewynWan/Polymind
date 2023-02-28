@@ -88,6 +88,7 @@ export function StickyNote({
       "bottom-left", "bottom-right"]}
       boundBoxFunc={(oldBox, newBox) => {
         newBox.width = Math.max(30, newBox.width);
+        newBox.height = Math.max(30, newBox.height);
         return newBox;
       }}
     />

@@ -3,18 +3,22 @@ import { HotKeys } from "react-hotkeys";
 
 import Konva from "konva";
 import { MyLine } from "./MyLine";
-import { Stage, Layer, Group, Line } from "react-konva";
+import { Stage, Layer, Group } from "react-konva";
 
-import { StickyNote } from "./StickyNote";
-import { Prompter } from "./Prompter";
 import { ToolBar } from "./ToolBar";
 import { Keyword } from "./Keyword"
-import { TaskPrompt } from "./TaskPrompt";
+import { Concept } from "./Concept";
+import { StickyNote } from "./StickyNote";
+
 import { TaskBoard } from "./TaskBoard";
+
+import { Prompter } from "./Prompter";
+import { TaskPrompt } from "./TaskPrompt";
 import { PromptPanel } from "./PromptPanel";
 import { PromptGPT } from "./GPT_utils";
 
 import { GlobalContext, CanvasContext, PrompterContext } from "./state";
+
 
 
 // async function PromptGPT()
@@ -682,7 +686,33 @@ export function Canvas({dimensions})
                     }}
                     onConnected={(e,anchor)=>onNodeConnected(e,node.id,anchor)}
                     /> :
-                    node.type === "concept" ? null : null : null
+                    node.type === "concept" ?
+                    <Concept
+                    key={node.id}
+                    x={node.x}
+                    y={node.y}
+                    radiusX={node.radiusX}
+                    radiusY={node.radiusY}
+                    text={node.text}
+                    fontSize={20}
+                    color={"#FADADD"}
+                    isNull={node.text===""}
+                    isSelected={node.selected}
+                    onClick={(e)=>onNodeSelect(e,node.id)}
+                    onTextChange={(value)=>onNodeTextChange(value,node.id)}
+                    onOverflow={(scrollHeight)=>{
+                        setNodes(prevState =>{
+                            return prevState.map(state => {
+                                let tmp = state;
+                                if (tmp.id === node.id)
+                                    tmp.radiusY = scrollHeight;
+                                return tmp;
+                            });
+                        })
+                    }}
+                    onDragMove={(e)=>{handleDragNodeMove(e,node.id)}}
+                    onDragEnd={(e)=>{handleDragNodeEnd(e,node.id)}}
+                    /> : null : null
                 })
             }
             {arrows.map((arrow,index)=>{
