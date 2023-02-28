@@ -28,6 +28,7 @@ export function Keyword({
   onConnectingUnhover,
   onConnected,
   onTextChange,
+  onTextSizeChange,
   onDragStart,
   onDragMove,
   onDragEnd,
@@ -70,6 +71,7 @@ export function Keyword({
 
     if (nodeRef.current) {
       setAnchorPosition(calcAnchorPosition());
+      onTextSizeChange(nodeRef.current.getClientRect());
     }  
 
     if (transformerRef.current !== null) {

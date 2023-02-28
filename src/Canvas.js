@@ -260,7 +260,8 @@ export function Canvas({dimensions})
             const position = pointer2CanvasPosition(pointerPosition);
             setNodes(prevState=>{
                 let tmp = {id: numNodes, type: "keyword",
-                x: position[0], y: position[1], fontSize: 20,
+                x: position[0], y: position[1],
+                width: 0, height: 0, fontSize: 20,
                 scaleX: 1/canvasScale, scaleY: 1/canvasScale,
                 selected: true, text: "", display: true};
                 return [...prevState, tmp];
@@ -393,13 +394,34 @@ export function Canvas({dimensions})
     }
 
     const calcAnchorPosition = (anchor, node) => {
-        const anchorPosition = [
+        const anchorPosition = node.type === "sticky_note" ? [
             [node.x + (node.width + 35)*node.scaleX / 2, node.y-20/canvasScale],
             [node.x-20/canvasScale, node.y + (node.height + 70)*node.scaleY / 2],
             [node.x + (node.width + 35)*node.scaleX / 2, node.y + (node.height + 70)*node.scaleY + 20/canvasScale],
             [node.x + (node.width + 35)*node.scaleX + 20/canvasScale, node.y + (node.height + 70)*node.scaleY / 2]
-        ]
+        ] : node.type === "keyword" ? [
+            [node.x + node.width/canvasScale / 2, node.y-15/canvasScale],
+            [node.x-15/canvasScale, node.y + node.height/canvasScale / 2],
+            [node.x + node.width/canvasScale / 2, node.y + node.height/canvasScale + 15/canvasScale],
+            [node.x + node.width/canvasScale + 15/canvasScale, node.y + node.height/canvasScale / 2]
+        ] : []
         return anchorPosition[anchor];
+    }
+
+    const calcAnchorOffsetPositions = (node) => {
+        const anchorOffset = node.type === "sticky_note" ? [
+            [node.x + (node.width + 35)*node.scaleX / 2, node.y-40/canvasScale],
+            [node.x-40/canvasScale, node.y + (node.height + 70)*node.scaleY / 2],
+            [node.x + (node.width + 35)*node.scaleX / 2, node.y + (node.height + 70)*node.scaleY + 40/canvasScale],
+            [node.x + (node.width + 35)*node.scaleX + 40/canvasScale, node.y + (node.height + 70)*node.scaleY / 2]
+        ] : node.type === "keyword" ? [
+            [node.x + node.width/canvasScale / 2, node.y-30/canvasScale],
+            [node.x-30/canvasScale, node.y + node.height/canvasScale / 2],
+            [node.x + node.width/canvasScale / 2, node.y + node.height/canvasScale + 30/canvasScale],
+            [node.x + node.width/canvasScale + 30/canvasScale, node.y + node.height/canvasScale / 2]
+        ] : [];
+
+        return anchorOffset;
     }
 
     const findPathBetweenVectors = (from, to) => {
@@ -466,12 +488,7 @@ export function Canvas({dimensions})
     }
 
     const findPathBetweenNodeAndPointer = (anchor, node) => {
-        const anchorOffset = [
-            [node.x + (node.width + 35)*node.scaleX / 2, node.y-40/canvasScale],
-            [node.x-40/canvasScale, node.y + (node.height + 70)*node.scaleY / 2],
-            [node.x + (node.width + 35)*node.scaleX / 2, node.y + (node.height + 70)*node.scaleY + 40/canvasScale],
-            [node.x + (node.width + 35)*node.scaleX + 40/canvasScale, node.y + (node.height + 70)*node.scaleY / 2]
-        ]
+        const anchorOffset = calcAnchorOffsetPositions(node);
 
         const pointerOnCanvasPosition = pointer2CanvasPosition(pointerPosition);
 
@@ -489,18 +506,8 @@ export function Canvas({dimensions})
     }
 
     const findPathBetweenNodes = (fromAnchor, toAnchor, fromNode, toNode) => {
-        const fromAnchorOffset = [
-            [fromNode.x + (fromNode.width + 35)*fromNode.scaleX / 2, fromNode.y-40/canvasScale],
-            [fromNode.x-40/canvasScale, fromNode.y + (fromNode.height + 70)*fromNode.scaleY / 2],
-            [fromNode.x + (fromNode.width + 35)*fromNode.scaleX / 2, fromNode.y + (fromNode.height + 70)*fromNode.scaleY + 40/canvasScale],
-            [fromNode.x + (fromNode.width + 35)*fromNode.scaleX + 40/canvasScale, fromNode.y + (fromNode.height + 70)*fromNode.scaleY / 2]
-        ]
-        const toAnchorOffset = [
-            [toNode.x + (toNode.width + 35)*toNode.scaleX / 2, toNode.y-40/canvasScale],
-            [toNode.x-40/canvasScale, toNode.y + (toNode.height + 70)*toNode.scaleY / 2],
-            [toNode.x + (toNode.width + 35)*toNode.scaleX / 2, toNode.y + (toNode.height + 70)*toNode.scaleY + 40/canvasScale],
-            [toNode.x + (toNode.width + 35)*toNode.scaleX + 40/canvasScale, toNode.y + (toNode.height + 70)*toNode.scaleY / 2]
-        ]
+        const fromAnchorOffset = calcAnchorOffsetPositions(fromNode);
+        const toAnchorOffset = calcAnchorOffsetPositions(toNode);
 
         const from = {x: fromAnchorOffset[fromAnchor][0],
         y: fromAnchorOffset[fromAnchor][1],
@@ -649,6 +656,21 @@ export function Canvas({dimensions})
                     onDragMove={(e)=>{handleDragNodeMove(e,node.id)}}
                     onDragEnd={(e)=>{handleDragNodeEnd(e,node.id)}}
                     onTextChange={(value)=>onNodeTextChange(value,node.id)}
+                    onTextSizeChange={(rect)=>{
+                        if (rect.width && rect.height &&
+                        (node.width !== rect.width || node.height !== rect.height)) {
+                            setNodes(prevState=>{
+                                return prevState.map(state=>{
+                                    let tmp = state;
+                                    if (tmp.id === node.id) {
+                                        tmp.width = rect.width;
+                                        tmp.height = rect.height;
+                                    }
+                                    return tmp;
+                                });
+                            })
+                        }
+                    }}
                     onScale={(newScale, newX, newY)=>onNodeScale(node.id, newScale, newX, newY)}
                     onConnectingHover={(e,anchor)=>{
                         if (arrowFrom.id !== -1) {
