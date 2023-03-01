@@ -3,6 +3,7 @@ import { Group, Rect, Circle, Text, Transformer } from "react-konva";
 
 import { CanvasContext } from "./state";
 import { TextInput } from "./TextInput"
+import { TaskHeader } from "./TaskHeader";
 
 const RETURN_KEY = 13;
 const ESCAPE_KEY = 27;
@@ -46,7 +47,7 @@ export function StickyNote({
   const nodeRef = useRef(null);
   const transformerRef= useRef(null);
 
-  const {canvasX, canvasY, canvasScale} = useContext(CanvasContext);
+  const {canvasX, canvasY, canvasScale, microTasks} = useContext(CanvasContext);
 
   const anchorPosition = [
     {x: (width + 35)*scaleX / 2, y: -20/canvasScale},
@@ -120,6 +121,12 @@ export function StickyNote({
        if (onDragEnd)
          onDragEnd(e);
      }}>
+    
+    <TaskHeader
+    x={10}
+    y={-30}
+    tasks={microTasks}/>
+    
     <Group
     x={0}
     y={0}

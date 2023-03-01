@@ -590,7 +590,7 @@ export function Canvas({dimensions})
         opacity={promptPanelVisibility ? 0.5 : 1}
         >
             <Group>
-            <CanvasContext.Provider value={{canvasX, canvasY, canvasScale}}>
+            <CanvasContext.Provider value={{canvasX, canvasY, canvasScale, microTasks}}>
             {
                 nodes.map((node, index) => {
                     return node.display ?

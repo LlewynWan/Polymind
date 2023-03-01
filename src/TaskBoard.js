@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Group, Label, Rect, Text } from "react-konva";
 
+import { colorPalette } from "./color_utils";
 import { TaskCard } from "./TaskCard";
 
 
@@ -12,7 +13,7 @@ export function TaskBoard({
     tasks
 })
 {
-    const colorPalette = ["#FFB347", "#966FD6", "#71C562", "#FB6B89", "#B39EB5", "#D64A4A"]
+    // const colorPalette = ["#FFB347", "#966FD6", "#71C562", "#FB6B89", "#B39EB5", "#D64A4A"]
     const [isHover, setIsHover] = useState(false);
     const [taskCardOffset, setTaskCardOffset] = useState(100);
 

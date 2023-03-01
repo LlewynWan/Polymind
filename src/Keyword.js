@@ -5,6 +5,7 @@ import Konva from "konva";
 
 import { CanvasContext } from "./state";
 import { TextInput } from "./TextInput"
+import { TaskHeader } from "./TaskHeader";
 
 const RETURN_KEY = 13;
 const ESCAPE_KEY = 27;
@@ -47,7 +48,7 @@ export function Keyword({
   const nodeRef = useRef(null);
   const transformerRef= useRef(null);
 
-  const {canvasX, canvasY, canvasScale} = useContext(CanvasContext);
+  const {canvasX, canvasY, canvasScale, microTasks} = useContext(CanvasContext);
 
   const calcAnchorPosition = () => {
     const clientRect = nodeRef.current.getClientRect();
@@ -128,60 +129,12 @@ export function Keyword({
       if (onDragEnd)
         onDragEnd(e);
     }}>
-    {/* <Group
+    
+    <TaskHeader
     x={10}
-    y={-20}>
-      <Circle
-      x={0}
-      y={0}
-      radius={5}
-      fill={"orange"}
-      />
-      <Circle
-      x={15}
-      y={0}
-      radius={5}
-      fill={"purple"}
-      onClick={()=>{
-        labelRef.current.to({scaleX: 1, scaleY: 1, duration: 0.25,
-          easing: Konva.Easings.EaseOut});
-      }}
-      />
-      <Circle
-      x={30}
-      y={0}
-      radius={5}
-      fill={"green"}
-      />
-      <Circle
-      x={45}
-      y={0}
-      radius={5}
-      fill={"pink"}
-      />
-      <Label
-      x={15}
-      y={-5}
-      scaleX={0}
-      scaleY={0}
-      ref={labelRef}>
-        <Tag
-        fill={"purple"}
-        cornerRadius={5}
-        pointerDirection={"down"}
-        pointerWidth={5}
-        pointerHeight={5}
-        />
-        <Text
-        text={"Provide a tldr version of [placeholder]"}
-        fontSize={12}
-        fontStyle={"bold"}
-        fontFamily={"sans-serif"}
-        fill={"white"}
-        // opacity={isNull?0.5:1}
-        padding={5}/>
-      </Label>
-    </Group> */}
+    y={-30}
+    tasks={microTasks}/>
+
     <Group x={0} y={0}
     // draggable={draggable}
     // onDragStart={onDragStart}

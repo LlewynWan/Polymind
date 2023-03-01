@@ -5,6 +5,7 @@ import Konva from "konva";
 
 import { CanvasContext } from "./state";
 import { TextInput } from "./TextInput"
+import { TaskHeader } from "./TaskHeader";
 
 const RETURN_KEY = 13;
 const ESCAPE_KEY = 27;
@@ -48,7 +49,7 @@ export function Concept({
     const textRef = useRef(null);
     const addTextRef = useRef(null);
 
-    const {canvasX, canvasY, canvasScale} = useContext(CanvasContext);
+    const {canvasX, canvasY, canvasScale, microTasks} = useContext(CanvasContext);
 
     const tmp = new Konva.Text({text: "test", fontSize: fontSize});
     const fontWidth = tmp.width()
@@ -137,6 +138,12 @@ export function Concept({
        if (onDragEnd)
          onDragEnd(e);
      }}>
+
+    <TaskHeader
+    x={-radiusX+10}
+    y={-radiusY-20}
+    tasks={microTasks}/>
+
     <Group
     x={0}
     y={0}

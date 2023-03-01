@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { colorMap } from "./color_utils";
 import { Group, Rect, Label, Tag, Text } from "react-konva";
 
 
@@ -14,14 +15,14 @@ export function TaskCard({
 })
 {
     const [isHover, setIsHover] = useState(false);
-    const colorMap = {
-        "Keyword": "#AFC6D9",
-        "Concept": "#5880A2",
-        "Sticky Note": "#003A6B",
-        "Section": "#80D8FF",
-        "Nodes": "#112233",
-        "Lines": "#C3E7FD"
-    }
+    // const colorMap = {
+    //     "Keyword": "#AFC6D9",
+    //     "Concept": "#5880A2",
+    //     "Sticky Note": "#003A6B",
+    //     "Section": "#80D8FF",
+    //     "Nodes": "#112233",
+    //     "Lines": "#C3E7FD"
+    // }
 
     return (
         <Group
