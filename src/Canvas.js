@@ -40,9 +40,10 @@ import { GlobalContext, CanvasContext, PrompterContext } from "./state";
 
 export function Canvas({dimensions})
 {
-    const {nodes, numNodes, arrows, promptCards, mainPrompter,
-        setNodes, setNumNodes, setArrows, taskPrompts, setTaskPrompts,
-        setPromptCards, setMainPrompter} = useContext(GlobalContext);
+    const {nodes, numNodes, arrows,
+        setNodes, setNumNodes, setArrows,
+        promptCards, mainPrompter, taskPrompts, microTasks,
+        setPromptCards, setMainPrompter, setTaskPrompts, setMicroTasks} = useContext(GlobalContext);
 
     const [canvasX, setCanvasX] = React.useState(0);
     const [canvasY, setCanvasY] = React.useState(0);
@@ -829,10 +830,11 @@ export function Canvas({dimensions})
         </Layer>
         <Layer>
             <TaskBoard
-            x={dimensions.width-375}
+            x={dimensions.width-360}
             y={25}
-            width={320}
-            height={dimensions.height-50}/>
+            width={300}
+            height={dimensions.height-50}
+            tasks={microTasks}/>
 
             {/* {followerPositionQueue.map((position,index)=>{
                 return <TaskPrompt

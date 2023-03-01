@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Group, Rect, Text } from "react-konva";
+import { Group, Label, Rect, Text } from "react-konva";
 
 import { TaskCard } from "./TaskCard";
 
@@ -8,17 +8,38 @@ export function TaskBoard({
     x,
     y,
     width,
-    height
+    height,
+    tasks
 })
 {
+    const colorPalette = ["#FFB347", "#966FD6", "#71C562", "#FB6B89", "#B39EB5", "#D64A4A"]
     const [isHover, setIsHover] = useState(false);
+    const [taskCardOffset, setTaskCardOffset] = useState(100);
+
+    const handleTaskBoardWheel = e => {
+        e.evt.preventDefault();
+        e.cancelBubble=true;
+        const offset = e.evt.deltaY < 0 ? 15 : -15;
+        if (taskCardOffset+offset + (tasks.length-1)*145+125 >= height-35) {
+            setTaskCardOffset(Math.min(taskCardOffset+offset,100));
+        }
+        // const newScale = canvasScale * scaleBy
+        // setCanvasScale(newScale);
+        
+        // const position = e.target.getStage().getPointerPosition();
+        // const offsetX = (position.x - canvasX) * (scaleBy - 1);
+        // const offsetY = (position.y - canvasY) * (scaleBy - 1);
+        // setCanvasX(canvasX - offsetX);
+        // setCanvasY(canvasY - offsetY);
+    }
 
     return (
         <Group
         x={x}
         y={y}
         onMouseEnter={()=>setIsHover(true)}
-        onMouseLeave={()=>setIsHover(false)}>
+        onMouseLeave={()=>setIsHover(false)}
+        onWheel={handleTaskBoardWheel}>
             <Rect
             x={0}
             y={0}
@@ -44,7 +65,31 @@ export function TaskBoard({
             fontFamily={"sans-serif"}
             fill={"black"}
             />
-            <TaskCard
+            <Group
+            x={0}
+            y={0}
+            clipX={-window.innerWidth}
+            clipY={95}
+            clipWidth={window.innerWidth*2}
+            clipHeight={height-115}>
+            {tasks.map((task,index)=>{
+                return (
+                    <TaskCard
+                    key={task.id}
+                    x={15}
+                    y={taskCardOffset+145*task.id}
+                    width={width-30}
+                    height={125}
+                    color={colorPalette[task.id%colorPalette.length]}
+                    goal={task.goal}
+                    inputType={task.inputType}
+                    outputType={task.outputType}
+                    />
+                )
+            })}
+            </Group>
+            
+            {/* <TaskCard
             x={25}
             y={100}
             width={width-50}
@@ -79,7 +124,7 @@ export function TaskBoard({
             color={"#FB6B89"}
             goal={"Draft"}
             outputType={"Section"}
-            />
+            /> */}
         </Group>
     )
 }

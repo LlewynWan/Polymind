@@ -8,10 +8,20 @@ export function TaskCard({
     height,
     color,
     goal,
-    outputType
+    inputType,
+    outputType,
+    examplePrompt
 })
 {
     const [isHover, setIsHover] = useState(false);
+    const colorMap = {
+        "Keyword": "#AFC6D9",
+        "Concept": "#5880A2",
+        "Sticky Note": "#003A6B",
+        "Section": "#80D8FF",
+        "Nodes": "#112233",
+        "Lines": "#C3E7FD"
+    }
 
     return (
         <Group
@@ -55,8 +65,11 @@ export function TaskCard({
             y={65}
             >
                 <Tag
-                fill={"#B0B3B8"}
+                // fill={"#B0B3B8"}
+                fill={"#C0C2CE"}
                 cornerRadius={5}
+                // stroke={"#010203"}
+                // strokeWidth={0.12}
                 pointerDirection={"right"}
                 pointerWidth={5}
                 pointerHeight={5}
@@ -71,12 +84,39 @@ export function TaskCard({
                 padding={5}/>
             </Label>
             <Label
+            x={width/2+5}
+            y={65}
+            >
+                <Tag
+                fill={colorMap[inputType]}
+                // fill={inputType==="Sticky Note" ? "#003A6B"
+                // : inputType==="Concept" ? "#5880A2"
+                // : inputType==="Keyword" ? "#AFC6D9" : "#80D8FF"}
+                cornerRadius={5}
+                pointerDirection={"left"}
+                // pointerWidth={5}
+                // pointerHeight={5}
+                lineJoin={'round'}
+                />
+                <Text
+                text={inputType}
+                fontSize={14}
+                fontStyle={"bold"}
+                fontFamily={"sans-serif"}
+                fill={"white"}
+                padding={5}/>
+            </Label>
+            
+            <Label
             x={width/2}
             y={95}
             >
                 <Tag
-                fill={"#B0B3B8"}
+                // fill={"#B0B3B8"}
+                fill={"#C0C2CE"}
                 cornerRadius={5}
+                // stroke={"#010203"}
+                // strokeWidth={0.12}
                 pointerDirection={"right"}
                 pointerWidth={5}
                 pointerHeight={5}
@@ -95,9 +135,10 @@ export function TaskCard({
             y={95}
             >
                 <Tag
-                fill={outputType==="Sticky Note" ? "#003A6B"
-                : outputType==="Concept" ? "#5880A2"
-                : outputType==="Keyword" ? "#AFC6D9" : "#80D8FF"}
+                fill={colorMap[outputType]}
+                // fill={outputType==="Sticky Note" ? "#003A6B"
+                // : outputType==="Concept" ? "#5880A2"
+                // : outputType==="Keyword" ? "#AFC6D9"  : "#80D8FF"}
                 cornerRadius={5}
                 pointerDirection={"left"}
                 // pointerWidth={5}

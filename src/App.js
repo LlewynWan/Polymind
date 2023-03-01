@@ -22,6 +22,16 @@ function App() {
     ],
     num_nodes: 0,
     arrows: [],
+    microtasks: [
+      {id: 0, goal: "Brainstorm", inputType: "Keyword", outputType: "Keyword", examplePrompt: []},
+      {id: 1, goal: "Summarise", inputType: "Sticky Note", outputType: "Keyword", examplePrompt: []},
+      {id: 2, goal: "Elaborate", inputType: "Concept", outputType: "Sticky Note", examplePrompt: []},
+      {id: 3, goal: "Draft", inputType: "Section", outputType: "Sticky Note", examplePrompt: []},
+      {id: 4, goal: "Freewrite", inputType: "Sticky Note", outputType: "Sticky Note", examplePrompt: []},
+      {id: 5, goal: "Associate", inputType: "Nodes", outputType: "Lines", examplePrompt: []},
+      // {id: 6, goal: "Clarify", inputType: "Concept", outputType: "Sticky Note", examplePrompt: []},
+      // {id: 7, goal: "Draft", inputType: "Section", outputType: "Sticky Note", examplePrompt: []}
+    ],
     task_prompts: [
       {node_id: 0, task_id: 0, prompt: "Brainstorm a list of keywords related to \"Interaction\""}
     ],
@@ -40,7 +50,8 @@ function App() {
   const [arrows, setArrows] = React.useState(initialState.arrows);
   const [promptCards, setPromptCards] = React.useState(initialState.prompt_cards);
   const [mainPrompter, setMainPrompter] = React.useState(initialState.main_prompter);
-  const [taskPrompts, setTaskPrompts] = React.useState(initialState.task_prompts)
+  const [taskPrompts, setTaskPrompts] = React.useState(initialState.task_prompts);
+  const [microTasks, setMicroTasks] = React.useState(initialState.microtasks);
 
 
   useEffect(() => {
@@ -70,8 +81,9 @@ function App() {
   return (
     <div className="container fullscreen" id="fullsccreen">
       <GlobalContext.Provider value={{
-        nodes, numNodes, arrows, promptCards, mainPrompter, taskPrompts,
-        setNodes, setNumNodes, setArrows, setTaskPrompts, setPromptCards, setMainPrompter
+        nodes, numNodes, arrows, promptCards, mainPrompter, taskPrompts, microTasks,
+        setNodes, setNumNodes, setArrows, setTaskPrompts, setPromptCards,
+        setMainPrompter, setMicroTasks
       }}>
         <Canvas dimensions={dimensions}/>
       </GlobalContext.Provider>
