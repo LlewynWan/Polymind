@@ -408,6 +408,11 @@ export function Canvas({dimensions})
             [node.x-15/canvasScale, node.y + node.height/canvasScale / 2],
             [node.x + node.width/canvasScale / 2, node.y + node.height/canvasScale + 15/canvasScale],
             [node.x + node.width/canvasScale + 15/canvasScale, node.y + node.height/canvasScale / 2]
+        ] : node.type === "concept" ? [
+            [node.x, node.y - node.radiusY*node.scaleY - 15/canvasScale],
+            [node.x - node.radiusX*node.scaleX - 15/canvasScale, node.y],
+            [node.x, node.y + node.radiusY*node.scaleY + 15/canvasScale],
+            [node.x + node.radiusX*node.scaleX + 15/canvasScale, node.y]
         ] : []
         return anchorPosition[anchor];
     }
@@ -423,6 +428,11 @@ export function Canvas({dimensions})
             [node.x-30/canvasScale, node.y + node.height/canvasScale / 2],
             [node.x + node.width/canvasScale / 2, node.y + node.height/canvasScale + 30/canvasScale],
             [node.x + node.width/canvasScale + 30/canvasScale, node.y + node.height/canvasScale / 2]
+        ] : node.type === "concept" ? [
+            [node.x, node.y - node.radiusY*node.scaleY - 30/canvasScale],
+            [node.x - node.radiusX*node.scaleX - 30/canvasScale, node.y],
+            [node.x, node.y + node.radiusY*node.scaleY + 30/canvasScale],
+            [node.x + node.radiusX*node.scaleX + 30/canvasScale, node.y]
         ] : [];
 
         return anchorOffset;
@@ -691,14 +701,31 @@ export function Canvas({dimensions})
                     key={node.id}
                     x={node.x}
                     y={node.y}
+                    scaleX={node.scaleX}
+                    scaleY={node.scaleY}
                     radiusX={node.radiusX}
                     radiusY={node.radiusY}
                     text={node.text}
                     fontSize={20}
-                    color={"#FADADD"}
+                    color={"#FFB5B7"}
                     isNull={node.text===""}
                     isSelected={node.selected}
                     onClick={(e)=>onNodeSelect(e,node.id)}
+                    onScale={(newScale, newX, newY)=>onNodeScale(node.id, newScale, newX, newY)}
+                    onResize={(offsetW,offsetH)=>{
+                        if (node.radiusX+offsetW >= 36 && node.radiusY+offsetH >=20) {
+                            setNodes(prevState => {
+                                return prevState.map(state => {
+                                    let tmp = state;
+                                    if (tmp.id === node.id) {
+                                        tmp.radiusX += offsetW;
+                                        tmp.radiusY += offsetH;
+                                    }
+                                    return tmp;
+                                });
+                            });
+                        }
+                    }}
                     onTextChange={(value)=>onNodeTextChange(value,node.id)}
                     onOverflow={(scrollHeight)=>{
                         setNodes(prevState =>{
@@ -710,6 +737,16 @@ export function Canvas({dimensions})
                             });
                         })
                     }}
+                    isConnecting={isDrawingArrow || isDrawingDoubleArrow}
+                    onConnectingHover={(e,anchor)=>{
+                        if (arrowFrom.id !== -1) {
+                            setArrowTo({id: node.id, anchor: anchor});
+                        }
+                    }}
+                    onConnectingUnhover={(e)=>{
+                        setArrowTo({id: -1, anchor: -1});
+                    }}
+                    onConnected={(e,anchor)=>onNodeConnected(e,node.id,anchor)}
                     onDragMove={(e)=>{handleDragNodeMove(e,node.id)}}
                     onDragEnd={(e)=>{handleDragNodeEnd(e,node.id)}}
                     /> : null : null

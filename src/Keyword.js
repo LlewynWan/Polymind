@@ -45,7 +45,6 @@ export function Keyword({
   const [textInputHeight, setTextInputHeight] = useState(20);
 
   const nodeRef = useRef(null);
-  const labelRef = useRef(null);
   const transformerRef= useRef(null);
 
   const {canvasX, canvasY, canvasScale} = useContext(CanvasContext);
@@ -312,8 +311,8 @@ export function Keyword({
     <Rect
     x={-20/canvasScale}
     y={-20/canvasScale}
-    width={anchorPosition[3].x-anchorPosition[1].x+10}
-    height={anchorPosition[2].y-anchorPosition[0].y+10}
+    width={anchorPosition[3].x-anchorPosition[1].x+10/canvasScale}
+    height={anchorPosition[2].y-anchorPosition[0].y+10/canvasScale}
     onMouseEnter={(e) => {
       setIsHoverBoundingBox(true);
       const pointerPosition = e.target.getStage().getPointerPosition();

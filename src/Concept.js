@@ -19,8 +19,8 @@ export function Concept({
     scaleX,
     scaleY,
     onScale,
+    onResize,
     fontSize,
-    padding,
     isNull,
     onClick,
     isSelected,
@@ -56,6 +56,19 @@ export function Concept({
 
     const [textInputY, setTextInputY] = useState(-tmp.height()/2-0.5);
     const [textInputHeight, setTextInputHeight] = useState(tmp.height()*1.2);
+
+    const pointer2CanvasPosition = (pointerPosition) => {
+        const posX = (pointerPosition.x - canvasX) / canvasScale;
+        const posY = (pointerPosition.y -  canvasY) / canvasScale;
+        return {x: posX, y: posY};
+    }
+
+    const anchorPosition = [
+        {x: 0, y: -radiusY*scaleY - 15/canvasScale},
+        {x: -radiusX*scaleX - 15/canvasScale, y: 0},
+        {x: 0, y: radiusY*scaleY + 15/canvasScale},
+        {x: radiusX*scaleX + 15/canvasScale, y: 0}
+    ]
 
     const transformer = isSelected && !isEditing ? (
         <Transformer
@@ -97,6 +110,14 @@ export function Concept({
     }
 
     function handleTextChange(e) {
+        const tmp = new Konva.Text({
+            width: radiusX*2,
+            text: e.currentTarget.value,
+            align: "center",
+            fontSize: fontSize
+        })
+        setTextInputY(-tmp.height()/2-0.5);
+        setTextInputHeight(tmp.height()*1.2)
         onTextChange(e.currentTarget.value);
     }
 
@@ -147,7 +168,7 @@ export function Concept({
         radiusY={radiusY}
         fill={color}
         stroke={"#010203"}
-        strokeWidth={0.12}
+        strokeWidth={0.2}
         opacity={0.85}
         />
         <Text
@@ -188,18 +209,7 @@ export function Concept({
             onKeyDown={handleEscapeKeys}
             value={text}
             onOverflow={(scrollHeight)=>{
-                setTextInputY(textInputY-(scrollHeight-textInputHeight)/2-1);
-                setTextInputHeight(scrollHeight)
-                // if ((scrollHeight-textInputHeight) % 2 === 0) {
-                //     setTextInputY(textInputY-(scrollHeight-textInputHeight)/2);
-                //     setTextInputHeight(scrollHeight)
-                // } else {
-                //     setTextInputY(textInputY-(scrollHeight-textInputHeight)/2-1);
-                //     setTextInputHeight(scrollHeight)
-                // }
-                // if (scrollHeight > radiusY) {
-                //     onOverflow(radiusY+fontHeight)
-                // }
+                onOverflow(scrollHeight)
             }}
         /> :
         <Text
@@ -222,6 +232,128 @@ export function Concept({
             perfectDrawEnabled={false}
         />}
     </Group>
+    <Group x={0} y={0}
+    visible={(isConnecting && isHover) || (isSelected && !isEditing && !isTransforming)}>
+    {anchorPosition.map((anchor,index)=>{
+        return (
+        <Group
+        key={index}
+        x={anchor.x}
+        y={anchor.y}
+        scaleX={1/canvasScale}
+        scaleY={1/canvasScale}>
+        <Circle
+        key={index+4}
+        radius={5}
+        stroke={"#0096FF"}
+        strokeWidth={1}
+        fill={(isHover && anchorIndex===index) ? "#0096FF" : "white"}
+        opacity={isDragging?0.12:0.75}
+        />
+        <Circle
+        key={index}
+        radius={20}
+        stroke={"#0096FF"}
+        strokeWidth={0}
+        fill={"transparent"}
+        opacity={isDragging?0.12:0.75}
+        onMouseEnter={(e)=>{
+          if (!isConnecting) {
+            const stage = e.target.getStage();
+            const type = (index%2 === 0) ? "ns-resize" : "ew-resize";
+            stage.container().style.cursor = type;
+          }
+        }}
+        onMouseLeave={(e)=>{
+          if (!isConnecting) {
+            const stage = e.target.getStage();
+            stage.container().style.cursor = "default"
+            setIsResizing(false);
+          }
+        }}
+        onMouseDown={(e)=>{
+          e.cancelBubble = true;
+          setIsResizing(true);
+          const position = e.target.getStage().getPointerPosition();
+          setInitialPointer({x: position.x, y: position.y})
+        }}
+        onMouseMove={(e)=>{
+          if (!isConnecting) {
+            e.cancelBubble = true;
+            const newPosition = e.target.getStage().getPointerPosition();
+            if (isResizing) {
+              var offsetW = (newPosition.x !== initialPointer.x) ? 18 : 0;
+              var offsetH = (newPosition.y !== initialPointer.y) ? 10 : 0;
+            //   var offsetX = (index===1 && newPosition.x !== initialPointer.x) ? -40 : 0;
+            //   var offsetY = (index===0 && newPosition.y !== initialPointer.y) ? -32 : 0;
+              if (index % 2 === 1) {
+                offsetH = 0;
+              } else {
+                offsetW = 0;
+              }
+              if ((newPosition.x < initialPointer.x && index === 3) ||
+              (newPosition.x > initialPointer.x && index === 1)) {
+                offsetW *= -1;
+              }
+              if ((newPosition.y > initialPointer.y && index === 0) ||
+              (newPosition.y < initialPointer.y && index === 2)) {
+                offsetH *= -1;
+              }
+              onResize(offsetW, offsetH);
+            }
+            if (newPosition.x !== initialPointer.x || newPosition.y !== initialPointer.y) {
+              setIsResizing(false);
+            }
+          }
+        }}
+        onMouseUp={(e)=>{
+          e.cancelBubble = true;
+          setIsResizing(false);
+        }}
+        />
+        </Group>)
+      })}
+    </Group>
+    <Rect
+    x={-radiusX*scaleX-20/canvasScale}
+    y={-radiusY*scaleY-20/canvasScale}
+    width={radiusX*scaleX*2+40/canvasScale}
+    height={radiusY*scaleY*2+40/canvasScale}
+    onMouseEnter={(e) => {
+      setIsHover(true);
+      const pointerPosition = e.target.getStage().getPointerPosition();
+      const canvasPosition = pointer2CanvasPosition(pointerPosition);
+      const distance = anchorPosition.map((position)=>{
+        return Math.sqrt((canvasPosition.x-(x+position.x))**2
+        + (canvasPosition.y-(y+position.y))**2)
+      });
+      const minIndex = distance.indexOf(Math.min(...distance));
+      setAnchorIndex(minIndex);
+      onConnectingHover(e,minIndex);
+    }}
+    onMouseLeave={(e) => {
+      setIsHover(false);
+      setAnchorIndex(-1);
+      onConnectingUnhover(e);
+    }}
+    fill="transparent"
+    onMouseDown={(e)=>{onConnected(e,anchorIndex)}}
+    onMouseUp={(e)=>{onConnected(e,anchorIndex)}}
+    visible={isConnecting}
+    onMouseMove={(e)=>{
+      if (isHover) {
+        const pointerPosition = e.target.getStage().getPointerPosition();
+        const canvasPosition = pointer2CanvasPosition(pointerPosition);
+        const distance = anchorPosition.map((position)=>{
+          return Math.sqrt((canvasPosition.x-(x+position.x))**2
+          + (canvasPosition.y-(y+position.y))**2)
+        });
+        const minIndex = distance.indexOf(Math.min(...distance));
+        setAnchorIndex(minIndex);
+        onConnectingHover(e,minIndex);
+      }
+    }}
+    />
     </Group>
     {transformer}
     </>

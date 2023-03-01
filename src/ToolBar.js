@@ -226,13 +226,13 @@ export function ToolBar({
             radiusX={40}
             radiusY={40}
             stroke={"#010203"}
-            strokeWidth={0.12}
+            strokeWidth={0.2}
             shadowColor={"gray"}
             shadowOffsetY={2.5}
             shadowOffsetX={5}
             shadowBlur={5}
             shadowOpacity={0.25}
-            fill={"#FADADD"}
+            fill={"#FFB5B7"}
             opacity={0.85}
             />
         </Group>
