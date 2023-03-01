@@ -1,6 +1,8 @@
 import React, { useContext, useRef, useState } from "react";
 import { Group, Rect, Line, Text, Ellipse } from "react-konva";
 
+import Konva from "konva";
+
 import { GlobalContext } from "./state";
 
 
@@ -19,6 +21,7 @@ export function ToolBar({
     onDoubleArrowIconClick,
     isTextIconClicked,
     onTextIconClick,
+    onAddConcept,
     onAddStickyNote,
     conceptOffset=325,
     stickyNoteOffset=400,
@@ -26,15 +29,19 @@ export function ToolBar({
     const [isHoverArrowIcon, setIsHoverArrowIcon] = useState(false);
     const [isHoverDoubleArrowIcon, setIsHoverDoubleArrowIcon] = useState(false);
     const [isHoverTextIcon, setIsHoverTextIcon] = useState(false);
-    const [isHoverStickyNotes, setIsHoverStickyNotes] = useState(false);
+    // const [isHoverStickyNotes, setIsHoverStickyNotes] = useState(false);
 
     const stickyNoteRef = useRef(null);
     const dummyStickyNoteRef1 = useRef(null);
     const dummyStickyNoteRef2 = useRef(null);
 
+    const ellipseRef = useRef(null);
+    const dummyEllipseRef = useRef(null);
+
     
-    const handleStickyNodeDragEnd = e => {
-        onAddStickyNote(e.target.x()+x+stickyNoteOffset, e.target.y()+y, 145, 110);
+    const handleStickyNoteDragEnd = e => {
+        onAddStickyNote(e.target.x()+x+stickyNoteOffset,
+        e.target.y()+y, 145, 110);
 
         stickyNoteRef.current.setAttrs({
             x: 12, y: 12, width: 60, height: 60,
@@ -51,7 +58,7 @@ export function ToolBar({
         stickyNoteRef.current.to({
             x: 19, y: 19,
             duration: 0.12,
-            onFinish: ()=>setIsHoverStickyNotes(false)
+            // onFinish: ()=>setIsHoverStickyNotes(false)
         });
         dummyStickyNoteRef1.current.to({
             x: 5, y: 5,
@@ -60,6 +67,28 @@ export function ToolBar({
         dummyStickyNoteRef2.current.to({
             x: 12, y: 12,
             duration: 0.45
+        })
+    }
+
+    const handleEllipseDragEnd = e => {
+        onAddConcept(e.target.x()+x+conceptOffset,
+        e.target.y()+y, 72, 40)
+        ellipseRef.current.setAttrs({
+            x: 0,
+            y: height + 20,
+            radiusX: 40,
+            radiusY: 40,
+            shadowOffsetX: 5,
+            shadowOffsetY: 2.5,
+            shadowOpacity: 0.25,
+            opacity: 1,
+            shadowBlur: 5
+        })
+        dummyEllipseRef.current.setAttrs({
+            y: height+40
+        })
+        ellipseRef.current.to({
+            y: height/2+20
         })
     }
 
@@ -209,7 +238,8 @@ export function ToolBar({
                 y: height / 2,
                 radiusX: 64,
                 radiusY: 35,
-                duration: 0.25
+                duration: 0.2,
+                easing: Konva.Easings.EaseOut
             })
         }}
         onMouseLeave={(e)=>{
@@ -217,14 +247,15 @@ export function ToolBar({
                 y: height / 2 + 20,
                 radiusX: 40,
                 radiusY: 40,
-                duration: 0.4
+                duration: 0.32
             })
         }}>
             <Ellipse
             x={0}
-            y={height/2+20}
+            y={height+40}
             radiusX={40}
             radiusY={40}
+            ref={dummyEllipseRef}
             stroke={"#010203"}
             strokeWidth={0.2}
             shadowColor={"gray"}
@@ -234,33 +265,87 @@ export function ToolBar({
             shadowOpacity={0.25}
             fill={"#FFB5B7"}
             opacity={0.85}
+            draggable={true}
+            />
+            <Ellipse
+            x={0}
+            y={height/2+20}
+            radiusX={40}
+            radiusY={40}
+            ref={ellipseRef}
+            stroke={"#010203"}
+            strokeWidth={0.2}
+            shadowColor={"gray"}
+            shadowOffsetY={2.5}
+            shadowOffsetX={5}
+            shadowBlur={5}
+            shadowOpacity={0.25}
+            fill={"#FFB5B7"}
+            opacity={1}
+            draggable={true}
+            onDragStart={(e)=>{
+                const stage = e.target.getStage();
+                stage.container().style.cursor = "grabbing";
+                ellipseRef.current.setAttrs({
+                    radiusX: 72,
+                    radiusY: 40,
+                    shadowOffsetX: 0,
+                    shadowOffsetY: 0,
+                    shadowOpacity: 0,
+                    shadowBlur: 0
+                });
+                dummyEllipseRef.current.to({
+                    y: height + 20,
+                    duration: 0.2,
+                    easing: Konva.Easings.EaseOut
+                })
+            }}
+            onDragEnd={(e)=>{
+                const stage = e.target.getStage();
+                stage.container().style.cursor = "default";
+                handleEllipseDragEnd(e);
+            }}
             />
         </Group>
 
         <Group x={stickyNoteOffset} y={0}
         onMouseEnter={()=>{
-            if (!isHoverStickyNotes) {
-                setIsHoverStickyNotes(true)
-                stickyNoteRef.current.to({
-                    x: -18,
-                    y: -75,
-                    width: 125,
-                    height: 125,
-                    duration: 0.2,
-                });
-            }
+            stickyNoteRef.current.to({
+                x: -21,
+                y: -75,
+                width: 125,
+                height: 125,
+                duration: 0.2,
+            });
+            // if (!isHoverStickyNotes) {
+            //     setIsHoverStickyNotes(true)
+            //     stickyNoteRef.current.to({
+            //         x: -18,
+            //         y: -75,
+            //         width: 125,
+            //         height: 125,
+            //         duration: 0.2,
+            //     });
+            // }
         }}
         onMouseLeave={()=>{
-            if (isHoverStickyNotes) {
-                setIsHoverStickyNotes(false);
-                stickyNoteRef.current.to({
-                    x: 19,
-                    y: 19,
-                    width: 60,
-                    height: 60,
-                    duration: 0.2
-                });
-            }
+            stickyNoteRef.current.to({
+                x: 19,
+                y: 19,
+                width: 60,
+                height: 60,
+                duration: 0.2
+            });
+            // if (isHoverStickyNotes) {
+            //     setIsHoverStickyNotes(false);
+            //     stickyNoteRef.current.to({
+            //         x: 19,
+            //         y: 19,
+            //         width: 60,
+            //         height: 60,
+            //         duration: 0.2
+            //     });
+            // }
         }}
         clipX={-window.innerWidth}
         clipY={-window.innerHeight}
@@ -318,7 +403,7 @@ export function ToolBar({
             onDragEnd={(e)=>{
                 const stage = e.target.getStage();
                 stage.container().style.cursor = "default";
-                handleStickyNodeDragEnd(e);
+                handleStickyNoteDragEnd(e);
             }}/>
         </Group>
         </Group>

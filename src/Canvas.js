@@ -3,7 +3,7 @@ import { HotKeys } from "react-hotkeys";
 
 import Konva from "konva";
 import { MyLine } from "./MyLine";
-import { Stage, Layer, Group } from "react-konva";
+import { Stage, Layer, Group, Line } from "react-konva";
 
 import { ToolBar } from "./ToolBar";
 import { Keyword } from "./Keyword"
@@ -419,20 +419,20 @@ export function Canvas({dimensions})
 
     const calcAnchorOffsetPositions = (node) => {
         const anchorOffset = node.type === "sticky_note" ? [
-            [node.x + (node.width + 35)*node.scaleX / 2, node.y-40/canvasScale],
-            [node.x-40/canvasScale, node.y + (node.height + 70)*node.scaleY / 2],
-            [node.x + (node.width + 35)*node.scaleX / 2, node.y + (node.height + 70)*node.scaleY + 40/canvasScale],
-            [node.x + (node.width + 35)*node.scaleX + 40/canvasScale, node.y + (node.height + 70)*node.scaleY / 2]
+            [node.x + (node.width + 35)*node.scaleX / 2, node.y-50/canvasScale],
+            [node.x-50/canvasScale, node.y + (node.height + 70)*node.scaleY / 2],
+            [node.x + (node.width + 35)*node.scaleX / 2, node.y + (node.height + 70)*node.scaleY + 50/canvasScale],
+            [node.x + (node.width + 35)*node.scaleX + 50/canvasScale, node.y + (node.height + 70)*node.scaleY / 2]
         ] : node.type === "keyword" ? [
-            [node.x + node.width/canvasScale / 2, node.y-30/canvasScale],
-            [node.x-30/canvasScale, node.y + node.height/canvasScale / 2],
-            [node.x + node.width/canvasScale / 2, node.y + node.height/canvasScale + 30/canvasScale],
-            [node.x + node.width/canvasScale + 30/canvasScale, node.y + node.height/canvasScale / 2]
+            [node.x + node.width/canvasScale / 2, node.y-40/canvasScale],
+            [node.x-40/canvasScale, node.y + node.height/canvasScale / 2],
+            [node.x + node.width/canvasScale / 2, node.y + node.height/canvasScale + 40/canvasScale],
+            [node.x + node.width/canvasScale + 40/canvasScale, node.y + node.height/canvasScale / 2]
         ] : node.type === "concept" ? [
-            [node.x, node.y - node.radiusY*node.scaleY - 30/canvasScale],
-            [node.x - node.radiusX*node.scaleX - 30/canvasScale, node.y],
-            [node.x, node.y + node.radiusY*node.scaleY + 30/canvasScale],
-            [node.x + node.radiusX*node.scaleX + 30/canvasScale, node.y]
+            [node.x, node.y - node.radiusY*node.scaleY - 40/canvasScale],
+            [node.x - node.radiusX*node.scaleX - 40/canvasScale, node.y],
+            [node.x, node.y + node.radiusY*node.scaleY + 40/canvasScale],
+            [node.x + node.radiusX*node.scaleX + 40/canvasScale, node.y]
         ] : [];
 
         return anchorOffset;
@@ -753,21 +753,51 @@ export function Canvas({dimensions})
                 })
             }
             {arrows.map((arrow,index)=>{
+                const arrow_size = 10 / canvasScale;
+                const arrow_dy = arrow.to_anchor===0 ? 1 : arrow.to_anchor===2 ? -1 : 0;
+                const arrow_dx = arrow.to_anchor===1 ? 1 : arrow.to_anchor===3 ? -1 : 0;
+                const finalAnchor = calcAnchorPosition(arrow.to_anchor, getNodeById(arrow.to_id));
                 return (
+                <Group
+                key={index}>
                 <MyLine
-                key={index}
                 points={[
                     ...calcAnchorPosition(arrow.from_anchor, getNodeById(arrow.from_id)),
                     ...findPathBetweenNodes(arrow.from_anchor, arrow.to_anchor,
                         getNodeById(arrow.from_id),getNodeById(arrow.to_id)),
                     // ...calcAnchorOffset(arrow.from_anchor, nodes[arrow.from_id]),
                     // ...calcAnchorOffset(arrow.to_anchor, nodes[arrow.to_id]),
-                    ...calcAnchorPosition(arrow.to_anchor, getNodeById(arrow.to_id)),
+                    ...finalAnchor
                 ]}
                 tension={0}
                 stroke={"gray"}
                 strokeWidth={2/canvasScale}
-                />)
+                />
+                {/* <Line
+                points={[...finalAnchor,
+                finalAnchor[0]+arrow_dx*5, finalAnchor[1]+arrow_dy*5]}
+                tension={0}
+                stroke={"gray"}
+                strokeWidth={2/canvasScale}
+                /> */}
+                <Line
+                points={[finalAnchor[0]-arrow_dx*arrow_size+arrow_dy*arrow_size,
+                    finalAnchor[1]-arrow_dy*arrow_size+arrow_dx*arrow_size,
+                    ...finalAnchor]}
+                    // finalAnchor[0]+arrow_dx*10, finalAnchor[1]+arrow_dy*10]}
+                tension={0}
+                stroke={"gray"}
+                strokeWidth={2/canvasScale}/>
+                <Line
+                points={[finalAnchor[0]-arrow_dx*arrow_size-arrow_dy*arrow_size,
+                    finalAnchor[1]-arrow_dy*arrow_size-arrow_dx*arrow_size,
+                    ...finalAnchor]}
+                    // finalAnchor[0]+arrow_dx*10, finalAnchor[1]+arrow_dy*10]}
+                tension={0}
+                stroke={"gray"}
+                strokeWidth={2/canvasScale}/>
+                </Group>
+                )
             })}
             {
                 arrowFrom.id!==-1 ? (
@@ -906,6 +936,17 @@ export function Canvas({dimensions})
                     setIsDrawingArrow(false);
                     setIsDrawingDoubleArrow(false);
                     setIsAddingKeyword(!isAddingKeyword);
+                }}
+                onAddConcept={(x,y,radiusX,radiusY)=>{
+                    setNodes(prevState => {
+                        let tmp = {id: numNodes, type: "concept",
+                        x: (x-canvasX)/canvasScale, y: (y-canvasY)/canvasScale,
+                        radiusX: radiusX, radiusY: radiusY,
+                        scaleX: 1/canvasScale, scaleY: 1/canvasScale,
+                        selected: false, text: "", display: true};
+                        return [...prevState, tmp];
+                    });
+                    setNumNodes(numNodes+1);
                 }}
                 onAddStickyNote={(x, y, width, height)=>{
                     setNodes(prevState => {
