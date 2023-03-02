@@ -131,9 +131,11 @@ export function Keyword({
     }}>
     
     <TaskHeader
-    x={10}
-    y={-30}
-    tasks={microTasks}/>
+    x={0}
+    y={-40/canvasScale}
+    tasks={microTasks}
+    fontSize={14}
+    scale={1/canvasScale}/>
 
     <Group x={0} y={0}
     // draggable={draggable}

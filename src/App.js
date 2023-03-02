@@ -35,6 +35,9 @@ function App() {
     task_prompts: [
       {node_id: 0, task_id: 0, prompt: "Brainstorm a list of keywords related to \"Interaction\""}
     ],
+    task_nodes: [
+      // {node_id: 0, task_id: 0, type: "keyword", text}
+    ],
     prompt_cards: [
         {x: dimensions.width*0.75, y: dimensions.height*0.05, scale: 1, width: 400, height: 120, text: "prompt suggestion 1", display: true},
         {x: dimensions.width*0.75, y: dimensions.height*0.05+175, scale: 1, width: 400, height: 120, text: "prompt suggestion 2", display: true},

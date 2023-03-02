@@ -123,9 +123,11 @@ export function StickyNote({
      }}>
     
     <TaskHeader
-    x={10}
-    y={-30}
-    tasks={microTasks}/>
+    x={0}
+    y={-45/canvasScale}
+    tasks={microTasks}
+    fontSize={14}
+    scale={1/canvasScale}/>
     
     <Group
     x={0}

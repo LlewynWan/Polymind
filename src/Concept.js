@@ -140,9 +140,11 @@ export function Concept({
      }}>
 
     <TaskHeader
-    x={-radiusX+10}
-    y={-radiusY-20}
-    tasks={microTasks}/>
+    x={-radiusX}
+    y={-radiusY-40/canvasScale}
+    tasks={microTasks}
+    fontSize={14}
+    scale={1/canvasScale}/>
 
     <Group
     x={0}

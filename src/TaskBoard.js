@@ -20,18 +20,12 @@ export function TaskBoard({
     const handleTaskBoardWheel = e => {
         e.evt.preventDefault();
         e.cancelBubble=true;
-        const offset = e.evt.deltaY < 0 ? 15 : -15;
-        if (taskCardOffset+offset + (tasks.length-1)*145+125 >= height-35) {
-            setTaskCardOffset(Math.min(taskCardOffset+offset,100));
-        }
-        // const newScale = canvasScale * scaleBy
-        // setCanvasScale(newScale);
-        
-        // const position = e.target.getStage().getPointerPosition();
-        // const offsetX = (position.x - canvasX) * (scaleBy - 1);
-        // const offsetY = (position.y - canvasY) * (scaleBy - 1);
-        // setCanvasX(canvasX - offsetX);
-        // setCanvasY(canvasY - offsetY);
+        const offset = e.evt.deltaY < 0 ? 50 : -50;
+        setTaskCardOffset(Math.max(
+            Math.min(taskCardOffset+offset,100), height-(tasks.length-1)*145-160));
+        // if (taskCardOffset+offset + (tasks.length-1)*145+125 >= height-35) {
+        //     setTaskCardOffset(Math.min(taskCardOffset+offset,100));
+        // }
     }
 
     return (
