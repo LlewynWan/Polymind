@@ -135,6 +135,7 @@ export function Keyword({
     y={-40/canvasScale}
     tasks={microTasks}
     fontSize={14}
+    width={150}
     scale={1/canvasScale}/>
 
     <Group x={0} y={0}

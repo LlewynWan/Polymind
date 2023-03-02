@@ -127,6 +127,7 @@ export function StickyNote({
     y={-45/canvasScale}
     tasks={microTasks}
     fontSize={14}
+    width={180}
     scale={1/canvasScale}/>
     
     <Group

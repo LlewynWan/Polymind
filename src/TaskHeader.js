@@ -3,15 +3,18 @@ import React, { useState, useEffect, useRef } from "react";
 import Konva from "konva";
 
 import { colorPalette } from "./color_utils";
-import { Group, Label, Tag, Text, Rect } from "react-konva";
+import { Group, Label, Tag, Text, Rect, Circle } from "react-konva";
 
 
 export function TaskHeader({
     x,y,
     tasks,
     scale,
+    width,
     fontSize,
 }) {
+    const [isHover, setIsHover] = useState(false);
+
     const [offsetX, setOffsetX] = useState(5);
     const [headerPositions, setHeaderPositions] = useState([0]);
     const [fontHeight, setFontHeight] = useState(0);
@@ -26,7 +29,7 @@ export function TaskHeader({
         e.cancelBubble=true;
         const offset = e.evt.deltaY < 0 ? 20 : -20;
         setOffsetX(Math.max(
-            Math.min(offsetX+offset,5),135-headerPositions.slice(-1)[0]));
+            Math.min(offsetX+offset,5),width-15-headerPositions.slice(-1)[0]));
     }
 
     useEffect(()=>{
@@ -50,33 +53,87 @@ export function TaskHeader({
     y={y}
     scaleX={scale}
     scaleY={scale}
+    opacity={isHover?1:0.5}
     onWheel={handleTaskHeaderWheel}
+    onMouseEnter={()=>{
+        setIsHover(true);
+    }}
     onMouseLeave={()=>{
+        setIsHover(false);
         setCurrentHoverId(-1);
         clearTimeout(hoverTimeout);
         setIsHoverHeader(false)
     }}>
-        <Rect
+        {/* <Rect
         x={0}
-        y={-4}
-        width={150}
-        height={fontHeight+8}
+        y={-8-fontHeight}
+        width={width}
+        height={fontHeight*2+8}
+        cornerRadius={2.5}
         stroke={"gray"}
         strokeWidth={0.25}
-        cornerRadius={2.5}
         shadowBlur={5}
         shadowOffsetX={0}
         shadowOffsetY={1.5}
         shadowOpacity={0.15}
         shadowColor={"black"}
+        fill={"#444444"}
+        /> */}
+        <Rect
+        x={0}
+        y={-fontHeight-12}
+        width={width}
+        height={fontHeight*2+16}
+        stroke={"gray"}
+        strokeWidth={0.25}
+        cornerRadius={5}
+        shadowBlur={5}
+        shadowOffsetX={0}
+        shadowOffsetY={1.5}
+        shadowOpacity={0.15}
+        shadowColor={"black"}
+        fill={"white"}/>
+        <Rect
+        x={0}
+        y={-4}
+        width={width}
+        height={fontHeight+8}
+        cornerRadius={5}
         fill={"#E1E1E1"}/>
+        <Circle
+        x={10}
+        y={-8-fontHeight/2}
+        radius={10}
+        fill={"silver"}/>
+        <Label
+        x={20}
+        y={-8-fontHeight/2}>
+            <Tag
+            fill={"silver"}
+            cornerRadius={2.5}
+            pointerDirection={"left"}
+            pointerWidth={5}
+            pointerHeight={5}/>
+            <Text
+            text={"......"}
+            fontSize={fontSize}
+            // width={20}
+            // height={20}
+            fontStyle={"bold"}
+            // Ellipsis={true}
+            align={"center"}
+            verticalAlign={"middle"}
+            fill={"white"}
+            padding={2.5}
+            />
+        </Label>
 
         <Group
         x={0}
         y={0}
         clipX={5}
         clipY={-window.innerHeight}
-        clipWidth={140}
+        clipWidth={width-10}
         clipHeight={window.innerHeight*2}>
         {tasks.slice(0).reverse().map(task=>{
             return (
@@ -94,7 +151,7 @@ export function TaskHeader({
                             setIsHoverHeader(true);
                             curtainRef.current.to({
                                 fill: colorPalette[task.id%colorPalette.length],
-                                width: 150,
+                                width: width,
                                 duration: 0.25,
                                 easing: Konva.Easings.EaseOut,
                             })

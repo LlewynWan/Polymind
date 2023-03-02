@@ -144,6 +144,7 @@ export function Concept({
     y={-radiusY-40/canvasScale}
     tasks={microTasks}
     fontSize={14}
+    width={150}
     scale={1/canvasScale}/>
 
     <Group
