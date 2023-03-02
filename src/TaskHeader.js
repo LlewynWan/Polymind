@@ -23,6 +23,8 @@ export function TaskHeader({
     const [currentHoverId, setCurrentHoverId] = useState(-1);
 
     const curtainRef = useRef(null);
+    const promptRectRef = useRef(null);
+    const promptCircleRef = useRef(null);
 
     const handleTaskHeaderWheel = e => {
         e.evt.preventDefault();
@@ -96,19 +98,26 @@ export function TaskHeader({
         <Rect
         x={0}
         y={-4}
+        // y={-fontHeight-12}
         width={width}
         height={fontHeight+8}
         cornerRadius={5}
         fill={"#E1E1E1"}/>
+
         <Circle
         x={10}
         y={-8-fontHeight/2}
+        // y={fontHeight/2}
+        ref={promptCircleRef}
         radius={10}
         fill={"silver"}/>
         <Label
         x={20}
-        y={-8-fontHeight/2}>
+        y={-8-fontHeight/2}
+        // y={fontHeight/2}
+        >
             <Tag
+            ref={promptRectRef}
             fill={"silver"}
             cornerRadius={2.5}
             pointerDirection={"left"}
@@ -131,6 +140,7 @@ export function TaskHeader({
         <Group
         x={0}
         y={0}
+        // y={-fontHeight-8}
         clipX={5}
         clipY={-window.innerHeight}
         clipWidth={width-10}
@@ -154,6 +164,18 @@ export function TaskHeader({
                                 width: width,
                                 duration: 0.25,
                                 easing: Konva.Easings.EaseOut,
+                                onFinish: ()=>{
+                                    promptRectRef.current.to({
+                                        fill: colorPalette[task.id%colorPalette.length],
+                                        opacity: 0.75,
+                                        duration: 0.25
+                                    });
+                                    promptCircleRef.current.to({
+                                        fill: colorPalette[task.id%colorPalette.length],
+                                        opacity: 0.75,
+                                        duration: 0.25
+                                    });
+                                }
                             })
                         }, 1800));
                     }
@@ -210,7 +232,19 @@ export function TaskHeader({
                 width: 0,
                 duration: 0.25,
                 easing: Konva.Easings.EaseOut,
-                onFinish: ()=>setIsHoverHeader(false)
+                onFinish: ()=> {
+                    setIsHoverHeader(false);
+                    promptRectRef.current.to({
+                        fill: "silver",
+                        opacity: 1,
+                        duration: 0.25
+                    });
+                    promptCircleRef.current.to({
+                        fill: "silver",
+                        opacity: 1,
+                        duration: 0.25
+                    });
+                }
             });
         }}/>
     </Group>
