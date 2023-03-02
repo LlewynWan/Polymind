@@ -20,9 +20,21 @@ export function TaskBoard({
     const handleTaskBoardWheel = e => {
         e.evt.preventDefault();
         e.cancelBubble=true;
-        const offset = e.evt.deltaY < 0 ? 50 : -50;
-        setTaskCardOffset(Math.max(
-            Math.min(taskCardOffset+offset,100), height-(tasks.length-1)*145-160));
+        const offset = e.evt.deltaY < 0 ? 20 : -20;
+        console.log(taskCardOffset+offset)
+        if (taskCardOffset+offset <= 100 &&
+            taskCardOffset+offset >= height-(tasks.length-1)*145-165)
+            {
+                setTaskCardOffset(taskCardOffset+offset)
+            }
+        // if (offset < 0) {
+        //     setTaskCardOffset(Math.max(Math.min(taskCardOffset+offset,
+        //         height-(tasks.length-1)*145-160), 100));
+        // } else {
+        //     setTaskCardOffset(Math.max(Math.min(taskCardOffset+offset, 100),
+        //         height-(tasks.length-1)*145-160));
+        // }
+        
         // if (taskCardOffset+offset + (tasks.length-1)*145+125 >= height-35) {
         //     setTaskCardOffset(Math.min(taskCardOffset+offset,100));
         // }

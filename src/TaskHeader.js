@@ -30,8 +30,13 @@ export function TaskHeader({
         e.evt.preventDefault();
         e.cancelBubble=true;
         const offset = e.evt.deltaY < 0 ? 20 : -20;
-        setOffsetX(Math.max(
-            Math.min(offsetX+offset,5),width-15-headerPositions.slice(-1)[0]));
+        if (offsetX+offset <= 5 &&
+            offsetX+offset >= width-12-headerPositions.slice(-1)[0])
+            {
+                setOffsetX(offsetX+offset)
+            }
+        // setOffsetX(Math.max(
+        //     Math.min(offsetX+offset,5),width-15-headerPositions.slice(-1)[0]));
     }
 
     useEffect(()=>{
