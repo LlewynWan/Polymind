@@ -22,19 +22,34 @@ export function TaskHeader({
     const [hoverTimeout, setHoverTimeout] = useState(0);
     const [currentHoverId, setCurrentHoverId] = useState(-1);
 
+    const [isHoverLeftArrow, setIsHoverLeftArrow] = useState(false);
+    const [isHoverRightArrow, setIsHoverRightArrow] = useState(false);
+    const [hoverLeftArrowInterval, setHoverLeftArrowInterval] = useState(null);
+    const [hoverRightArrowInterval, setHoverRightArrowInterval] = useState(null);
+
     const curtainRef = useRef(null);
     const promptRectRef = useRef(null);
     const promptCircleRef = useRef(null);
 
-    const handleTaskHeaderWheel = e => {
-        e.evt.preventDefault();
-        e.cancelBubble=true;
-        const offset = e.evt.deltaY < 0 ? 20 : -20;
+
+    const handleScroll = (offset) => {
         if (offsetX+offset <= 25 &&
             offsetX+offset >= width-35-headerPositions.slice(-1)[0])
             {
                 setOffsetX(offsetX+offset)
             }
+    }
+
+    const handleTaskHeaderWheel = e => {
+        e.evt.preventDefault();
+        e.cancelBubble=true;
+        const offset = e.evt.deltaY < 0 ? 20 : -20;
+        handleScroll(offset);
+        // if (offsetX+offset <= 25 &&
+        //     offsetX+offset >= width-35-headerPositions.slice(-1)[0])
+        //     {
+        //         setOffsetX(offsetX+offset)
+        //     }
         // setOffsetX(Math.max(
         //     Math.min(offsetX+offset,5),width-15-headerPositions.slice(-1)[0]));
     }
@@ -134,7 +149,7 @@ export function TaskHeader({
     y={y}
     scaleX={scale}
     scaleY={scale}
-    opacity={isHover?1:1}
+    opacity={isHover?1:0.5}
     onWheel={handleTaskHeaderWheel}
     onMouseEnter={()=>{
         setIsHover(true);
@@ -297,18 +312,52 @@ export function TaskHeader({
             )
         })}
         </Group>
+        
         <Arrow
-        points={[15,fontHeight/2,12.5,fontHeight/2,10,fontHeight/2]}
+        points={[12.5,fontHeight/2,10,fontHeight/2,7.5,fontHeight/2]}
         fill={"silver"}
         stroke={"silver"}
-        pointerLength={5}
-        strokeWidth={1}/>
+        opacity={isHoverLeftArrow?1:0.5}
+        pointerLength={8}
+        pointerWidth={12}
+        strokeWidth={1}
+        onMouseEnter={()=>{
+            setIsHoverLeftArrow(true);
+            const interval = setInterval(()=>{
+                handleScroll(20);
+            }, 100);
+            setHoverLeftArrowInterval(interval);
+        }}
+        onMouseLeave={()=>{
+            setIsHoverLeftArrow(false);
+            if (hoverLeftArrowInterval) {
+                clearInterval(hoverLeftArrowInterval);
+                setHoverLeftArrowInterval(null);
+            }
+        }}/>
         <Arrow
-        points={[width-15,fontHeight/2,width-12.5,fontHeight/2,width-10,fontHeight/2]}
+        points={[width-12.5,fontHeight/2,width-10,fontHeight/2,width-7.5,fontHeight/2]}
         fill={"silver"}
         stroke={"silver"}
-        pointerLength={5}
-        strokeWidth={1}/>
+        opacity={isHoverRightArrow?1:0.5}
+        pointerLength={8}
+        pointerWidth={12}
+        strokeWidth={1}
+        onMouseEnter={()=>{
+            setIsHoverRightArrow(true);
+            const interval = setInterval(()=>{
+                handleScroll(-20);
+            }, 100);
+            setHoverRightArrowInterval(interval);
+        }}
+        onMouseLeave={()=>{
+            setIsHoverRightArrow(false);
+            if (hoverRightArrowInterval) {
+                clearInterval(hoverRightArrowInterval);
+                setHoverRightArrowInterval(null);
+            }
+        }}/>
+
         <Rect
         x={0}
         y={-4}
