@@ -142,6 +142,8 @@ export function Concept({
     <TaskHeader
     x={-radiusX}
     y={-radiusY-40/canvasScale}
+    // x={-radiusX}
+    // y={-radiusY-10/canvasScale}
     tasks={microTasks}
     fontSize={14}
     width={150}

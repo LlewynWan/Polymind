@@ -31,6 +31,9 @@ export function ToolBar({
     const [isHoverTextIcon, setIsHoverTextIcon] = useState(false);
     // const [isHoverStickyNotes, setIsHoverStickyNotes] = useState(false);
 
+    const [stickyNoteDraggable, setStickyNoteDraggable] = useState(false);
+    const [ellipseDraggable, setEllipseDraggable] = useState(false);
+
     const stickyNoteRef = useRef(null);
     const dummyStickyNoteRef1 = useRef(null);
     const dummyStickyNoteRef2 = useRef(null);
@@ -238,8 +241,11 @@ export function ToolBar({
                 y: height / 2,
                 radiusX: 64,
                 radiusY: 35,
-                duration: 0.2,
-                easing: Konva.Easings.EaseOut
+                duration: 0.25,
+                easing: Konva.Easings.EaseOut,
+                onFinish: ()=>{
+                    setEllipseDraggable(true);
+                }
             })
         }}
         onMouseLeave={(e)=>{
@@ -247,7 +253,10 @@ export function ToolBar({
                 y: height / 2 + 20,
                 radiusX: 40,
                 radiusY: 40,
-                duration: 0.32
+                duration: 0.32,
+                onFinish: ()=>{
+                    setEllipseDraggable(false);
+                }
             })
         }}>
             <Ellipse
@@ -265,7 +274,7 @@ export function ToolBar({
             shadowOpacity={0.25}
             fill={"#FFB5B7"}
             opacity={0.85}
-            draggable={true}
+            // draggable={true}
             />
             <Ellipse
             x={0}
@@ -282,7 +291,7 @@ export function ToolBar({
             shadowOpacity={0.25}
             fill={"#FFB5B7"}
             opacity={1}
-            draggable={true}
+            draggable={ellipseDraggable}
             onDragStart={(e)=>{
                 const stage = e.target.getStage();
                 stage.container().style.cursor = "grabbing";
@@ -315,7 +324,10 @@ export function ToolBar({
                 y: -75,
                 width: 125,
                 height: 125,
-                duration: 0.2,
+                duration: 0.25,
+                onFinish: ()=>{
+                    setStickyNoteDraggable(true);
+                }
             });
             // if (!isHoverStickyNotes) {
             //     setIsHoverStickyNotes(true)
@@ -334,7 +346,10 @@ export function ToolBar({
                 y: 19,
                 width: 60,
                 height: 60,
-                duration: 0.2
+                duration: 0.2,
+                onFinish: ()=>{
+                    setStickyNoteDraggable(false);
+                }
             });
             // if (isHoverStickyNotes) {
             //     setIsHoverStickyNotes(false);
@@ -389,7 +404,7 @@ export function ToolBar({
             shadowBlur={5}
             shadowOpacity={0.5}
             fill={"#748B97"}
-            draggable={true}
+            draggable={stickyNoteDraggable}
             onDragStart={(e)=>{
                 const stage = e.target.getStage();
                 stage.container().style.cursor = "grabbing";

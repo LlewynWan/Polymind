@@ -3,7 +3,7 @@ import React, { useState, useEffect, useRef } from "react";
 import Konva from "konva";
 
 import { colorPalette } from "./color_utils";
-import { Group, Label, Tag, Text, Rect, Circle } from "react-konva";
+import { Group, Label, Tag, Text, Rect, Arrow, Circle } from "react-konva";
 
 
 export function TaskHeader({
@@ -15,7 +15,7 @@ export function TaskHeader({
 }) {
     const [isHover, setIsHover] = useState(false);
 
-    const [offsetX, setOffsetX] = useState(5);
+    const [offsetX, setOffsetX] = useState(25);
     const [headerPositions, setHeaderPositions] = useState([0]);
     const [fontHeight, setFontHeight] = useState(0);
     const [isHoverHeader, setIsHoverHeader] = useState(false);
@@ -30,8 +30,8 @@ export function TaskHeader({
         e.evt.preventDefault();
         e.cancelBubble=true;
         const offset = e.evt.deltaY < 0 ? 20 : -20;
-        if (offsetX+offset <= 5 &&
-            offsetX+offset >= width-12-headerPositions.slice(-1)[0])
+        if (offsetX+offset <= 25 &&
+            offsetX+offset >= width-35-headerPositions.slice(-1)[0])
             {
                 setOffsetX(offsetX+offset)
             }
@@ -54,13 +54,87 @@ export function TaskHeader({
         setFontHeight(test.height());
     }, [tasks, fontSize])
 
+    // return (
+    //     <Group
+    //     x={x}
+    //     y={y}
+    //     scaleX={scale}
+    //     scaleY={scale}
+    //     opacity={isHover?1:0.5}
+    //     onMouseEnter={()=>{setIsHover(true)}}
+    //     onMouseLeave={()=>{setIsHover(false)}}>
+    //         <Rect
+    //         x={0}
+    //         y={-25}
+    //         width={(tasks.length-1)*12}
+    //         height={35}
+    //         fill={"transparent"}
+    //         />
+    //         <Group>
+    //         {tasks.slice(0).reverse().map(task=>{
+    //             return (
+    //             <Group>
+    //             <Rect
+    //             // x={12*task.id}
+    //             x={12*task.id}
+    //             y={-10}
+    //             width={10}
+    //             height={10}
+    //             // cornerRadius={5}
+    //             // shadowOffsetX={0}
+    //             // shadowOffsetY={2.5}
+    //             // shadowBlur={5}
+    //             // shadowOpacity={0.25}
+    //             // shadowColor={"gray"}
+    //             fill={colorPalette[task.id%colorPalette.length]}/>
+    //             <Rect
+    //             // x={12*task.id}
+    //             x={12*task.id}
+    //             y={-35}
+    //             width={10}
+    //             height={25}
+    //             // cornerRadius={5}
+    //             // shadowOffsetX={2.5}
+    //             // shadowOffsetY={5}
+    //             // shadowBlur={5}
+    //             // shadowOpacity={0.5}
+    //             // shadowColor={"gray"}
+    //             opacity={0.25}
+    //             fill={"silver"}/>
+    //             {/* <Label
+    //             x={12*task.id}
+    //             y={-4}
+    //             // y={fontHeight/2}
+    //             >
+    //                 <Tag
+    //                 // ref={promptRectRef}
+    //                 fill={colorPalette[task.id%colorPalette.length]}/>
+    //                 <Text
+    //                 text={task.goal[0]}
+    //                 fontSize={fontSize+4}
+    //                 // width={20}
+    //                 // height={20}
+    //                 fontStyle={"bold"}
+    //                 // Ellipsis={true}
+    //                 align={"center"}
+    //                 verticalAlign={"middle"}
+    //                 fill={"white"}
+    //                 padding={1}
+    //                 />
+    //             </Label> */}
+    //             </Group>)
+    //         })}
+    //         </Group>
+    //     </Group>
+    // )
+
     return (
     <Group
     x={x}
     y={y}
     scaleX={scale}
     scaleY={scale}
-    opacity={isHover?1:0.5}
+    opacity={isHover?1:1}
     onWheel={handleTaskHeaderWheel}
     onMouseEnter={()=>{
         setIsHover(true);
@@ -88,9 +162,11 @@ export function TaskHeader({
         /> */}
         <Rect
         x={0}
-        y={-fontHeight-12}
+        // y={-fontHeight-12}
+        y={-4}
         width={width}
-        height={fontHeight*2+16}
+        // height={fontHeight*2+16}
+        height={fontHeight+8}
         stroke={"gray"}
         strokeWidth={0.25}
         cornerRadius={5}
@@ -100,16 +176,16 @@ export function TaskHeader({
         shadowOpacity={0.15}
         shadowColor={"black"}
         fill={"white"}/>
-        <Rect
+        {/* <Rect
         x={0}
         y={-4}
         // y={-fontHeight-12}
         width={width}
         height={fontHeight+8}
         cornerRadius={5}
-        fill={"#E1E1E1"}/>
+        fill={"#E1E1E1"}/> */}
 
-        <Circle
+        {/* <Circle
         x={10}
         y={-8-fontHeight/2}
         // y={fontHeight/2}
@@ -140,15 +216,15 @@ export function TaskHeader({
             fill={"white"}
             padding={2.5}
             />
-        </Label>
+        </Label> */}
 
         <Group
         x={0}
         y={0}
         // y={-fontHeight-8}
-        clipX={5}
+        clipX={20}
         clipY={-window.innerHeight}
-        clipWidth={width-10}
+        clipWidth={width-40}
         clipHeight={window.innerHeight*2}>
         {tasks.slice(0).reverse().map(task=>{
             return (
@@ -169,18 +245,18 @@ export function TaskHeader({
                                 width: width,
                                 duration: 0.25,
                                 easing: Konva.Easings.EaseOut,
-                                onFinish: ()=>{
-                                    promptRectRef.current.to({
-                                        fill: colorPalette[task.id%colorPalette.length],
-                                        opacity: 0.75,
-                                        duration: 0.25
-                                    });
-                                    promptCircleRef.current.to({
-                                        fill: colorPalette[task.id%colorPalette.length],
-                                        opacity: 0.75,
-                                        duration: 0.25
-                                    });
-                                }
+                                // onFinish: ()=>{
+                                //     promptRectRef.current.to({
+                                //         fill: colorPalette[task.id%colorPalette.length],
+                                //         opacity: 0.75,
+                                //         duration: 0.25
+                                //     });
+                                //     promptCircleRef.current.to({
+                                //         fill: colorPalette[task.id%colorPalette.length],
+                                //         opacity: 0.75,
+                                //         duration: 0.25
+                                //     });
+                                // }
                             })
                         }, 1800));
                     }
@@ -221,7 +297,18 @@ export function TaskHeader({
             )
         })}
         </Group>
-
+        <Arrow
+        points={[15,fontHeight/2,12.5,fontHeight/2,10,fontHeight/2]}
+        fill={"silver"}
+        stroke={"silver"}
+        pointerLength={5}
+        strokeWidth={1}/>
+        <Arrow
+        points={[width-15,fontHeight/2,width-12.5,fontHeight/2,width-10,fontHeight/2]}
+        fill={"silver"}
+        stroke={"silver"}
+        pointerLength={5}
+        strokeWidth={1}/>
         <Rect
         x={0}
         y={-4}
@@ -239,16 +326,16 @@ export function TaskHeader({
                 easing: Konva.Easings.EaseOut,
                 onFinish: ()=> {
                     setIsHoverHeader(false);
-                    promptRectRef.current.to({
-                        fill: "silver",
-                        opacity: 1,
-                        duration: 0.25
-                    });
-                    promptCircleRef.current.to({
-                        fill: "silver",
-                        opacity: 1,
-                        duration: 0.25
-                    });
+                    // promptRectRef.current.to({
+                    //     fill: "silver",
+                    //     opacity: 1,
+                    //     duration: 0.25
+                    // });
+                    // promptCircleRef.current.to({
+                    //     fill: "silver",
+                    //     opacity: 1,
+                    //     duration: 0.25
+                    // });
                 }
             });
         }}/>
