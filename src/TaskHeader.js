@@ -33,11 +33,16 @@ export function TaskHeader({
 
 
     const handleScroll = (offset) => {
-        if (offsetX+offset <= 25 &&
-            offsetX+offset >= width-35-headerPositions.slice(-1)[0])
-            {
-                setOffsetX(offsetX+offset)
+        setOffsetX(previousOffsetX => {
+            if (previousOffsetX+offset <= 25 &&
+                previousOffsetX+offset >= width-35-headerPositions.slice(-1)[0])
+                {
+                    return previousOffsetX+offset;
+                }
+            else {
+                return previousOffsetX;
             }
+        })
     }
 
     const handleTaskHeaderWheel = e => {
@@ -67,7 +72,7 @@ export function TaskHeader({
         });
         setHeaderPositions(positions);
         setFontHeight(test.height());
-    }, [tasks, fontSize])
+    }, [tasks, fontSize, offsetX])
 
     // return (
     //     <Group
