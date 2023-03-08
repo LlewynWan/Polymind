@@ -33,6 +33,7 @@ export function Keyword({
   onDragStart,
   onDragMove,
   onDragEnd,
+  header=true,
   draggable=true
 }) {
   const [isEditing, setIsEditing] = useState(false);
@@ -73,7 +74,9 @@ export function Keyword({
 
     if (nodeRef.current) {
       setAnchorPosition(calcAnchorPosition());
-      onTextSizeChange(nodeRef.current.getClientRect());
+      if (onTextSizeChange) {
+        onTextSizeChange(nodeRef.current.getClientRect());
+      }
     }  
 
     if (transformerRef.current !== null) {
@@ -130,13 +133,13 @@ export function Keyword({
         onDragEnd(e);
     }}>
     
-    <TaskHeader
+    {header ? <TaskHeader
     x={0}
     y={-40/canvasScale}
     tasks={microTasks}
     fontSize={14}
     width={150}
-    scale={1/canvasScale}/>
+    scale={1/canvasScale}/> : null}
 
     <Group x={0} y={0}
     // draggable={draggable}
@@ -279,12 +282,16 @@ export function Keyword({
       });
       const minIndex = distance.indexOf(Math.min(...distance));
       setAnchorIndex(minIndex);
-      onConnectingHover(e,minIndex);
+      if (onConnectingHover) {
+        onConnectingHover(e,minIndex);
+      }
     }}
     onMouseLeave={(e) => {
       setIsHoverBoundingBox(false);
       setAnchorIndex(-1);
-      onConnectingUnhover(e);
+      if (onConnectingUnhover) {
+        onConnectingUnhover(e);
+      }
     }}
     fill="transparent"
     onMouseDown={(e)=>{onConnected(e,anchorIndex)}}

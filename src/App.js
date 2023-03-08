@@ -36,7 +36,11 @@ function App() {
       {node_id: 0, task_id: 0, prompt: "Brainstorm a list of keywords related to \"Interaction\""}
     ],
     task_nodes: [
-      // {node_id: 0, task_id: 0, type: "keyword", text}
+      {node_id: 0, task_id: 0, type: "keyword", x: 500, y: 250, text: "task1"},
+      {node_id: 1, task_id: 0, type: "sticky_note", x: 1000, y: 250, width: 145, height: 110, text: "task1"}
+    ],
+    task_arrows: [
+      {task_id: 0, from_type: "", from_id: 0, to_type: "", to_id: 0}
     ],
     prompt_cards: [
         {x: dimensions.width*0.75, y: dimensions.height*0.05, scale: 1, width: 400, height: 120, text: "prompt suggestion 1", display: true},
@@ -55,6 +59,7 @@ function App() {
   const [mainPrompter, setMainPrompter] = React.useState(initialState.main_prompter);
   const [taskPrompts, setTaskPrompts] = React.useState(initialState.task_prompts);
   const [microTasks, setMicroTasks] = React.useState(initialState.microtasks);
+  const [taskNodes, setTaskNodes] = React.useState(initialState.task_nodes);
 
 
   useEffect(() => {
@@ -84,9 +89,10 @@ function App() {
   return (
     <div className="container fullscreen" id="fullsccreen">
       <GlobalContext.Provider value={{
-        nodes, numNodes, arrows, promptCards, mainPrompter, taskPrompts, microTasks,
-        setNodes, setNumNodes, setArrows, setTaskPrompts, setPromptCards,
-        setMainPrompter, setMicroTasks
+        nodes, numNodes, arrows, promptCards, mainPrompter,
+        taskPrompts, microTasks, taskNodes,
+        setNodes, setNumNodes, setArrows, setTaskPrompts,
+        setPromptCards, setMainPrompter, setMicroTasks, setTaskNodes
       }}>
         <Canvas dimensions={dimensions}/>
       </GlobalContext.Provider>

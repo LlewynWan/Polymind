@@ -34,6 +34,7 @@ export function StickyNote({
   onDragMove,
   onDragEnd,
   onOverflow,
+  header=true,
   draggable=true
 }) {
   const [isEditing, setIsEditing] = useState(false);
@@ -122,13 +123,13 @@ export function StickyNote({
          onDragEnd(e);
      }}>
     
-    <TaskHeader
+    {header ? <TaskHeader
     x={0}
     y={-45/canvasScale}
     tasks={microTasks}
     fontSize={14}
     width={180}
-    scale={1/canvasScale}/>
+    scale={1/canvasScale}/> : null}
     
     <Group
     x={0}
@@ -317,12 +318,16 @@ export function StickyNote({
       });
       const minIndex = distance.indexOf(Math.min(...distance));
       setAnchorIndex(minIndex);
-      onConnectingHover(e,minIndex);
+      if (onConnectingHover) {
+        onConnectingHover(e,minIndex);
+      }
     }}
     onMouseLeave={(e) => {
       setIsHover(false);
       setAnchorIndex(-1);
-      onConnectingUnhover(e);
+      if (onConnectingUnhover) {
+        onConnectingUnhover(e);
+      }
     }}
     fill="transparent"
     onMouseDown={(e)=>{onConnected(e,anchorIndex)}}

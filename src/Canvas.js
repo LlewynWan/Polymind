@@ -17,6 +17,7 @@ import { TaskPrompt } from "./TaskPrompt";
 import { PromptPanel } from "./PromptPanel";
 import { PromptGPT } from "./GPT_utils";
 
+import { colorPalette } from "./color_utils";
 import { GlobalContext, CanvasContext, PrompterContext } from "./state";
 
 
@@ -43,7 +44,8 @@ export function Canvas({dimensions})
     const {nodes, numNodes, arrows,
         setNodes, setNumNodes, setArrows,
         promptCards, mainPrompter, taskPrompts, microTasks,
-        setPromptCards, setMainPrompter, setTaskPrompts, setMicroTasks} = useContext(GlobalContext);
+        setPromptCards, setMainPrompter, setTaskPrompts, setMicroTasks,
+        taskNodes, setTaskNodes} = useContext(GlobalContext);
 
     const [canvasX, setCanvasX] = React.useState(0);
     const [canvasY, setCanvasY] = React.useState(0);
@@ -129,7 +131,10 @@ export function Canvas({dimensions})
             });
         });
     }
-    const UnselectAll = () => {
+    const UnselectAll = e => {
+        if (e) {
+            e.preventDefault();
+        }
         UnselectAllNodes();
 
         setIsDrawingArrow(false);
@@ -137,6 +142,19 @@ export function Canvas({dimensions})
         setIsAddingKeyword(false);
         setPromptPanelVisibility(false);
     };
+    const DeleteSelected = e => {
+        if (e) {
+            e.preventDefault();
+        }
+        setNodes(prevState => {
+            return prevState.map((state)=>{
+                let tmp = state;
+                tmp.display = (tmp.display & !tmp.selected);
+                tmp.selected = false;
+                return tmp;
+            })
+        });
+    }
 
     const [promptCardIndex, setPromptCardIndex] = React.useState(1);
 
@@ -215,10 +233,12 @@ export function Canvas({dimensions})
 
     const keyMap = {
         UNSELECT_ALL: "escape",
+        DELETE: "del"
     };
     
     const handlers = {
-        UNSELECT_ALL: UnselectAll
+        UNSELECT_ALL: UnselectAll,
+        DELETE: DeleteSelected
     };
 
     const handleDragNodeMove = (e, id) => {
@@ -753,6 +773,41 @@ export function Canvas({dimensions})
                     /> : null : null
                 })
             }
+            {/* {taskNodes.map(node=>{
+                return node.type === "keyword" ?
+                <Keyword
+                key={node.node_id}
+                x={node.x}
+                y={node.y}
+                scaleX={1/canvasScale}
+                scaleY={1/canvasScale}
+                fontSize={20}
+                padding={10}
+                text={node.text}
+                isSelected={false}
+                isConnecting={false}
+                color={colorPalette[node.task_id]}
+                header={false}
+                /> :
+                node.type === "sticky_note" ?
+                <StickyNote
+                key={node.node_id}
+                x={node.x}
+                y={node.y}
+                scaleX={1/canvasScale}
+                scaleY={1/canvasScale}
+                width={node.width}
+                height={node.height}
+                fontSize={18}
+                color={colorPalette[node.task_id]}
+                text={node.text}
+                isNull={false}
+                header={false}
+                isSelected={false}
+                isConnecting={false}
+                /> : null;
+            })
+            } */}
             {arrows.map((arrow,index)=>{
                 const arrow_size = 10 / canvasScale;
                 const arrow_dy = arrow.to_anchor===0 ? 1 : arrow.to_anchor===2 ? -1 : 0;
@@ -824,7 +879,7 @@ export function Canvas({dimensions})
                 strokeWidth={2/canvasScale}
                 />)
                 : null
-            } 
+            }
             </CanvasContext.Provider>
             </Group>
         </Layer>
