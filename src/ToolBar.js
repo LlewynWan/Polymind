@@ -1,5 +1,5 @@
 import React, { useContext, useRef, useState } from "react";
-import { Group, Rect, Line, Text, Ellipse } from "react-konva";
+import { Group, Rect, Line, Path, Ellipse } from "react-konva";
 
 import Konva from "konva";
 
@@ -19,15 +19,18 @@ export function ToolBar({
     onArrowIconClick,
     isDoubleArrowIconClicked,
     onDoubleArrowIconClick,
+    isSectionIconClicked,
+    onSectionIconClick,
     isTextIconClicked,
     onTextIconClick,
     onAddConcept,
     onAddStickyNote,
-    conceptOffset=325,
-    stickyNoteOffset=400,
+    conceptOffset=540,
+    stickyNoteOffset=385,
 }) {
     const [isHoverArrowIcon, setIsHoverArrowIcon] = useState(false);
     const [isHoverDoubleArrowIcon, setIsHoverDoubleArrowIcon] = useState(false);
+    const [isHoverSectionIcon, setIsHoverSectionIcon] = useState(false);
     const [isHoverTextIcon, setIsHoverTextIcon] = useState(false);
     // const [isHoverStickyNotes, setIsHoverStickyNotes] = useState(false);
 
@@ -118,7 +121,7 @@ export function ToolBar({
         shadowOpacity={0.25}
         />
 
-        <Group x={25} y={height/2-25}
+        <Group x={40} y={height/2-25}
         onMouseEnter={()=>{setIsHoverArrowIcon(true)}}
         onMouseLeave={()=>{setIsHoverArrowIcon(false)}}
         onClick={onArrowIconClick}
@@ -156,7 +159,7 @@ export function ToolBar({
             />
         </Group>
 
-        <Group x={100} y={height/2-25}
+        <Group x={110} y={height/2-25}
         onMouseEnter={()=>{setIsHoverDoubleArrowIcon(true)}}
         onMouseLeave={()=>{setIsHoverDoubleArrowIcon(false)}}
         onClick={onDoubleArrowIconClick}
@@ -201,7 +204,71 @@ export function ToolBar({
             />
         </Group>
 
-        <Group x={200} y={height/2-25}
+        <Group x={180} y={height/2-25}
+        onMouseEnter={()=>{setIsHoverSectionIcon(true)}}
+        onMouseLeave={()=>{setIsHoverSectionIcon(false)}}
+        onClick={onSectionIconClick}
+        >
+            <Rect
+            x={0}
+            y={0}
+            cornerRadius={10}
+            width={50}
+            height={50}
+            fill={isSectionIconClicked?"#010203":
+            isHoverSectionIcon?"#D5D5D5":"#D9CBA6"}
+            stroke={"#010203"}
+            strokeWidth={1.5}
+            shadowOffsetY={0}
+            shadowOffsetX={0}
+            shadowBlur={isSectionIconClicked?5:0}
+            shadowOpacity={isSectionIconClicked?0.25:0}
+            opacity={isSectionIconClicked?0.75:
+                isHoverSectionIcon?0.27:0.2}
+            />
+            <Path
+            x={8}
+            y={8}
+            // data={'m0,0l15,15z'}
+            data={'M24,0L29,0Q34,0,34,5L34,29Q34,34,29,34L5,34Q0,34,0,29L0,15'}
+            fill={"transparent"}
+            stroke={isSectionIconClicked?"white":"black"}
+            strokeWidth={1.75}
+            />
+            {/* <Line
+            points={[25,10,
+                30,10,35,10,
+                40,10,
+                40,15,40,35,
+                40,40,
+                35,40,15,40,10,40,
+                10,35,10,20,10,15]}
+            stroke={isSectionIconClicked?"white":"black"}
+            tension={0.5}/> */}
+            {/* <Rect
+            x={8}
+            y={8}
+            width={34}
+            height={34}
+            cornerRadius={2.5}
+            fill={"transparent"}
+            stroke={isSectionIconClicked?"white":"black"}
+            strokeWidth={2}/> */}
+            <Rect
+            x={8}
+            y={8}
+            width={20}
+            height={10}
+            cornerRadius={2.5}
+            fill={"transparent"}
+            stroke={isSectionIconClicked?"white":"black"}
+            strokeWidth={1.75}/>
+            {/* <Line
+            points={[25,10,40,10,40,40,10,40,10,15]}
+            stroke={isSectionIconClicked?"white":"black"}/> */}
+        </Group>
+
+        <Group x={300} y={height/2-25}
         onMouseEnter={()=>{setIsHoverTextIcon(true)}}
         onMouseLeave={()=>{setIsHoverTextIcon(false)}}
         onClick={onTextIconClick}

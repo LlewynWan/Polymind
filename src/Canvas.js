@@ -61,6 +61,7 @@ export function Canvas({dimensions})
 
     const [isDrawingArrow, setIsDrawingArrow] = React.useState(false);
     const [isDrawingDoubleArrow, setIsDrawingDoubleArrow] = React.useState(false);
+    const [isSectioning, setIsSectioning] = React.useState(false);
     const [isAddingKeyword, setIsAddingKeyword] = React.useState(false);
     const [arrowFrom, setArrowFrom] = React.useState({id: -1, anchor: -1});
     const [arrowTo, setArrowTo] = React.useState({id: -1, anchor: -1});
@@ -375,19 +376,21 @@ export function Canvas({dimensions})
             setArrowFrom({id: id, anchor: anchor});
         } else if (e.evt.button===0 && e.evt.type==="mouseup") {
             if (id !== arrowFrom.id && arrowFrom.id !== -1) {
-                if (isDrawingArrow) {
+                if (isDrawingArrow || isDrawingDoubleArrow) {
                     setArrows(prevState=>{
                         return [...prevState, {
                             from_id: arrowFrom.id,
                             from_anchor: arrowFrom.anchor,
                             to_id: id,
-                            to_anchor: anchor
+                            to_anchor: anchor,
+                            directed: isDrawingArrow
                         }]
                     });
                 }
             }
 
             setIsDrawingArrow(false);
+            setIsDrawingDoubleArrow(false);
             setArrowFrom({id: -1, anchor: -1});
             setArrowTo({id: -1, anchor: -1});
             // promptPanelPopup();
@@ -646,7 +649,7 @@ export function Canvas({dimensions})
                                         return tmp;
                                     });
                                 });
-                            }   
+                            }
                     }}
                     onConnectingHover={(e,anchor)=>{
                         if (arrowFrom.id !== -1) {
@@ -836,6 +839,7 @@ export function Canvas({dimensions})
                 stroke={"gray"}
                 strokeWidth={2/canvasScale}
                 /> */}
+                {arrow.directed ? <Group>
                 <Line
                 points={[finalAnchor[0]-arrow_dx*arrow_size+arrow_dy*arrow_size,
                     finalAnchor[1]-arrow_dy*arrow_size+arrow_dx*arrow_size,
@@ -852,6 +856,7 @@ export function Canvas({dimensions})
                 tension={0}
                 stroke={"gray"}
                 strokeWidth={2/canvasScale}/>
+                </Group>: null}
                 </Group>
                 )
             })}
@@ -962,9 +967,9 @@ export function Canvas({dimensions})
             "prompt_5"]}
             /> */}
             <ToolBar
-                x={mainPrompter.x+mainPrompter.width/2-255}
+                x={mainPrompter.x+mainPrompter.width/2-285}
                 y={mainPrompter.y-70}
-                width={510}
+                width={615}
                 height={60}
                 color={"white"}
                 onHover={()=>setIsHoverToolBar(true)}
@@ -976,6 +981,7 @@ export function Canvas({dimensions})
                     UnselectAllNodes();
                     setIsDrawingDoubleArrow(false);
                     setIsAddingKeyword(false);
+                    setIsSectioning(false);
                     setIsDrawingArrow(!isDrawingArrow);
                 }}
                 isDoubleArrowIconClicked={isDrawingDoubleArrow}
@@ -984,7 +990,17 @@ export function Canvas({dimensions})
                     UnselectAllNodes();
                     setIsDrawingArrow(false);
                     setIsAddingKeyword(false);
+                    setIsSectioning(false);
                     setIsDrawingDoubleArrow(!isDrawingDoubleArrow);
+                }}
+                isSectionIconClicked={isSectioning}
+                onSectionIconClick={(e)=>{
+                    e.cancelBubble = true;
+                    UnselectAllNodes();
+                    setIsDrawingArrow(false);
+                    setIsDrawingDoubleArrow(false);
+                    setIsAddingKeyword(false);
+                    setIsSectioning(!isSectioning);
                 }}
                 isTextIconClicked={isAddingKeyword}
                 onTextIconClick={(e)=>{
@@ -992,6 +1008,7 @@ export function Canvas({dimensions})
                     UnselectAllNodes();
                     setIsDrawingArrow(false);
                     setIsDrawingDoubleArrow(false);
+                    setIsSectioning(false);
                     setIsAddingKeyword(!isAddingKeyword);
                 }}
                 onAddConcept={(x,y,radiusX,radiusY)=>{
