@@ -8,11 +8,10 @@ import { TaskHeader } from "./TaskHeader";
 const RETURN_KEY = 13;
 const ESCAPE_KEY = 27;
 
-export function Section({
+export function TaskNode({
     x,
     y,
-    scaleX,
-    scaleY,
+    type,
     width,
     height,
     color,
@@ -24,35 +23,33 @@ export function Section({
     return (
     <Group
     x={x}
-    y={y}>
-        <Label
-        x={0}
-        y={-40/canvasScale}
-        scaleX={1/canvasScale}
-        scaleY={1/canvasScale}>
+    y={y}
+    opacity={0.2}
+    draggable>
+        {type === "keyword" ?
+        <Label>
             <Tag
             fill={color}
-            cornerRadius={5}
-            opacity={0.5}
-            stroke={"gray"}
-            strokeWidth={0.5}/>
+            cornerRadius={5}/>
             <Text
             text={text}
             fontSize={fontSize}
-            fontStyle={"bold"}
-            fontFamily={"sans-serif"}
-            fill={"black"}
-            padding={5}/>
+            padding={10}/>
         </Label>
-        <Rect
-        x={0}
-        y={0}
-        width={width}
-        height={height}
-        cornerRadius={10}
-        opacity={0.15}
-        fill={color}
-        />
+        : type === "sticky_note" ?
+        <Label>
+            <Tag
+            fill={color}
+            shadowOffsetX={0}
+            shadowOffsetY={5}
+            shadowBlur={12}
+            shadowOpacity={0.2}/>
+            <Text
+            text={text}
+            fontSize={fontSize}
+            padding={15}
+            width={width}/>
+        </Label>: null}
     </Group>
     )
 }

@@ -9,6 +9,7 @@ import { ToolBar } from "./ToolBar";
 import { Keyword } from "./Keyword"
 import { Concept } from "./Concept";
 import { Section } from "./Section";
+import { TaskNode } from "./TaskNode";
 import { StickyNote } from "./StickyNote";
 
 import { TaskBoard } from "./TaskBoard";
@@ -844,41 +845,20 @@ export function Canvas({dimensions})
                 onDragEnd={(e)=>{handleDragNodeEnd(e,node.id)}}
                 /> : null : null
             })}
-            {/* {taskNodes.map(node=>{
-                return node.type === "keyword" ?
-                <Keyword
-                key={node.node_id}
-                x={node.x}
-                y={node.y}
-                scaleX={1/canvasScale}
-                scaleY={1/canvasScale}
-                fontSize={20}
-                padding={10}
-                text={node.text}
-                isSelected={false}
-                isConnecting={false}
-                color={colorPalette[node.task_id]}
-                header={false}
-                /> :
-                node.type === "sticky_note" ?
-                <StickyNote
-                key={node.node_id}
-                x={node.x}
-                y={node.y}
-                scaleX={1/canvasScale}
-                scaleY={1/canvasScale}
-                width={node.width}
-                height={node.height}
-                fontSize={18}
-                color={colorPalette[node.task_id]}
-                text={node.text}
-                isNull={false}
-                header={false}
-                isSelected={false}
-                isConnecting={false}
-                /> : null;
-            })
-            } */}
+            {taskNodes.map(node=>{
+                return (
+                    <TaskNode
+                    key={node.node_id}
+                    type={node.type}
+                    x={node.x}
+                    y={node.y}
+                    width={node.width}
+                    height={node.height}
+                    text={node.text}
+                    fontSize={node.fontSize}
+                    color={colorPalette[node.task_id]}/>
+                )
+            })}
             {arrows.map((arrow,index)=>{
                 const arrow_size = 10 / canvasScale;
                 const arrow_dy = arrow.to_anchor===0 ? 1 : arrow.to_anchor===2 ? -1 : 0;
