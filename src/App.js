@@ -29,7 +29,7 @@ function App() {
       {id: 2, goal: "Elaborate", inputType: "Concept", outputType: "Sticky Note", examplePrompt: []},
       {id: 3, goal: "Draft", inputType: "Section", outputType: "Sticky Note", examplePrompt: []},
       {id: 4, goal: "Freewrite", inputType: "Sticky Note", outputType: "Sticky Note", examplePrompt: []},
-      {id: 5, goal: "Associate", inputType: "Nodes", outputType: "Lines", examplePrompt: []},
+      {id: 5, goal: "Associate", inputType: "Node", outputType: "Line", examplePrompt: []},
       // {id: 6, goal: "Clarify", inputType: "Concept", outputType: "Sticky Note", examplePrompt: []},
       // {id: 7, goal: "Draft", inputType: "Section", outputType: "Sticky Note", examplePrompt: []}
     ],

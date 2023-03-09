@@ -3,8 +3,8 @@ const colorMap = {
     "Concept": "#5880A2",
     "Sticky Note": "#003A6B",
     "Section": "#80D8FF",
-    "Nodes": "#112233",
-    "Lines": "#C3E7FD"
+    "Node": "#112233",
+    "Line": "#C3E7FD"
 }
 
 const colorPalette = ["#FFB347", "#966FD6", "#71C562", "#FB6B89",
