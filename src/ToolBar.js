@@ -121,7 +121,7 @@ export function ToolBar({
         shadowOpacity={0.25}
         />
 
-        <Group x={40} y={height/2-25}
+        <Group x={35} y={height/2-25}
         onMouseEnter={()=>{setIsHoverArrowIcon(true)}}
         onMouseLeave={()=>{setIsHoverArrowIcon(false)}}
         onClick={onArrowIconClick}
@@ -159,7 +159,7 @@ export function ToolBar({
             />
         </Group>
 
-        <Group x={110} y={height/2-25}
+        <Group x={105} y={height/2-25}
         onMouseEnter={()=>{setIsHoverDoubleArrowIcon(true)}}
         onMouseLeave={()=>{setIsHoverDoubleArrowIcon(false)}}
         onClick={onDoubleArrowIconClick}
@@ -204,7 +204,7 @@ export function ToolBar({
             />
         </Group>
 
-        <Group x={180} y={height/2-25}
+        <Group x={175} y={height/2-25}
         onMouseEnter={()=>{setIsHoverSectionIcon(true)}}
         onMouseLeave={()=>{setIsHoverSectionIcon(false)}}
         onClick={onSectionIconClick}

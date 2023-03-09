@@ -3,11 +3,12 @@ import { HotKeys } from "react-hotkeys";
 
 import Konva from "konva";
 import { MyLine } from "./MyLine";
-import { Stage, Layer, Group, Line } from "react-konva";
+import { Stage, Layer, Group, Line, Rect } from "react-konva";
 
 import { ToolBar } from "./ToolBar";
 import { Keyword } from "./Keyword"
 import { Concept } from "./Concept";
+import { Section } from "./Section";
 import { StickyNote } from "./StickyNote";
 
 import { TaskBoard } from "./TaskBoard";
@@ -41,8 +42,8 @@ import { GlobalContext, CanvasContext, PrompterContext } from "./state";
 
 export function Canvas({dimensions})
 {
-    const {nodes, numNodes, arrows,
-        setNodes, setNumNodes, setArrows,
+    const {nodes, numNodes, arrows, sections,
+        setNodes, setNumNodes, setArrows, setSections,
         promptCards, mainPrompter, taskPrompts, microTasks,
         setPromptCards, setMainPrompter, setTaskPrompts, setMicroTasks,
         taskNodes, setTaskNodes} = useContext(GlobalContext);
@@ -52,6 +53,13 @@ export function Canvas({dimensions})
     const [canvasScale, setCanvasScale] = React.useState(1);
     const stageRef = React.useRef(null);
     const layerRef = React.useRef(null);
+
+    const [selectionRect, setSeletionRect] = React.useState({
+        visible: false,
+        x1: 0, y1: 0,
+        x2: 0, y2: 0
+    });
+    const selectionRectRef = React.useRef(null);
 
     const promptCardsRef = React.useRef([]);
     if (promptCardsRef.current.length !== promptCards.length+1) {
@@ -300,9 +308,58 @@ export function Canvas({dimensions})
     }
 
     const handleStageMouseDown = e => {
-        e.cancelBubble = true;
-        if (!isDrawingArrow && !isDrawingDoubleArrow) {
-            setIsMultiSelecting(true);
+        // e.cancelBubble = true;
+        // if (!isDrawingArrow && !isDrawingDoubleArrow) {
+        //     setIsMultiSelecting(true);
+        // }
+        if (isSectioning) {
+            setSeletionRect({
+                visible: true,
+                x1: pointerPosition.x,
+                x2: pointerPosition.x,
+                y1: pointerPosition.y,
+                y2: pointerPosition.y
+            });
+            // updateSelectionRect();
+        }
+    }
+    const handleStageMouseMove = e => {
+        if (isSectioning) {
+            setSeletionRect(rect=>{
+                return {
+                visible: rect.visible,
+                x1: rect.x1,
+                y1: rect.y1,
+                x2: pointerPosition.x,
+                y2: pointerPosition.y
+                }
+            })
+        }
+    }
+    const handleStageMouseUp = e => {
+        if (isSectioning) {
+            setSections(prevState=>{
+                const position1 = pointer2CanvasPosition({
+                    x: selectionRect.x1, y: selectionRect.y1
+                })
+                const position2 = pointer2CanvasPosition({
+                    x: selectionRect.x2, y: selectionRect.y2
+                })
+                return [
+                    ...prevState,
+                    {x: Math.min(position1[0], position2[0]),
+                    y: Math.min(position1[1], position2[1]),
+                    width: Math.abs(position1[0]-position2[0]),
+                    height: Math.abs(position1[1]-position2[1]),
+                    text: "section "+(sections.length+1).toString()}
+                ];
+            });
+            setSeletionRect({
+                visible: false,
+                x1: 0, y1: 0,
+                x2: 0, y2: 0
+            })
+            setIsSectioning(false);
         }
     }
 
@@ -576,6 +633,8 @@ export function Canvas({dimensions})
     onWheel={handleStageWheel}
     onClick={handleStageClick}
     onMouseDown={handleStageMouseDown}
+    onMouseMove={handleStageMouseMove}
+    onMouseUp={handleStageMouseUp}
     // onDblClick={toggleFollowerMode}
     ref={stageRef}
     >
@@ -614,168 +673,177 @@ export function Canvas({dimensions})
         >
             <Group>
             <CanvasContext.Provider value={{canvasX, canvasY, canvasScale, microTasks}}>
-            {
-                nodes.map((node, index) => {
-                    return node.display ?
-                    node.type==="sticky_note"?
-                    <StickyNote
-                    key={node.id}
-                    id={node.id}
-                    x={node.x}
-                    y={node.y}
-                    scaleX={node.scaleX}
-                    scaleY={node.scaleY}
-                    width={node.width}
-                    height={node.height}
-                    fontSize={18}
-                    color={"#748B97"}
-                    isNull={node.text === ""}
-                    text={node.text}
-                    draggable={!isDrawingArrow && !isDrawingDoubleArrow}
-                    isConnecting={isDrawingArrow || isDrawingDoubleArrow}
-                    onScale={(newScale, newX, newY)=>onNodeScale(node.id, newScale, newX, newY)}
-                    onResize={(offsetW, offsetH, offsetX, offsetY) => {
-                        if (node.height + offsetH >= 14
-                            && node.width + offsetW >= 105) {
-                                setNodes(prevState => {
-                                    return prevState.map(state => {
-                                        let tmp = state;
-                                        if (tmp.id === node.id) {
-                                            tmp.width += offsetW;
-                                            tmp.height += offsetH;
-                                            tmp.x += offsetX;
-                                            tmp.y += offsetY;
-                                        }
-                                        return tmp;
-                                    });
-                                });
-                            }
-                    }}
-                    onConnectingHover={(e,anchor)=>{
-                        if (arrowFrom.id !== -1) {
-                            setArrowTo({id: node.id, anchor: anchor});
-                        }
-                    }}
-                    onConnectingUnhover={(e)=>{
-                        setArrowTo({id: -1, anchor: -1});
-                    }}
-                    onConnected={(e,anchor)=>onNodeConnected(e,node.id,anchor)}
-                    onClick={(e)=>onNodeSelect(e,node.id)}
-                    // onDragStart={(e)=>{e.cancelBubble=true}}
-                    onDragMove={(e)=>{handleDragNodeMove(e,node.id)}}
-                    onDragEnd={(e)=>{handleDragNodeEnd(e,node.id)}}
-                    onTextChange={(value)=>onNodeTextChange(value,node.id)}
-                    isSelected={node.selected}
-                    onOverflow={(scrollHeight)=>{
-                        setNodes(prevState =>{
-                            return prevState.map(state => {
-                                let tmp = state;
-                                if (tmp.id === node.id)
-                                    tmp.height = scrollHeight;
-                                return tmp;
-                            });
-                        })
-                    }}/> :
-                    node.type === "keyword" ?
-                    <Keyword
-                    key={node.id}
-                    x={node.x}
-                    y={node.y}
-                    scaleX={node.scaleX}
-                    scaleY={node.scaleY}
-                    fontSize={node.fontSize}
-                    color={"#CED8DF"}
-                    text={node.text}
-                    padding={10}
-                    isNull={node.text===""}
-                    isSelected={node.selected}
-                    isConnecting={isDrawingArrow || isDrawingDoubleArrow}
-                    onClick={(e)=>onNodeSelect(e,node.id)}
-                    onDragMove={(e)=>{handleDragNodeMove(e,node.id)}}
-                    onDragEnd={(e)=>{handleDragNodeEnd(e,node.id)}}
-                    onTextChange={(value)=>onNodeTextChange(value,node.id)}
-                    onTextSizeChange={(rect)=>{
-                        if (rect.width && rect.height &&
-                        (node.width !== rect.width || node.height !== rect.height)) {
-                            setNodes(prevState=>{
-                                return prevState.map(state=>{
-                                    let tmp = state;
-                                    if (tmp.id === node.id) {
-                                        tmp.width = rect.width;
-                                        tmp.height = rect.height;
-                                    }
-                                    return tmp;
-                                });
-                            })
-                        }
-                    }}
-                    onScale={(newScale, newX, newY)=>onNodeScale(node.id, newScale, newX, newY)}
-                    onConnectingHover={(e,anchor)=>{
-                        if (arrowFrom.id !== -1) {
-                            setArrowTo({id: node.id, anchor: anchor});
-                        }
-                    }}
-                    onConnectingUnhover={(e)=>{
-                        setArrowTo({id: -1, anchor: -1});
-                    }}
-                    onConnected={(e,anchor)=>onNodeConnected(e,node.id,anchor)}
-                    /> :
-                    node.type === "concept" ?
-                    <Concept
-                    key={node.id}
-                    x={node.x}
-                    y={node.y}
-                    scaleX={node.scaleX}
-                    scaleY={node.scaleY}
-                    radiusX={node.radiusX}
-                    radiusY={node.radiusY}
-                    text={node.text}
-                    fontSize={20}
-                    color={"#FFB5B7"}
-                    isNull={node.text===""}
-                    isSelected={node.selected}
-                    onClick={(e)=>onNodeSelect(e,node.id)}
-                    onScale={(newScale, newX, newY)=>onNodeScale(node.id, newScale, newX, newY)}
-                    onResize={(offsetW,offsetH)=>{
-                        if (node.radiusX+offsetW >= 36 && node.radiusY+offsetH >=20) {
+            {sections.map((section,index)=>{
+                return (<Section
+                key={index}
+                x={section.x}
+                y={section.y}
+                width={section.width}
+                height={section.height}
+                text={section.text}
+                fontSize={18}
+                color={"#0099FF"}/>)
+            })}
+            {nodes.map((node, index) => {
+                return node.display ?
+                node.type==="sticky_note"?
+                <StickyNote
+                key={node.id}
+                id={node.id}
+                x={node.x}
+                y={node.y}
+                scaleX={node.scaleX}
+                scaleY={node.scaleY}
+                width={node.width}
+                height={node.height}
+                fontSize={18}
+                color={"#748B97"}
+                isNull={node.text === ""}
+                text={node.text}
+                draggable={!isDrawingArrow && !isDrawingDoubleArrow}
+                isConnecting={isDrawingArrow || isDrawingDoubleArrow}
+                onScale={(newScale, newX, newY)=>onNodeScale(node.id, newScale, newX, newY)}
+                onResize={(offsetW, offsetH, offsetX, offsetY) => {
+                    if (node.height + offsetH >= 14
+                        && node.width + offsetW >= 105) {
                             setNodes(prevState => {
                                 return prevState.map(state => {
                                     let tmp = state;
                                     if (tmp.id === node.id) {
-                                        tmp.radiusX += offsetW;
-                                        tmp.radiusY += offsetH;
+                                        tmp.width += offsetW;
+                                        tmp.height += offsetH;
+                                        tmp.x += offsetX;
+                                        tmp.y += offsetY;
                                     }
                                     return tmp;
                                 });
                             });
                         }
-                    }}
-                    onTextChange={(value)=>onNodeTextChange(value,node.id)}
-                    onOverflow={(scrollHeight)=>{
-                        setNodes(prevState =>{
-                            return prevState.map(state => {
+                }}
+                onConnectingHover={(e,anchor)=>{
+                    if (arrowFrom.id !== -1) {
+                        setArrowTo({id: node.id, anchor: anchor});
+                    }
+                }}
+                onConnectingUnhover={(e)=>{
+                    setArrowTo({id: -1, anchor: -1});
+                }}
+                onConnected={(e,anchor)=>onNodeConnected(e,node.id,anchor)}
+                onClick={(e)=>onNodeSelect(e,node.id)}
+                // onDragStart={(e)=>{e.cancelBubble=true}}
+                onDragMove={(e)=>{handleDragNodeMove(e,node.id)}}
+                onDragEnd={(e)=>{handleDragNodeEnd(e,node.id)}}
+                onTextChange={(value)=>onNodeTextChange(value,node.id)}
+                isSelected={node.selected}
+                onOverflow={(scrollHeight)=>{
+                    setNodes(prevState =>{
+                        return prevState.map(state => {
+                            let tmp = state;
+                            if (tmp.id === node.id)
+                                tmp.height = scrollHeight;
+                            return tmp;
+                        });
+                    })
+                }}/> :
+                node.type === "keyword" ?
+                <Keyword
+                key={node.id}
+                x={node.x}
+                y={node.y}
+                scaleX={node.scaleX}
+                scaleY={node.scaleY}
+                fontSize={node.fontSize}
+                color={"#CED8DF"}
+                text={node.text}
+                padding={10}
+                isNull={node.text===""}
+                isSelected={node.selected}
+                isConnecting={isDrawingArrow || isDrawingDoubleArrow}
+                onClick={(e)=>onNodeSelect(e,node.id)}
+                onDragMove={(e)=>{handleDragNodeMove(e,node.id)}}
+                onDragEnd={(e)=>{handleDragNodeEnd(e,node.id)}}
+                onTextChange={(value)=>onNodeTextChange(value,node.id)}
+                onTextSizeChange={(rect)=>{
+                    if (rect.width && rect.height &&
+                    (node.width !== rect.width || node.height !== rect.height)) {
+                        setNodes(prevState=>{
+                            return prevState.map(state=>{
                                 let tmp = state;
-                                if (tmp.id === node.id)
-                                    tmp.radiusY = scrollHeight;
+                                if (tmp.id === node.id) {
+                                    tmp.width = rect.width;
+                                    tmp.height = rect.height;
+                                }
                                 return tmp;
                             });
                         })
-                    }}
-                    isConnecting={isDrawingArrow || isDrawingDoubleArrow}
-                    onConnectingHover={(e,anchor)=>{
-                        if (arrowFrom.id !== -1) {
-                            setArrowTo({id: node.id, anchor: anchor});
-                        }
-                    }}
-                    onConnectingUnhover={(e)=>{
-                        setArrowTo({id: -1, anchor: -1});
-                    }}
-                    onConnected={(e,anchor)=>onNodeConnected(e,node.id,anchor)}
-                    onDragMove={(e)=>{handleDragNodeMove(e,node.id)}}
-                    onDragEnd={(e)=>{handleDragNodeEnd(e,node.id)}}
-                    /> : null : null
-                })
-            }
+                    }
+                }}
+                onScale={(newScale, newX, newY)=>onNodeScale(node.id, newScale, newX, newY)}
+                onConnectingHover={(e,anchor)=>{
+                    if (arrowFrom.id !== -1) {
+                        setArrowTo({id: node.id, anchor: anchor});
+                    }
+                }}
+                onConnectingUnhover={(e)=>{
+                    setArrowTo({id: -1, anchor: -1});
+                }}
+                onConnected={(e,anchor)=>onNodeConnected(e,node.id,anchor)}
+                /> :
+                node.type === "concept" ?
+                <Concept
+                key={node.id}
+                x={node.x}
+                y={node.y}
+                scaleX={node.scaleX}
+                scaleY={node.scaleY}
+                radiusX={node.radiusX}
+                radiusY={node.radiusY}
+                text={node.text}
+                fontSize={20}
+                color={"#FFB5B7"}
+                isNull={node.text===""}
+                isSelected={node.selected}
+                onClick={(e)=>onNodeSelect(e,node.id)}
+                onScale={(newScale, newX, newY)=>onNodeScale(node.id, newScale, newX, newY)}
+                onResize={(offsetW,offsetH)=>{
+                    if (node.radiusX+offsetW >= 36 && node.radiusY+offsetH >=20) {
+                        setNodes(prevState => {
+                            return prevState.map(state => {
+                                let tmp = state;
+                                if (tmp.id === node.id) {
+                                    tmp.radiusX += offsetW;
+                                    tmp.radiusY += offsetH;
+                                }
+                                return tmp;
+                            });
+                        });
+                    }
+                }}
+                onTextChange={(value)=>onNodeTextChange(value,node.id)}
+                onOverflow={(scrollHeight)=>{
+                    setNodes(prevState =>{
+                        return prevState.map(state => {
+                            let tmp = state;
+                            if (tmp.id === node.id)
+                                tmp.radiusY = scrollHeight;
+                            return tmp;
+                        });
+                    })
+                }}
+                isConnecting={isDrawingArrow || isDrawingDoubleArrow}
+                onConnectingHover={(e,anchor)=>{
+                    if (arrowFrom.id !== -1) {
+                        setArrowTo({id: node.id, anchor: anchor});
+                    }
+                }}
+                onConnectingUnhover={(e)=>{
+                    setArrowTo({id: -1, anchor: -1});
+                }}
+                onConnected={(e,anchor)=>onNodeConnected(e,node.id,anchor)}
+                onDragMove={(e)=>{handleDragNodeMove(e,node.id)}}
+                onDragEnd={(e)=>{handleDragNodeEnd(e,node.id)}}
+                /> : null : null
+            })}
             {/* {taskNodes.map(node=>{
                 return node.type === "keyword" ?
                 <Keyword
@@ -968,7 +1036,7 @@ export function Canvas({dimensions})
             /> */}
             <ToolBar
                 x={mainPrompter.x+mainPrompter.width/2-285}
-                y={mainPrompter.y-70}
+                y={mainPrompter.y-50}
                 width={615}
                 height={60}
                 color={"white"}
@@ -1034,6 +1102,14 @@ export function Canvas({dimensions})
                     setNumNodes(numNodes+1);
                 }}
             />
+
+            <Rect fill="#0099FF"
+            opacity={0.15}
+            visible={selectionRect.visible} ref={selectionRectRef}
+            x={Math.min(selectionRect.x1, selectionRect.x2)}
+            y={Math.min(selectionRect.y1, selectionRect.y2)}
+            width={Math.abs(selectionRect.x1 - selectionRect.x2)}
+            height={Math.abs(selectionRect.y1 - selectionRect.y2)}/>
         </Layer>
     </Stage>
     </HotKeys>

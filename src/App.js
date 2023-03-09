@@ -22,6 +22,7 @@ function App() {
     ],
     num_nodes: 0,
     arrows: [],
+    sections: [],
     microtasks: [
       {id: 0, goal: "Brainstorm", inputType: "Keyword", outputType: "Keyword", examplePrompt: []},
       {id: 1, goal: "Summarise", inputType: "Sticky Note", outputType: "Keyword", examplePrompt: []},
@@ -55,6 +56,7 @@ function App() {
   const [nodes, setNodes] = React.useState(initialState.nodes);
   const [numNodes, setNumNodes] = React.useState(initialState.num_nodes);
   const [arrows, setArrows] = React.useState(initialState.arrows);
+  const [sections, setSections] = React.useState(initialState.sections)
   const [promptCards, setPromptCards] = React.useState(initialState.prompt_cards);
   const [mainPrompter, setMainPrompter] = React.useState(initialState.main_prompter);
   const [taskPrompts, setTaskPrompts] = React.useState(initialState.task_prompts);
@@ -89,9 +91,9 @@ function App() {
   return (
     <div className="container fullscreen" id="fullsccreen">
       <GlobalContext.Provider value={{
-        nodes, numNodes, arrows, promptCards, mainPrompter,
+        nodes, numNodes, arrows, sections, promptCards, mainPrompter,
         taskPrompts, microTasks, taskNodes,
-        setNodes, setNumNodes, setArrows, setTaskPrompts,
+        setNodes, setNumNodes, setArrows, setSections, setTaskPrompts,
         setPromptCards, setMainPrompter, setMicroTasks, setTaskNodes
       }}>
         <Canvas dimensions={dimensions}/>
