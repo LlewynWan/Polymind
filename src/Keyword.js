@@ -34,7 +34,8 @@ export function Keyword({
   onDragMove,
   onDragEnd,
   header=true,
-  draggable=true
+  draggable=true,
+  callbackTaskId=-1
 }) {
   const [isEditing, setIsEditing] = useState(false);
   const [isHover, setIsHover] = useState(false);
@@ -139,7 +140,8 @@ export function Keyword({
     tasks={microTasks}
     fontSize={14}
     width={150}
-    scale={1/canvasScale}/> : null}
+    scale={1/canvasScale}
+    callbackTaskId={callbackTaskId}/> : null}
 
     <Group x={0} y={0}
     // draggable={draggable}

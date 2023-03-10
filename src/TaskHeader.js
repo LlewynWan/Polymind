@@ -3,7 +3,7 @@ import React, { useState, useEffect, useRef } from "react";
 import Konva from "konva";
 
 import { colorPalette } from "./color_utils";
-import { Group, Label, Tag, Text, Rect, Arrow, Circle } from "react-konva";
+import { Group, Label, Tag, Text, Rect, Arrow } from "react-konva";
 
 
 export function TaskHeader({
@@ -12,6 +12,7 @@ export function TaskHeader({
     scale,
     width,
     fontSize,
+    callbackTaskId=-1,
 }) {
     const [isHover, setIsHover] = useState(false);
 
@@ -60,6 +61,24 @@ export function TaskHeader({
     }
 
     useEffect(()=>{
+        if (callbackTaskId !== -1 && ! isHover) {
+            clearTimeout(hoverTimeout);
+            curtainRef.current.to({
+                fill: colorPalette[callbackTaskId%colorPalette.length],
+                width: width,
+                visible: true,
+                duration: 0.25,
+                easing: Konva.Easings.EaseOut,
+                onFinish: ()=>{
+                    setTimeout(()=>{curtainRef.current.to({
+                        width: 0,
+                        visible: false,
+                        duration: 0.15
+                    })}, 2000);
+                }
+            })
+        }
+
         var positions = [0];
         const test = new Konva.Text({text: "test", fontSize: fontSize, fontStyle: "bold",
             align: "center", verticalAlign: "middle", padding: 2.5});
@@ -72,7 +91,7 @@ export function TaskHeader({
         });
         setHeaderPositions(positions);
         setFontHeight(test.height());
-    }, [tasks, fontSize, offsetX])
+    }, [tasks, fontSize, offsetX, callbackTaskId])
 
     // return (
     //     <Group
@@ -154,7 +173,7 @@ export function TaskHeader({
     y={y}
     scaleX={scale}
     scaleY={scale}
-    opacity={isHover?1:0.5}
+
     onWheel={handleTaskHeaderWheel}
     onMouseEnter={()=>{
         setIsHover(true);
@@ -180,6 +199,8 @@ export function TaskHeader({
         shadowColor={"black"}
         fill={"#444444"}
         /> */}
+    <Group
+    opacity={isHover?1:0.5}>
         <Rect
         x={0}
         // y={-fontHeight-12}
@@ -362,37 +383,38 @@ export function TaskHeader({
                 setHoverRightArrowInterval(null);
             }
         }}/>
+    </Group>
 
-        <Rect
-        x={0}
-        y={-4}
-        width={0}
-        height={fontHeight+8}
-        cornerRadius={2.5}
-        visible={isHoverHeader}
-        ref={curtainRef}
-        onMouseLeave={()=>{
-            setCurrentHoverId(-1);
-            clearTimeout(hoverTimeout)
-            curtainRef.current.to({
-                width: 0,
-                duration: 0.25,
-                easing: Konva.Easings.EaseOut,
-                onFinish: ()=> {
-                    setIsHoverHeader(false);
-                    // promptRectRef.current.to({
-                    //     fill: "silver",
-                    //     opacity: 1,
-                    //     duration: 0.25
-                    // });
-                    // promptCircleRef.current.to({
-                    //     fill: "silver",
-                    //     opacity: 1,
-                    //     duration: 0.25
-                    // });
-                }
-            });
-        }}/>
+    <Rect
+    x={0}
+    y={-4}
+    width={0}
+    height={fontHeight+8}
+    cornerRadius={2.5}
+    visible={isHoverHeader}
+    ref={curtainRef}
+    onMouseLeave={()=>{
+        setCurrentHoverId(-1);
+        clearTimeout(hoverTimeout)
+        curtainRef.current.to({
+            width: 0,
+            duration: 0.25,
+            easing: Konva.Easings.EaseOut,
+            onFinish: ()=> {
+                setIsHoverHeader(false);
+                // promptRectRef.current.to({
+                //     fill: "silver",
+                //     opacity: 1,
+                //     duration: 0.25
+                // });
+                // promptCircleRef.current.to({
+                //     fill: "silver",
+                //     opacity: 1,
+                //     duration: 0.25
+                // });
+            }
+        });
+    }}/>
     </Group>
     )
 }

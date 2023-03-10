@@ -86,7 +86,7 @@ export function Canvas({dimensions})
     // const [followerPositionQueue, setFollowerPositionQueue] = React.useState([]);
     // const [isFollowerModeEnabled, setIsFollowerModeEnabled] = React.useState(false);
 
-    const pointerTracker = React.useRef(null);
+    const [pointerTracker, setPointerTracker] = React.useState(-1);
     const [pointerPosition, setPointerPosition] = React.useState({x:-1, y:-1});
 
     const pointer2CanvasPosition = (position) => {
@@ -102,17 +102,28 @@ export function Canvas({dimensions})
     }
 
     useEffect(() => {
-        if (pointerTracker && pointerTracker.current) {
-            clearInterval(pointerTracker.current);
+        if (pointerTracker) {
+            clearInterval(pointerTracker);
         }
-        pointerTracker.current = setInterval(() => {
+        setPointerTracker(setInterval(() => {
             if (stageRef && stageRef.current) {
                 const position = stageRef.current.getPointerPosition();
                 if (position) {
                     setPointerPosition(position);
                 }
             }
-        }, 20);
+        }, 20));
+
+
+        // setInterval(()=>{
+        //     setNodes(prevState=>{
+        //         return prevState.map(state=>{
+        //             let tmp = state;
+        //             tmp.callbackTaskId=Math.floor(Math.random()*5);
+        //             return tmp;
+        //         })
+        //     })
+        // }, 10000)
 
         if (!isHoverToolBar && stageRef) {
             stageRef.current.container().style.cursor =
@@ -298,7 +309,8 @@ export function Canvas({dimensions})
                 x: position[0], y: position[1],
                 width: 0, height: 0, fontSize: 20,
                 scaleX: 1/canvasScale, scaleY: 1/canvasScale,
-                selected: true, text: "", display: true};
+                selected: true, text: "", display: true,
+                callbackTaskId: -1};
                 return [...prevState, tmp];
             });
             setNumNodes(numNodes+1);
@@ -745,7 +757,8 @@ export function Canvas({dimensions})
                             return tmp;
                         });
                     })
-                }}/> :
+                }}
+                callbackTaskId={node.callbackTaskId}/> :
                 node.type === "keyword" ?
                 <Keyword
                 key={node.id}
@@ -789,7 +802,7 @@ export function Canvas({dimensions})
                     setArrowTo({id: -1, anchor: -1});
                 }}
                 onConnected={(e,anchor)=>onNodeConnected(e,node.id,anchor)}
-                /> :
+                callbackTaskId={node.callbackTaskId}/> :
                 node.type === "concept" ?
                 <Concept
                 key={node.id}
@@ -843,6 +856,7 @@ export function Canvas({dimensions})
                 onConnected={(e,anchor)=>onNodeConnected(e,node.id,anchor)}
                 onDragMove={(e)=>{handleDragNodeMove(e,node.id)}}
                 onDragEnd={(e)=>{handleDragNodeEnd(e,node.id)}}
+                callbackTaskId={node.callbackTaskId}
                 /> : null : null
             })}
             {taskNodes.map(node=>{
@@ -1066,7 +1080,8 @@ export function Canvas({dimensions})
                         x: (x-canvasX)/canvasScale, y: (y-canvasY)/canvasScale,
                         radiusX: radiusX, radiusY: radiusY,
                         scaleX: 1/canvasScale, scaleY: 1/canvasScale,
-                        selected: false, text: "", display: true};
+                        selected: false, text: "", display: true,
+                        callbackTaskId: -1};
                         return [...prevState, tmp];
                     });
                     setNumNodes(numNodes+1);
@@ -1077,7 +1092,8 @@ export function Canvas({dimensions})
                         x: (x-canvasX)/canvasScale, y: (y-canvasY)/canvasScale,
                         width: width, height: height,
                         scaleX: 1/canvasScale, scaleY: 1/canvasScale,
-                        selected: false, text: "", display: true};
+                        selected: false, text: "", display: true,
+                        callbackTaskId: -1};
                         return [...prevState, tmp];
                     });
                     setNumNodes(numNodes+1);
