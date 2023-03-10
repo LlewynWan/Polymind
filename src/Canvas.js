@@ -853,7 +853,8 @@ export function Canvas({dimensions})
                     x={node.x}
                     y={node.y}
                     width={node.width}
-                    height={node.height}
+                    radiusX={node.radiusX}
+                    radiusY={node.radiusY}
                     text={node.text}
                     fontSize={node.fontSize}
                     color={colorPalette[node.task_id]}/>
@@ -1084,7 +1085,7 @@ export function Canvas({dimensions})
             />
 
             <Rect fill="#0099FF"
-            opacity={0.15}
+            opacity={0.22}
             visible={selectionRect.visible} ref={selectionRectRef}
             x={Math.min(selectionRect.x1, selectionRect.x2)}
             y={Math.min(selectionRect.y1, selectionRect.y2)}

@@ -33,7 +33,7 @@ export function Section({
             <Tag
             fill={color}
             cornerRadius={5}
-            opacity={0.5}
+            opacity={0.35}
             stroke={"gray"}
             strokeWidth={0.5}/>
             <Text
@@ -50,7 +50,7 @@ export function Section({
         width={width}
         height={height}
         cornerRadius={10}
-        opacity={0.15}
+        opacity={0.1}
         fill={color}
         />
     </Group>
