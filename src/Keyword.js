@@ -33,6 +33,7 @@ export function Keyword({
   onDragStart,
   onDragMove,
   onDragEnd,
+  resetNodeCallbackTaskId,
   header=true,
   draggable=true,
   callbackTaskId=-1
@@ -141,7 +142,8 @@ export function Keyword({
     fontSize={14}
     width={150}
     scale={1/canvasScale}
-    callbackTaskId={callbackTaskId}/> : null}
+    callbackTaskId={callbackTaskId}
+    resetNodeCallbackTaskId={resetNodeCallbackTaskId}/> : null}
 
     <Group x={0} y={0}
     // draggable={draggable}

@@ -87,6 +87,13 @@ export function Canvas({dimensions})
         return [posX, posY];
     }
 
+    useEffect(()=>{
+        setTaskNodes(prevState=>prevState.filter(state=>
+            state.node_id!==inFocus.node&&state.task_id!==0));
+
+        handleMicroTask(0,"node",0);
+    }, [inFocus])
+
     useEffect(() => {
         // clearInterval(pointerTracker);
         const pointerTracker = setInterval(() => {
@@ -101,10 +108,25 @@ export function Canvas({dimensions})
         // clearInterval(fittsLawTracker)
         const fittsLawTracker = setInterval(()=>{
             const position = pointer2CanvasPosition(stageRef.current.getPointerPosition());
-            const ID = nodes.map(node=>node_utils.calcFittsLawID(node,position));
-            setInFocus({node: ID.indexOf(Math.min(...ID))});
+            var ID_inv = nodes.map(node=>1/node_utils.calcFittsLawID(node,position));
+            const sumIDInv = ID_inv.reduce((sum,id_inv)=>sum+id_inv,0);
+            ID_inv = ID_inv.map(id_inv=>id_inv/sumIDInv);
+            
+            const split = Math.random();
+            var tmpSum = 0.;
+            var sample_id = -1;
+            for (var i = 0; i < ID_inv.length; i++) {
+                tmpSum += ID_inv[i];
+                if (tmpSum > split) {
+                    sample_id = i;
+                    break;
+                }
+            }
+
+            setInFocus({node: sample_id})
+            // setInFocus({node: ID_inv.indexOf(Math.min(...ID_inv))});
             // console.log(ID.indexOf(Math.min(...ID)));
-        }, 250);
+        }, 5000);
 
         if (!isHoverToolBar && stageRef) {
             stageRef.current.container().style.cursor =
@@ -159,6 +181,27 @@ export function Canvas({dimensions})
                 return tmp;
             })
         });
+    }
+
+    const handleMicroTask = (task_id, object_type, object_id) => {
+        setTimeout(()=>{
+            // setTaskNodes(prevState=>{
+            //     return [
+            //         ...prevState,
+            //         {node_id: prevState.lenth,
+            //             task_id: 0, attached_to_id: 0, type: "keyword"}
+            //     ]
+            // })
+            if (object_type==="node") {
+                setNodes(prevState=>prevState.map(state=>{
+                    let tmp = state;
+                    if (tmp.id === object_id) {
+                        tmp.callbackTaskId = task_id;
+                    }
+                    return tmp;
+                }));
+            }
+        }, 3000)
     }
 
     const [promptCardIndex, setPromptCardIndex] = React.useState(1);
@@ -402,6 +445,15 @@ export function Canvas({dimensions})
             });
         });
     }
+    const resetNodeCallbackTaskId = (id) =>{
+        setNodes(prevState => prevState.map(state=>{
+            let tmp = state;
+            if (tmp.id === id) {
+                tmp.callbackTaskId = -1;
+            }
+            return tmp;
+        }));
+    }
 
     const onNodeConnected = (e, id, anchor)=>{
         e.cancelBubble = true;
@@ -594,7 +646,8 @@ export function Canvas({dimensions})
                         });
                     })
                 }}
-                callbackTaskId={node.callbackTaskId}/> :
+                callbackTaskId={node.callbackTaskId}
+                resetNodeCallbackTaskId={()=>resetNodeCallbackTaskId(node.id)}/> :
                 node.type === "keyword" ?
                 <Keyword
                 key={node.id}
@@ -638,7 +691,8 @@ export function Canvas({dimensions})
                     setArrowTo({id: -1, anchor: -1});
                 }}
                 onConnected={(e,anchor)=>onNodeConnected(e,node.id,anchor)}
-                callbackTaskId={node.callbackTaskId}/> :
+                callbackTaskId={node.callbackTaskId}
+                resetNodeCallbackTaskId={()=>resetNodeCallbackTaskId(node.id)}/> :
                 node.type === "concept" ?
                 <Concept
                 key={node.id}
@@ -693,6 +747,7 @@ export function Canvas({dimensions})
                 onDragMove={(e)=>{handleDragNodeMove(e,node.id)}}
                 onDragEnd={(e)=>{handleDragNodeEnd(e,node.id)}}
                 callbackTaskId={node.callbackTaskId}
+                resetNodeCallbackTaskId={()=>resetNodeCallbackTaskId(node.id)}
                 /> : null : null
             })}
             {taskNodes.map(node=>{

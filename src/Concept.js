@@ -34,6 +34,7 @@ export function Concept({
     onDragStart,
     onDragMove,
     onDragEnd,
+    resetNodeCallbackTaskId,
     draggable=true,
     callbackTaskId=-1
 }) {
@@ -149,7 +150,8 @@ export function Concept({
     fontSize={14}
     width={150}
     scale={1/canvasScale}
-    callbackTaskId={callbackTaskId}/>
+    callbackTaskId={callbackTaskId}
+    resetNodeCallbackTaskId={resetNodeCallbackTaskId}/>
 
     <Group
     x={0}

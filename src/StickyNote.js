@@ -34,6 +34,7 @@ export function StickyNote({
   onDragMove,
   onDragEnd,
   onOverflow,
+  resetNodeCallbackTaskId,
   header=true,
   draggable=true,
   callbackTaskId=-1
@@ -131,7 +132,8 @@ export function StickyNote({
     fontSize={14}
     width={180}
     scale={1/canvasScale}
-    callbackTaskId={callbackTaskId}/> : null}
+    callbackTaskId={callbackTaskId}
+    resetNodeCallbackTaskId={resetNodeCallbackTaskId}/> : null}
     
     <Group
     x={0}

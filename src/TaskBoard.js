@@ -52,7 +52,7 @@ export function TaskBoard({
             y={0}
             width={width}
             height={height}
-            cornerRadius={10}
+            cornerRadius={5}
             fill={"#D3D3D3"}
             opacity={0.6}
             strokeWidth={0.32}

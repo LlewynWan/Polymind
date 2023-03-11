@@ -12,7 +12,8 @@ export function TaskHeader({
     scale,
     width,
     fontSize,
-    callbackTaskId=-1,
+    resetNodeCallbackTaskId,
+    callbackTaskId=-1
 }) {
     const [isHover, setIsHover] = useState(false);
 
@@ -61,6 +62,7 @@ export function TaskHeader({
     }
 
     useEffect(()=>{
+        console.log(callbackTaskId)
         if (callbackTaskId !== -1 && ! isHover) {
             clearTimeout(hoverTimeout);
             curtainRef.current.to({
@@ -70,11 +72,14 @@ export function TaskHeader({
                 duration: 0.25,
                 easing: Konva.Easings.EaseOut,
                 onFinish: ()=>{
-                    setTimeout(()=>{curtainRef.current.to({
-                        width: 0,
-                        visible: false,
-                        duration: 0.15
-                    })}, 2000);
+                    setTimeout(()=>{
+                        curtainRef.current.to({
+                            width: 0,
+                            visible: false,
+                            duration: 0.15,
+                            onFinish: ()=>{resetNodeCallbackTaskId()}
+                        });
+                    }, 1500);
                 }
             })
         }
