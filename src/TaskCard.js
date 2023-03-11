@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { colorMap } from "./utils/color_utils";
-import { Group, Rect, Label, Tag, Text } from "react-konva";
+import { Group, Rect, Label, Tag, Text, Line } from "react-konva";
 
 
 export function TaskCard({
@@ -15,6 +15,7 @@ export function TaskCard({
 })
 {
     const [isHover, setIsHover] = useState(false);
+    const rectRef = React.useRef(null);
     // const colorMap = {
     //     "Keyword": "#AFC6D9",
     //     "Concept": "#5880A2",
@@ -28,11 +29,18 @@ export function TaskCard({
         <Group
         x={x}
         y={y}
-        onMouseEnter={()=>setIsHover(true)}
-        onMouseLeave={()=>setIsHover(false)}>
+        onMouseEnter={()=>{
+            setIsHover(true);
+            // rectRef.current.to({height: height+75, duration: 0.25})
+        }}
+        onMouseLeave={()=>{
+            setIsHover(false);
+            // rectRef.current.to({height: height, duration: 0.25})
+        }}>
             <Rect
             x={0}
             y={0}
+            ref={rectRef}
             width={width}
             height={height}
             cornerRadius={10}
@@ -45,6 +53,16 @@ export function TaskCard({
             shadowBlur={2.5}
             shadowOpacity={0.32}
             />
+
+            <Group
+            x={width/2}
+            y={height-15}>
+                <Line
+                points={[-15,0,0,5,15,0]}
+                stroke={"silver"}
+                />
+            </Group>
+            
             <Label
             x={10}
             y={10}

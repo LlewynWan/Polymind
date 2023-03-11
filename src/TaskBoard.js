@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Group, Label, Rect, Text } from "react-konva";
+import { Group, Circle, Rect, Text, Line } from "react-konva";
 
 import { colorPalette } from "./utils/color_utils";
 import { TaskCard } from "./TaskCard";
@@ -15,15 +15,16 @@ export function TaskBoard({
 {
     // const colorPalette = ["#FFB347", "#966FD6", "#71C562", "#FB6B89", "#B39EB5", "#D64A4A"]
     const [isHover, setIsHover] = useState(false);
-    const [taskCardOffset, setTaskCardOffset] = useState(100);
+    const [isHoverAddIcon, setIsHoverAddIcon] = useState(false);
+    const [taskCardOffset, setTaskCardOffset] = useState(120);
 
     const handleTaskBoardWheel = e => {
         e.evt.preventDefault();
         e.cancelBubble=true;
         const offset = e.evt.deltaY < 0 ? 20 : -20;
         console.log(taskCardOffset+offset)
-        if (taskCardOffset+offset <= 100 &&
-            taskCardOffset+offset >= height-(tasks.length-1)*145-165)
+        if (taskCardOffset+offset <= 120 &&
+            taskCardOffset+offset >= height-(tasks.length-1)*160-195)
             {
                 setTaskCardOffset(taskCardOffset+offset)
             }
@@ -72,21 +73,45 @@ export function TaskBoard({
             fontFamily={"sans-serif"}
             fill={"black"}
             />
+
+            <Group
+            x={160}
+            y={35}
+            onMouseEnter={()=>setIsHoverAddIcon(true)}
+            onMouseLeave={()=>setIsHoverAddIcon(false)}>
+                <Circle
+                x={0}
+                y={0}
+                radius={10}
+                fill={"transparent"}
+                stroke={isHoverAddIcon?"black":"gray"}
+                strokeWidth={1.5}
+                />
+                <Line
+                points={[-5,0,5,0]}
+                stroke={isHoverAddIcon?"black":"gray"}
+                strokeWidth={1.5}/>
+                <Line
+                points={[0,-5,0,5]}
+                stroke={isHoverAddIcon?"black":"gray"}
+                strokeWidth={1.5}/>
+            </Group>
+
             <Group
             x={0}
             y={0}
             clipX={-window.innerWidth}
-            clipY={95}
+            clipY={115}
             clipWidth={window.innerWidth*2}
-            clipHeight={height-115}>
-            {tasks.map((task,index)=>{
+            clipHeight={height-135}>
+            {tasks.slice().reverse().map((task,index)=>{
                 return (
                     <TaskCard
                     key={task.id}
                     x={15}
-                    y={taskCardOffset+145*task.id}
+                    y={taskCardOffset+160*task.id}
                     width={width-30}
-                    height={125}
+                    height={140}
                     color={colorPalette[task.id%colorPalette.length]}
                     goal={task.goal}
                     inputType={task.inputType}
