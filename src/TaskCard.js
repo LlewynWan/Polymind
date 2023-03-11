@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { colorMap } from "./color_utils";
+import { colorMap } from "./utils/color_utils";
 import { Group, Rect, Label, Tag, Text } from "react-konva";
 
 

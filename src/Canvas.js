@@ -17,28 +17,12 @@ import { TaskBoard } from "./TaskBoard";
 import { Prompter } from "./Prompter";
 import { TaskPrompt } from "./TaskPrompt";
 import { PromptPanel } from "./PromptPanel";
-import { PromptGPT } from "./GPT_utils";
+import { PromptGPT } from "./utils/GPT_utils";
 
-import { colorPalette } from "./color_utils";
+import { colorPalette } from "./utils/color_utils";
+import { anchor_utils, node_utils } from "./utils/canvas_utils";
 import { GlobalContext, CanvasContext, PrompterContext } from "./state";
 
-
-
-// async function PromptGPT()
-// {
-//     const configuration = new Configuration({
-//         apiKey: process.env.OPENAI_API_KEY,
-//       });
-//     const openai = new OpenAIApi(configuration);
-//     const response = await openai.createCompletion({
-//         model: "text-davinci-003",
-//         prompt: "Say this is a test",
-//         temperature: 0,
-//         max_tokens: 7,
-//       });
-    
-//     return response;
-// }
 
 
 export function Canvas({dimensions})
@@ -82,11 +66,13 @@ export function Canvas({dimensions})
     const [promptPanelPosition, setPromptPanelPosition] = React.useState({});
     const [promptPanelVisibility, setPromptPanelVisibility] = React.useState(false);
 
+    const [inFocus, setInFocus] = React.useState({});
     // const followerProcess = React.useRef(null);
     // const [followerPositionQueue, setFollowerPositionQueue] = React.useState([]);
     // const [isFollowerModeEnabled, setIsFollowerModeEnabled] = React.useState(false);
 
-    const [pointerTracker, setPointerTracker] = React.useState(-1);
+    // const [pointerTracker, setPointerTracker] = React.useState(-1);
+    // const [fittsLawTracker, setFittsLawTracker] = React.useState(-1);
     const [pointerPosition, setPointerPosition] = React.useState({x:-1, y:-1});
 
     const pointer2CanvasPosition = (position) => {
@@ -102,28 +88,23 @@ export function Canvas({dimensions})
     }
 
     useEffect(() => {
-        if (pointerTracker) {
-            clearInterval(pointerTracker);
-        }
-        setPointerTracker(setInterval(() => {
+        // clearInterval(pointerTracker);
+        const pointerTracker = setInterval(() => {
             if (stageRef && stageRef.current) {
                 const position = stageRef.current.getPointerPosition();
                 if (position) {
                     setPointerPosition(position);
                 }
             }
-        }, 20));
-
-
-        // setInterval(()=>{
-        //     setNodes(prevState=>{
-        //         return prevState.map(state=>{
-        //             let tmp = state;
-        //             tmp.callbackTaskId=Math.floor(Math.random()*5);
-        //             return tmp;
-        //         })
-        //     })
-        // }, 10000)
+        }, 25);
+        // setPointerTracker(_pointerTracker);
+        // clearInterval(fittsLawTracker)
+        const fittsLawTracker = setInterval(()=>{
+            const position = pointer2CanvasPosition(stageRef.current.getPointerPosition());
+            const ID = nodes.map(node=>node_utils.calcFittsLawID(node,position));
+            setInFocus({node: ID.indexOf(Math.min(...ID))});
+            // console.log(ID.indexOf(Math.min(...ID)));
+        }, 250);
 
         if (!isHoverToolBar && stageRef) {
             stageRef.current.container().style.cursor =
@@ -138,7 +119,10 @@ export function Canvas({dimensions})
             setArrowTo({id: -1, anchor: -1});
         }
 
-        return () => clearInterval(pointerTracker);
+        return () => {
+            clearInterval(pointerTracker);
+            clearInterval(fittsLawTracker);
+        };
     }, [dimensions, canvasScale, isHoverToolBar,
         isDrawingArrow, isDrawingDoubleArrow, isAddingKeyword]);
 
@@ -230,27 +214,6 @@ export function Canvas({dimensions})
             }
         });
     }
-    
-    // const toggleFollowerMode = () => {
-    //     if (!isFollowerModeEnabled) {
-    //         followerProcess.current = setInterval(() => {
-    //             const position = stageRef.current.getPointerPosition();
-    //             if (position) {
-    //                 followerPositionQueue.push({
-    //                     x: position.x+(Math.random()-0.8)*40,
-    //                     y: position.y+(Math.random()-0.8)*40})
-    //             }
-    //             if (followerPositionQueue.length === 6) {
-    //                 followerPositionQueue.shift();
-    //             }
-    //             setFollowerPositionQueue(followerPositionQueue);
-    //         }, 200);
-    //     } else {
-    //         clearInterval(followerProcess.current);
-    //         setFollowerPositionQueue([]);
-    //     }
-    //     setIsFollowerModeEnabled(!isFollowerModeEnabled)
-    // }
 
     const keyMap = {
         UNSELECT_ALL: "escape",
@@ -491,112 +454,8 @@ export function Canvas({dimensions})
         })
     }
 
-    const calcAnchorPosition = (anchor, node) => {
-        const anchorPosition = node.type === "sticky_note" ? [
-            [node.x + (node.width + 35)*node.scaleX / 2, node.y-20/canvasScale],
-            [node.x-20/canvasScale, node.y + (node.height + 70)*node.scaleY / 2],
-            [node.x + (node.width + 35)*node.scaleX / 2, node.y + (node.height + 70)*node.scaleY + 20/canvasScale],
-            [node.x + (node.width + 35)*node.scaleX + 20/canvasScale, node.y + (node.height + 70)*node.scaleY / 2]
-        ] : node.type === "keyword" ? [
-            [node.x + node.width/canvasScale / 2, node.y-15/canvasScale],
-            [node.x-15/canvasScale, node.y + node.height/canvasScale / 2],
-            [node.x + node.width/canvasScale / 2, node.y + node.height/canvasScale + 15/canvasScale],
-            [node.x + node.width/canvasScale + 15/canvasScale, node.y + node.height/canvasScale / 2]
-        ] : node.type === "concept" ? [
-            [node.x, node.y - node.radiusY*node.scaleY - 15/canvasScale],
-            [node.x - node.radiusX*node.scaleX - 15/canvasScale, node.y],
-            [node.x, node.y + node.radiusY*node.scaleY + 15/canvasScale],
-            [node.x + node.radiusX*node.scaleX + 15/canvasScale, node.y]
-        ] : []
-        return anchorPosition[anchor];
-    }
-
-    const calcAnchorOffsetPositions = (node) => {
-        const anchorOffset = node.type === "sticky_note" ? [
-            [node.x + (node.width + 35)*node.scaleX / 2, node.y-50/canvasScale],
-            [node.x-50/canvasScale, node.y + (node.height + 70)*node.scaleY / 2],
-            [node.x + (node.width + 35)*node.scaleX / 2, node.y + (node.height + 70)*node.scaleY + 50/canvasScale],
-            [node.x + (node.width + 35)*node.scaleX + 50/canvasScale, node.y + (node.height + 70)*node.scaleY / 2]
-        ] : node.type === "keyword" ? [
-            [node.x + node.width/canvasScale / 2, node.y-40/canvasScale],
-            [node.x-40/canvasScale, node.y + node.height/canvasScale / 2],
-            [node.x + node.width/canvasScale / 2, node.y + node.height/canvasScale + 40/canvasScale],
-            [node.x + node.width/canvasScale + 40/canvasScale, node.y + node.height/canvasScale / 2]
-        ] : node.type === "concept" ? [
-            [node.x, node.y - node.radiusY*node.scaleY - 40/canvasScale],
-            [node.x - node.radiusX*node.scaleX - 40/canvasScale, node.y],
-            [node.x, node.y + node.radiusY*node.scaleY + 40/canvasScale],
-            [node.x + node.radiusX*node.scaleX + 40/canvasScale, node.y]
-        ] : [];
-
-        return anchorOffset;
-    }
-
-    const findPathBetweenVectors = (from, to) => {
-        var points = []
-        if (from.dx === to.dx && from.dx !== 0) {
-            const borderX = from.dx > 0 ? Math.max(from.x, to.x) : Math.min(from.x, to.x);
-            points = [borderX, from.y, borderX, to.y];
-            // if ((from.x-to.x)*from.dx < 0 && Math.abs(from.y-to.y) < to.height/2) {
-            //     // points = [(to.x-from.dx*to.width-from.x)/2+from.x, from.y,
-            //     // (to.x-from.dx*to.width-from.x)/2+from.x, to.y+(to.height/2)*(from.y>to.y?1:-1),
-            //     // borderX, to.y+(to.height/2)*(from.y>to.y?1:-1)
-            //     // ]
-            // } else if ((from.x-to.x)*from.dx > 0 && Math.abs(from.y-to.y) < from.height/2) {
-            // //     points = [
-            // //     borderX, to.y+(to.height/2)*(from.y>to.y?-1:1),
-            // //     (from.x-from.dx*from.width-to.x)/2+to.x, to.y+(to.height/2)*(from.y>to.y?-1:1),
-            // //     (from.x-from.dx*from.width-to.x)/2+to.x, to.y,
-            // //    ]
-            // } else {
-            //     points = [borderX, from.y, borderX, to.y];
-            // }
-        }
-        if (from.dx === -to.dx && from.dx !== 0) {
-            const middleX = (from.x+to.x) / 2;
-            const middleY = (from.y+to.y) / 2;
-            if (from.dx*(to.x-from.x) > 0) {
-                points = [middleX, from.y, middleX, to.y];
-            } else {
-                points = [from.x, middleY, to.x, middleY];
-            }
-        }
-        if (from.dy === to.dy && from.dy !== 0) {
-            const borderY = from.dy > 0 ? Math.max(from.y, to.y) : Math.min(from.y, to.y);
-            points = [from.x, borderY, to.x, borderY];
-        }
-        if (from.dy === -to.dy && from.dy !== 0) {
-            const middleX = (from.x+to.x) / 2;
-            const middleY = (from.y+to.y) / 2;
-            if (from.dy*(to.y-from.y) > 0) {
-                points = [from.x, middleY, to.x, middleY];
-                // points = [middleX, from.y, middleX, to.y];
-            } else {
-                // points = [from.x, middleY, to.x, middleY];
-                points = [middleX, from.y, middleX, to.y];
-            }
-        }
-
-        if (from.dx*to.dy !== 0) {
-            if ((to.x-from.x)*from.dx < 0 || (to.y-from.y)*to.dy > 0) {
-                points = [from.x, to.y]
-            } else {
-                points = [to.x, from.y]
-            }
-        }
-        if (from.dy*to.dx !== 0) {
-            if ((to.y-from.y)*from.dy < 0 || (to.x-from.x)*to.dx > 0) {
-                points = [to.x, from.y]
-            } else {
-                points = [from.x, to.y]
-            }
-        }
-        
-        return points;
-    }
-
     const findPathBetweenNodeAndPointer = (anchor, node) => {
-        const anchorOffset = calcAnchorOffsetPositions(node);
+        const anchorOffset = anchor_utils.calcAnchorOffsetPositions(node,canvasScale);
 
         const pointerOnCanvasPosition = pointer2CanvasPosition(pointerPosition);
 
@@ -611,29 +470,6 @@ export function Canvas({dimensions})
             return [anchorX, anchorY, anchorX, pointerOnCanvasPosition[1],
                 pointerOnCanvasPosition[0], pointerOnCanvasPosition[1]];
         }
-    }
-
-    const findPathBetweenNodes = (fromAnchor, toAnchor, fromNode, toNode) => {
-        const fromAnchorOffset = calcAnchorOffsetPositions(fromNode);
-        const toAnchorOffset = calcAnchorOffsetPositions(toNode);
-
-        const from = {x: fromAnchorOffset[fromAnchor][0],
-        y: fromAnchorOffset[fromAnchor][1],
-        dx: (fromAnchor%2)*parseInt(2*(fromAnchor/2-1)),
-        dy: ((fromAnchor+1)%2)*parseInt(2*(fromAnchor/2-0.5)),
-        width: (fromNode.width + 35)*fromNode.scaleX + 40/canvasScale,
-        height: (fromNode.height + 70)*fromNode.scaleY + 40/canvasScale}
-
-        const to = {x: toAnchorOffset[toAnchor][0],
-            y: toAnchorOffset[toAnchor][1],
-            dx: (toAnchor%2)*parseInt(2*(toAnchor/2-1)),
-            dy: ((toAnchor+1)%2)*parseInt(2*(toAnchor/2-0.5)),
-            width: (toNode.width + 35)*toNode.scaleX + 40/canvasScale,
-            height: (toNode.height + 70)*toNode.scaleY + 40/canvasScale}
-
-        return [...fromAnchorOffset[fromAnchor],
-        ...findPathBetweenVectors(from,to),
-        ...toAnchorOffset[toAnchor]]
     }
 
 
@@ -709,7 +545,7 @@ export function Canvas({dimensions})
                 scaleY={node.scaleY}
                 width={node.width}
                 height={node.height}
-                fontSize={18}
+                fontSize={node.fontSize}
                 color={"#748B97"}
                 isNull={node.text === ""}
                 text={node.text}
@@ -813,7 +649,7 @@ export function Canvas({dimensions})
                 radiusX={node.radiusX}
                 radiusY={node.radiusY}
                 text={node.text}
-                fontSize={20}
+                fontSize={node.fontSize}
                 color={"#FFB5B7"}
                 isNull={node.text===""}
                 isSelected={node.selected}
@@ -878,15 +714,17 @@ export function Canvas({dimensions})
                 const arrow_size = 10 / canvasScale;
                 const arrow_dy = arrow.to_anchor===0 ? 1 : arrow.to_anchor===2 ? -1 : 0;
                 const arrow_dx = arrow.to_anchor===1 ? 1 : arrow.to_anchor===3 ? -1 : 0;
-                const finalAnchor = calcAnchorPosition(arrow.to_anchor, getNodeById(arrow.to_id));
+                const finalAnchor = anchor_utils.calcAnchorPosition(
+                    arrow.to_anchor, getNodeById(arrow.to_id), canvasScale);
                 return (
                 <Group
                 key={index}>
                 <MyLine
                 points={[
-                    ...calcAnchorPosition(arrow.from_anchor, getNodeById(arrow.from_id)),
-                    ...findPathBetweenNodes(arrow.from_anchor, arrow.to_anchor,
-                        getNodeById(arrow.from_id),getNodeById(arrow.to_id)),
+                    ...anchor_utils.calcAnchorPosition(
+                        arrow.from_anchor, getNodeById(arrow.from_id), canvasScale),
+                    ...anchor_utils.findPathBetweenNodes(arrow.from_anchor, arrow.to_anchor,
+                        getNodeById(arrow.from_id),getNodeById(arrow.to_id), canvasScale),
                     // ...calcAnchorOffset(arrow.from_anchor, nodes[arrow.from_id]),
                     // ...calcAnchorOffset(arrow.to_anchor, nodes[arrow.to_id]),
                     ...finalAnchor
@@ -928,7 +766,7 @@ export function Canvas({dimensions})
                 arrowTo.id===-1 ?
                 <MyLine
                 points={[
-                    ...calcAnchorPosition(arrowFrom.anchor,getNodeById(arrowFrom.id)),
+                    ...anchor_utils.calcAnchorPosition(arrowFrom.anchor,getNodeById(arrowFrom.id), canvasScale),
                     ...findPathBetweenNodeAndPointer(arrowFrom.anchor,getNodeById(arrowFrom.id)),
                     ]}
                 stroke={"gray"}
@@ -937,10 +775,10 @@ export function Canvas({dimensions})
                 /> :
                 <MyLine
                 points={[
-                    ...calcAnchorPosition(arrowFrom.anchor,getNodeById(arrowFrom.id)),
-                    ...findPathBetweenNodes(arrowFrom.anchor,arrowTo.anchor,
-                        getNodeById(arrowFrom.id), getNodeById(arrowTo.id)),
-                    ...calcAnchorPosition(arrowTo.anchor,getNodeById(arrowTo.id))
+                    ...anchor_utils.calcAnchorPosition(arrowFrom.anchor,getNodeById(arrowFrom.id),canvasScale),
+                    ...anchor_utils.findPathBetweenNodes(arrowFrom.anchor,arrowTo.anchor,
+                        getNodeById(arrowFrom.id), getNodeById(arrowTo.id), canvasScale),
+                    ...anchor_utils.calcAnchorPosition(arrowTo.anchor,getNodeById(arrowTo.id),canvasScale)
                     ]}
                 stroke={"gray"}
                 listening={false}
@@ -1080,7 +918,7 @@ export function Canvas({dimensions})
                         x: (x-canvasX)/canvasScale, y: (y-canvasY)/canvasScale,
                         radiusX: radiusX, radiusY: radiusY,
                         scaleX: 1/canvasScale, scaleY: 1/canvasScale,
-                        selected: false, text: "", display: true,
+                        selected: false, text: "", fontSize: 20, display: true,
                         callbackTaskId: -1};
                         return [...prevState, tmp];
                     });
@@ -1090,7 +928,7 @@ export function Canvas({dimensions})
                     setNodes(prevState => {
                         let tmp = {id: numNodes, type: "sticky_note",
                         x: (x-canvasX)/canvasScale, y: (y-canvasY)/canvasScale,
-                        width: width, height: height,
+                        width: width, height: height, fontSize: 18,
                         scaleX: 1/canvasScale, scaleY: 1/canvasScale,
                         selected: false, text: "", display: true,
                         callbackTaskId: -1};
@@ -1112,3 +950,154 @@ export function Canvas({dimensions})
     </HotKeys>
     )
 }
+
+
+/* deprecated */
+
+    // const toggleFollowerMode = () => {
+    //     if (!isFollowerModeEnabled) {
+    //         followerProcess.current = setInterval(() => {
+    //             const position = stageRef.current.getPointerPosition();
+    //             if (position) {
+    //                 followerPositionQueue.push({
+    //                     x: position.x+(Math.random()-0.8)*40,
+    //                     y: position.y+(Math.random()-0.8)*40})
+    //             }
+    //             if (followerPositionQueue.length === 6) {
+    //                 followerPositionQueue.shift();
+    //             }
+    //             setFollowerPositionQueue(followerPositionQueue);
+    //         }, 200);
+    //     } else {
+    //         clearInterval(followerProcess.current);
+    //         setFollowerPositionQueue([]);
+    //     }
+    //     setIsFollowerModeEnabled(!isFollowerModeEnabled)
+    // }
+
+    // const calcAnchorPosition = (anchor, node) => {
+    //     const anchorPosition = node.type === "sticky_note" ? [
+    //         [node.x + (node.width + 35)*node.scaleX / 2, node.y-20/canvasScale],
+    //         [node.x-20/canvasScale, node.y + (node.height + 70)*node.scaleY / 2],
+    //         [node.x + (node.width + 35)*node.scaleX / 2, node.y + (node.height + 70)*node.scaleY + 20/canvasScale],
+    //         [node.x + (node.width + 35)*node.scaleX + 20/canvasScale, node.y + (node.height + 70)*node.scaleY / 2]
+    //     ] : node.type === "keyword" ? [
+    //         [node.x + node.width/canvasScale / 2, node.y-15/canvasScale],
+    //         [node.x-15/canvasScale, node.y + node.height/canvasScale / 2],
+    //         [node.x + node.width/canvasScale / 2, node.y + node.height/canvasScale + 15/canvasScale],
+    //         [node.x + node.width/canvasScale + 15/canvasScale, node.y + node.height/canvasScale / 2]
+    //     ] : node.type === "concept" ? [
+    //         [node.x, node.y - node.radiusY*node.scaleY - 15/canvasScale],
+    //         [node.x - node.radiusX*node.scaleX - 15/canvasScale, node.y],
+    //         [node.x, node.y + node.radiusY*node.scaleY + 15/canvasScale],
+    //         [node.x + node.radiusX*node.scaleX + 15/canvasScale, node.y]
+    //     ] : []
+    //     return anchorPosition[anchor];
+    // }
+
+    // const calcAnchorOffsetPositions = (node) => {
+    //     const anchorOffset = node.type === "sticky_note" ? [
+    //         [node.x + (node.width + 35)*node.scaleX / 2, node.y-50/canvasScale],
+    //         [node.x-50/canvasScale, node.y + (node.height + 70)*node.scaleY / 2],
+    //         [node.x + (node.width + 35)*node.scaleX / 2, node.y + (node.height + 70)*node.scaleY + 50/canvasScale],
+    //         [node.x + (node.width + 35)*node.scaleX + 50/canvasScale, node.y + (node.height + 70)*node.scaleY / 2]
+    //     ] : node.type === "keyword" ? [
+    //         [node.x + node.width/canvasScale / 2, node.y-40/canvasScale],
+    //         [node.x-40/canvasScale, node.y + node.height/canvasScale / 2],
+    //         [node.x + node.width/canvasScale / 2, node.y + node.height/canvasScale + 40/canvasScale],
+    //         [node.x + node.width/canvasScale + 40/canvasScale, node.y + node.height/canvasScale / 2]
+    //     ] : node.type === "concept" ? [
+    //         [node.x, node.y - node.radiusY*node.scaleY - 40/canvasScale],
+    //         [node.x - node.radiusX*node.scaleX - 40/canvasScale, node.y],
+    //         [node.x, node.y + node.radiusY*node.scaleY + 40/canvasScale],
+    //         [node.x + node.radiusX*node.scaleX + 40/canvasScale, node.y]
+    //     ] : [];
+
+    //     return anchorOffset;
+    // }
+
+    // const findPathBetweenVectors = (from, to) => {
+    //     var points = []
+    //     if (from.dx === to.dx && from.dx !== 0) {
+    //         const borderX = from.dx > 0 ? Math.max(from.x, to.x) : Math.min(from.x, to.x);
+    //         points = [borderX, from.y, borderX, to.y];
+    //         // if ((from.x-to.x)*from.dx < 0 && Math.abs(from.y-to.y) < to.height/2) {
+    //         //     // points = [(to.x-from.dx*to.width-from.x)/2+from.x, from.y,
+    //         //     // (to.x-from.dx*to.width-from.x)/2+from.x, to.y+(to.height/2)*(from.y>to.y?1:-1),
+    //         //     // borderX, to.y+(to.height/2)*(from.y>to.y?1:-1)
+    //         //     // ]
+    //         // } else if ((from.x-to.x)*from.dx > 0 && Math.abs(from.y-to.y) < from.height/2) {
+    //         // //     points = [
+    //         // //     borderX, to.y+(to.height/2)*(from.y>to.y?-1:1),
+    //         // //     (from.x-from.dx*from.width-to.x)/2+to.x, to.y+(to.height/2)*(from.y>to.y?-1:1),
+    //         // //     (from.x-from.dx*from.width-to.x)/2+to.x, to.y,
+    //         // //    ]
+    //         // } else {
+    //         //     points = [borderX, from.y, borderX, to.y];
+    //         // }
+    //     }
+    //     if (from.dx === -to.dx && from.dx !== 0) {
+    //         const middleX = (from.x+to.x) / 2;
+    //         const middleY = (from.y+to.y) / 2;
+    //         if (from.dx*(to.x-from.x) > 0) {
+    //             points = [middleX, from.y, middleX, to.y];
+    //         } else {
+    //             points = [from.x, middleY, to.x, middleY];
+    //         }
+    //     }
+    //     if (from.dy === to.dy && from.dy !== 0) {
+    //         const borderY = from.dy > 0 ? Math.max(from.y, to.y) : Math.min(from.y, to.y);
+    //         points = [from.x, borderY, to.x, borderY];
+    //     }
+    //     if (from.dy === -to.dy && from.dy !== 0) {
+    //         const middleX = (from.x+to.x) / 2;
+    //         const middleY = (from.y+to.y) / 2;
+    //         if (from.dy*(to.y-from.y) > 0) {
+    //             points = [from.x, middleY, to.x, middleY];
+    //             // points = [middleX, from.y, middleX, to.y];
+    //         } else {
+    //             // points = [from.x, middleY, to.x, middleY];
+    //             points = [middleX, from.y, middleX, to.y];
+    //         }
+    //     }
+
+    //     if (from.dx*to.dy !== 0) {
+    //         if ((to.x-from.x)*from.dx < 0 || (to.y-from.y)*to.dy > 0) {
+    //             points = [from.x, to.y]
+    //         } else {
+    //             points = [to.x, from.y]
+    //         }
+    //     }
+    //     if (from.dy*to.dx !== 0) {
+    //         if ((to.y-from.y)*from.dy < 0 || (to.x-from.x)*to.dx > 0) {
+    //             points = [to.x, from.y]
+    //         } else {
+    //             points = [from.x, to.y]
+    //         }
+    //     }
+        
+    //     return points;
+    // }
+
+    // const findPathBetweenNodes = (fromAnchor, toAnchor, fromNode, toNode, canvasScale) => {
+    //     const fromAnchorOffset = calcAnchorOffsetPositions(fromNode, canvasScale);
+    //     const toAnchorOffset = calcAnchorOffsetPositions(toNode, canvasScale);
+
+    //     const from = {x: fromAnchorOffset[fromAnchor][0],
+    //     y: fromAnchorOffset[fromAnchor][1],
+    //     dx: (fromAnchor%2)*parseInt(2*(fromAnchor/2-1)),
+    //     dy: ((fromAnchor+1)%2)*parseInt(2*(fromAnchor/2-0.5)),
+    //     width: (fromNode.width + 35)*fromNode.scaleX + 40/canvasScale,
+    //     height: (fromNode.height + 70)*fromNode.scaleY + 40/canvasScale}
+
+    //     const to = {x: toAnchorOffset[toAnchor][0],
+    //         y: toAnchorOffset[toAnchor][1],
+    //         dx: (toAnchor%2)*parseInt(2*(toAnchor/2-1)),
+    //         dy: ((toAnchor+1)%2)*parseInt(2*(toAnchor/2-0.5)),
+    //         width: (toNode.width + 35)*toNode.scaleX + 40/canvasScale,
+    //         height: (toNode.height + 70)*toNode.scaleY + 40/canvasScale}
+
+    //     return [...fromAnchorOffset[fromAnchor],
+    //     ...findPathBetweenVectors(from,to),
+    //     ...toAnchorOffset[toAnchor]]
+    // }

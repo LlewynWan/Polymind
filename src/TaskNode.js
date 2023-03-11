@@ -7,7 +7,7 @@ import { CanvasContext } from "./state";
 import { TextInput } from "./TextInput"
 import { TaskHeader } from "./TaskHeader";
 
-import { sizeMap } from "./size_utils";
+import { sizeMap } from "./utils/size_utils";
 
 const RETURN_KEY = 13;
 const ESCAPE_KEY = 27;

@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 
 import Konva from "konva";
 
-import { colorPalette } from "./color_utils";
+import { colorPalette } from "./utils/color_utils";
 import { Group, Label, Tag, Text, Rect, Arrow } from "react-konva";
 
 

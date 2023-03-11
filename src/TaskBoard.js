@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Group, Label, Rect, Text } from "react-konva";
 
-import { colorPalette } from "./color_utils";
+import { colorPalette } from "./utils/color_utils";
 import { TaskCard } from "./TaskCard";
 
 

@@ -141,8 +141,8 @@ export function Concept({
      }}>
 
     <TaskHeader
-    x={-radiusX}
-    y={-radiusY-40/canvasScale}
+    x={-radiusX*scaleX}
+    y={-radiusY*scaleY-40/canvasScale}
     // x={-radiusX}
     // y={-radiusY-10/canvasScale}
     tasks={microTasks}
