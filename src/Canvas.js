@@ -850,7 +850,13 @@ export function Canvas({dimensions})
             y={25}
             width={300}
             height={dimensions.height-50}
-            tasks={microTasks}/>
+            tasks={microTasks}
+            listening={!isDrawingArrow && !isDrawingDoubleArrow
+            && !isSectioning && ! isAddingKeyword}
+            deleteTask={(id)=>{
+                setMicroTasks(prevState=>prevState.filter(state=>state.id!==id));
+                setTaskNodes(prevState=>prevState.filter(state=>state.task_id!==id));
+            }}/>
 
             {/* {followerPositionQueue.map((position,index)=>{
                 return <TaskPrompt

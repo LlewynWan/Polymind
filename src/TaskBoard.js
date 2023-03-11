@@ -1,7 +1,8 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Group, Circle, Rect, Text, Line } from "react-konva";
 
 import { colorPalette } from "./utils/color_utils";
+import { Icon } from "./Icon";
 import { TaskCard } from "./TaskCard";
 
 
@@ -10,7 +11,9 @@ export function TaskBoard({
     y,
     width,
     height,
-    tasks
+    tasks,
+    listening,
+    deleteTask,
 })
 {
     // const colorPalette = ["#FFB347", "#966FD6", "#71C562", "#FB6B89", "#B39EB5", "#D64A4A"]
@@ -18,14 +21,19 @@ export function TaskBoard({
     const [isHoverAddIcon, setIsHoverAddIcon] = useState(false);
     const [taskCardOffset, setTaskCardOffset] = useState(120);
 
+    const cardsRef = React.useRef(null);
+
     const handleTaskBoardWheel = e => {
         e.evt.preventDefault();
         e.cancelBubble=true;
         const offset = e.evt.deltaY < 0 ? 20 : -20;
-        console.log(taskCardOffset+offset)
+        console.log(taskCardOffset+offset )
         if (taskCardOffset+offset <= 120 &&
-            taskCardOffset+offset >= height-(tasks.length-1)*160-195)
+            taskCardOffset+offset >= height-(tasks.length-1)*160-205)
             {
+                setTaskCardOffset(taskCardOffset+offset)
+            } else if (taskCardOffset < height-(tasks.length-1)*160-205
+            && taskCardOffset+offset <= 120 && offset > 0) {
                 setTaskCardOffset(taskCardOffset+offset)
             }
         // if (offset < 0) {
@@ -41,13 +49,21 @@ export function TaskBoard({
         // }
     }
 
+    // useEffect(()=>{
+    //     cardsRef.current.to({
+    //         opacity: 1,
+    //         duration: 0.25
+    //     })
+    // }, [tasks])
+
     return (
         <Group
         x={x}
         y={y}
         onMouseEnter={()=>setIsHover(true)}
         onMouseLeave={()=>setIsHover(false)}
-        onWheel={handleTaskBoardWheel}>
+        onWheel={handleTaskBoardWheel}
+        listening={listening}>
             <Rect
             x={0}
             y={0}
@@ -73,12 +89,22 @@ export function TaskBoard({
             fontFamily={"sans-serif"}
             fill={"black"}
             />
-
-            <Group
+            <Icon
             x={160}
             y={35}
-            onMouseEnter={()=>setIsHoverAddIcon(true)}
-            onMouseLeave={()=>setIsHoverAddIcon(false)}>
+            type={"add"}/>
+
+            {/* <Group
+            x={160}
+            y={35}
+            onMouseEnter={(e)=>{
+                setIsHoverAddIcon(true);
+                e.target.getStage().container().style.cursor = "pointer"
+            }}
+            onMouseLeave={(e)=>{
+                setIsHoverAddIcon(false);
+                e.target.getStage().container().style.cursor = "default"
+            }}>
                 <Circle
                 x={0}
                 y={0}
@@ -95,30 +121,43 @@ export function TaskBoard({
                 points={[0,-5,0,5]}
                 stroke={isHoverAddIcon?"black":"gray"}
                 strokeWidth={1.5}/>
-            </Group>
+            </Group> */}
 
+            <Group>
+            <Rect
+            x={0}
+            y={110}
+            width={width}
+            height={height-135}
+            opacity={0.75}
+            fill={"#D3D3D3"}
+            />
             <Group
             x={0}
             y={0}
             clipX={-window.innerWidth}
             clipY={115}
             clipWidth={window.innerWidth*2}
-            clipHeight={height-135}>
-            {tasks.slice().reverse().map((task,index)=>{
+            clipHeight={height-145}
+            ref={cardsRef}>
+            {tasks.map((task,index)=>{
                 return (
                     <TaskCard
                     key={task.id}
                     x={15}
-                    y={taskCardOffset+160*task.id}
+                    y={taskCardOffset+160*index}
                     width={width-30}
                     height={140}
                     color={colorPalette[task.id%colorPalette.length]}
                     goal={task.goal}
                     inputType={task.inputType}
                     outputType={task.outputType}
+                    examplePrompt={task.examplePrompt}
+                    deleteTask={()=>deleteTask(task.id)}
                     />
                 )
             })}
+            </Group>
             </Group>
             
             {/* <TaskCard

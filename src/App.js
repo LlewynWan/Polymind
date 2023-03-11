@@ -24,7 +24,7 @@ function App() {
     arrows: [],
     sections: [],
     microtasks: [
-      {id: 0, goal: "Brainstorm", inputType: "Keyword", outputType: "Keyword", examplePrompt: []},
+      {id: 0, goal: "Brainstorm", inputType: "Keyword", outputType: "Keyword", examplePrompt: "Brainstorm five keywords related to [Keyword]. Output should be in a list, each no more than 3 words."},
       {id: 1, goal: "Summarise", inputType: "Sticky Note", outputType: "Keyword", examplePrompt: []},
       {id: 2, goal: "Elaborate", inputType: "Concept", outputType: "Sticky Note", examplePrompt: []},
       {id: 3, goal: "Draft", inputType: "Section", outputType: "Sticky Note", examplePrompt: []},

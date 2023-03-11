@@ -41,6 +41,10 @@ export function TaskHeader({
                 {
                     return previousOffsetX+offset;
                 }
+            else if (previousOffsetX < width-35-headerPositions.slice(-1)[0]
+            && previousOffsetX+offset <= 25 && offset > 0) {
+                return previousOffsetX+offset;
+            }
             else {
                 return previousOffsetX;
             }
@@ -272,12 +276,12 @@ export function TaskHeader({
         clipY={-window.innerHeight}
         clipWidth={width-40}
         clipHeight={window.innerHeight*2}>
-        {tasks.slice(0).reverse().map(task=>{
+        {tasks.slice().reverse().map((task,index)=>{
             return (
                 <Label
                 key={task.id}
                 // x={task.id*25+offsetX}
-                x={headerPositions[task.id]+offsetX}
+                x={headerPositions[tasks.length-index-1]+offsetX}
                 y={0}
                 // onWheel={(e)=>{clearTimeout(hoverTimeout)}}
                 onMouseEnter={(e)=>{
