@@ -209,7 +209,8 @@ export function TaskHeader({
         fill={"#444444"}
         /> */}
     <Group
-    opacity={isHover?1:0.5}>
+    // opacity={isHover?1:0.75}
+    >
         <Rect
         x={0}
         // y={-fontHeight-12}
@@ -225,7 +226,9 @@ export function TaskHeader({
         shadowOffsetY={1.5}
         shadowOpacity={0.15}
         shadowColor={"black"}
-        fill={"white"}/>
+        // fill={"#646464"}
+        fill={"white"}
+        />
         {/* <Rect
         x={0}
         y={-4}

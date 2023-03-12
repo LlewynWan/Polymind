@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Group, Circle, Rect, Text, Line } from "react-konva";
+import { Group, Rect, Text, Label, Tag } from "react-konva";
 
 import { colorPalette } from "./utils/color_utils";
 import { Icon } from "./Icon";
@@ -14,13 +14,15 @@ export function TaskBoard({
     tasks,
     listening,
     deleteTask,
+    toggleTaskHeaderSwitch
 })
 {
     // const colorPalette = ["#FFB347", "#966FD6", "#71C562", "#FB6B89", "#B39EB5", "#D64A4A"]
     const [isHover, setIsHover] = useState(false);
-    const [isHoverAddIcon, setIsHoverAddIcon] = useState(false);
+    const [isAddingCard, setIsAddingCard] = useState(false);
     const [taskCardOffset, setTaskCardOffset] = useState(120);
 
+    const panelRef = React.useRef(null);
     const cardsRef = React.useRef(null);
 
     const handleTaskBoardWheel = e => {
@@ -90,10 +92,119 @@ export function TaskBoard({
             fill={"black"}
             />
             <Icon
-            x={160}
+            x={155}
             y={35}
-            type={"add"}/>
+            type={"add"}
+            onClick={()=>{
+                cardsRef.current.to({
+                    y:85,
+                    clipHeight:height-230,
+                    duration: 0.32
+                });
+                panelRef.current.to({
+                    y:195,
+                    height: height-195,
+                    duration: 0.32
+                })
+                setIsAddingCard(true);
+            }}/>
+            <Icon
+            x={225}
+            y={35}
+            type={"switch"}
+            onClick={toggleTaskHeaderSwitch}/>
 
+            <Group
+            x={0}
+            y={25}
+            visible={isAddingCard}>
+                <Label
+                x={width/2}
+                y={65}
+                >
+                    <Tag
+                    // fill={"#B0B3B8"}
+                    fill={"#C0C2CE"}
+                    cornerRadius={5}
+                    // stroke={"#010203"}
+                    // strokeWidth={0.12}
+                    pointerDirection={"right"}
+                    pointerWidth={5}
+                    pointerHeight={5}
+                    lineJoin={'round'}
+                    />
+                    <Text
+                    text={"Input Type"}
+                    fontSize={14}
+                    fontStyle={"bold"}
+                    fontFamily={"sans-serif"}
+                    fill={"white"}
+                    padding={5}/>
+                </Label>
+                <Label
+                x={width/2}
+                y={95}
+                >
+                    <Tag
+                    // fill={"#B0B3B8"}
+                    fill={"#C0C2CE"}
+                    cornerRadius={5}
+                    // stroke={"#010203"}
+                    // strokeWidth={0.12}
+                    pointerDirection={"right"}
+                    pointerWidth={5}
+                    pointerHeight={5}
+                    lineJoin={'round'}
+                    />
+                    <Text
+                    text={"Output Type"}
+                    fontSize={14}
+                    fontStyle={"bold"}
+                    fontFamily={"sans-serif"}
+                    fill={"white"}
+                    padding={5}/>
+                </Label>
+                <Label
+                x={100}
+                y={125}
+                >
+                    <Tag
+                    // fill={"#B0B3B8"}
+                    fill={"#C0C2CE"}
+                    cornerRadius={5}
+                    // stroke={"#010203"}
+                    // strokeWidth={0.12}
+                    lineJoin={'round'}
+                    />
+                    <Text
+                    width={width-200}
+                    text={"Prompt"}
+                    fontSize={14}
+                    fontStyle={"bold"}
+                    fontFamily={"sans-serif"}
+                    fill={"white"}
+                    align={"center"}
+                    padding={5}/>
+                </Label>
+
+                <Icon
+                x={width-50}
+                y={140}
+                type={"confirm"}
+                onClick={()=>{
+                    setIsAddingCard(false);
+                    cardsRef.current.to({
+                        y:0,
+                        clipHeight:height-145,
+                        duration: 0.32
+                    });
+                    panelRef.current.to({
+                        y:110,
+                        height: height-110,
+                        duration: 0.32
+                    })
+                }}/>
+            </Group>
             {/* <Group
             x={160}
             y={35}
@@ -127,10 +238,13 @@ export function TaskBoard({
             <Rect
             x={0}
             y={110}
+            cornerRadius={5}
             width={width}
-            height={height-135}
+            // height={height-135}
+            height={height-110}
             opacity={0.75}
             fill={"#D3D3D3"}
+            ref={panelRef}
             />
             <Group
             x={0}

@@ -60,6 +60,7 @@ export function Canvas({dimensions})
     const [arrowTo, setArrowTo] = React.useState({id: -1, anchor: -1});
     const [isMultiSelecting, setIsMultiSelecting] = React.useState(false);
 
+    const [isTaskHeaderVisible, setIsTaskHeaderVisible] = React.useState(true);
     const [isHoverToolBar, setIsHoverToolBar] = React.useState(false);
     const [toolBarVisibility, setToolBarVisibility] = React.useState(true);
 
@@ -647,7 +648,8 @@ export function Canvas({dimensions})
                     })
                 }}
                 callbackTaskId={node.callbackTaskId}
-                resetNodeCallbackTaskId={()=>resetNodeCallbackTaskId(node.id)}/> :
+                resetNodeCallbackTaskId={()=>resetNodeCallbackTaskId(node.id)}
+                header={isTaskHeaderVisible}/> :
                 node.type === "keyword" ?
                 <Keyword
                 key={node.id}
@@ -692,7 +694,8 @@ export function Canvas({dimensions})
                 }}
                 onConnected={(e,anchor)=>onNodeConnected(e,node.id,anchor)}
                 callbackTaskId={node.callbackTaskId}
-                resetNodeCallbackTaskId={()=>resetNodeCallbackTaskId(node.id)}/> :
+                resetNodeCallbackTaskId={()=>resetNodeCallbackTaskId(node.id)}
+                header={isTaskHeaderVisible}/> :
                 node.type === "concept" ?
                 <Concept
                 key={node.id}
@@ -748,6 +751,7 @@ export function Canvas({dimensions})
                 onDragEnd={(e)=>{handleDragNodeEnd(e,node.id)}}
                 callbackTaskId={node.callbackTaskId}
                 resetNodeCallbackTaskId={()=>resetNodeCallbackTaskId(node.id)}
+                header={isTaskHeaderVisible}
                 /> : null : null
             })}
             {taskNodes.map(node=>{
@@ -856,7 +860,8 @@ export function Canvas({dimensions})
             deleteTask={(id)=>{
                 setMicroTasks(prevState=>prevState.filter(state=>state.id!==id));
                 setTaskNodes(prevState=>prevState.filter(state=>state.task_id!==id));
-            }}/>
+            }}
+            toggleTaskHeaderSwitch={()=>setIsTaskHeaderVisible(!isTaskHeaderVisible)}/>
 
             {/* {followerPositionQueue.map((position,index)=>{
                 return <TaskPrompt

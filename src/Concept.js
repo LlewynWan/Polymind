@@ -35,6 +35,7 @@ export function Concept({
     onDragMove,
     onDragEnd,
     resetNodeCallbackTaskId,
+    header=true,
     draggable=true,
     callbackTaskId=-1
 }) {
@@ -141,7 +142,7 @@ export function Concept({
          onDragEnd(e);
      }}>
 
-    <TaskHeader
+    {header ? <TaskHeader
     x={-radiusX*scaleX}
     y={-radiusY*scaleY-40/canvasScale}
     // x={-radiusX}
@@ -151,7 +152,7 @@ export function Concept({
     width={150}
     scale={1/canvasScale}
     callbackTaskId={callbackTaskId}
-    resetNodeCallbackTaskId={resetNodeCallbackTaskId}/>
+    resetNodeCallbackTaskId={resetNodeCallbackTaskId}/>: null}
 
     <Group
     x={0}
