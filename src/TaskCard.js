@@ -67,11 +67,18 @@ export function TaskCard({
         fill={"#F7F7F7"}
         strokeWidth={0.12}
         stroke={"#010203"}
-        shadowColor={"gray"}
+        shadowColor={"grey"}
         shadowOffsetY={1.5}
         shadowOffsetX={0}
         shadowBlur={2.5}
         shadowOpacity={0.32}
+        // strokeWidth={0.25}
+        // stroke={"grey"}
+        // shadowColor={"black"}
+        // shadowOffsetY={1.5}
+        // shadowOffsetX={0}
+        // shadowBlur={2.5}
+        // shadowOpacity={0.32}
         />
 
         <Group
@@ -107,14 +114,8 @@ export function TaskCard({
         <Icon
         x={width-20}
         y={20}
-        type={"cross"}
-        onClick={()=>{deleteTask()
-            // cardRef.current.to({
-            //     opacity: 0,
-            //     duration: 0.25,
-            //     onFinish: ()=>deleteTask()
-            // })
-        }}/>
+        type={"delete"}
+        onClick={deleteTask}/>
         
         <Label
         x={10}

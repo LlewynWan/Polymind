@@ -2,8 +2,10 @@ import React, { useEffect, useState } from "react";
 import { Group, Rect, Text, Label, Tag } from "react-konva";
 
 import { colorPalette } from "./utils/color_utils";
+
 import { Icon } from "./Icon";
 import { TaskCard } from "./TaskCard";
+import { TaskCardAdder } from "./TaskCardAdder";
 
 
 export function TaskBoard({
@@ -114,97 +116,26 @@ export function TaskBoard({
             type={"switch"}
             onClick={toggleTaskHeaderSwitch}/>
 
-            <Group
+            <TaskCardAdder
             x={0}
-            y={25}
-            visible={isAddingCard}>
-                <Label
-                x={width/2}
-                y={65}
-                >
-                    <Tag
-                    // fill={"#B0B3B8"}
-                    fill={"#C0C2CE"}
-                    cornerRadius={5}
-                    // stroke={"#010203"}
-                    // strokeWidth={0.12}
-                    pointerDirection={"right"}
-                    pointerWidth={5}
-                    pointerHeight={5}
-                    lineJoin={'round'}
-                    />
-                    <Text
-                    text={"Input Type"}
-                    fontSize={14}
-                    fontStyle={"bold"}
-                    fontFamily={"sans-serif"}
-                    fill={"white"}
-                    padding={5}/>
-                </Label>
-                <Label
-                x={width/2}
-                y={95}
-                >
-                    <Tag
-                    // fill={"#B0B3B8"}
-                    fill={"#C0C2CE"}
-                    cornerRadius={5}
-                    // stroke={"#010203"}
-                    // strokeWidth={0.12}
-                    pointerDirection={"right"}
-                    pointerWidth={5}
-                    pointerHeight={5}
-                    lineJoin={'round'}
-                    />
-                    <Text
-                    text={"Output Type"}
-                    fontSize={14}
-                    fontStyle={"bold"}
-                    fontFamily={"sans-serif"}
-                    fill={"white"}
-                    padding={5}/>
-                </Label>
-                <Label
-                x={100}
-                y={125}
-                >
-                    <Tag
-                    // fill={"#B0B3B8"}
-                    fill={"#C0C2CE"}
-                    cornerRadius={5}
-                    // stroke={"#010203"}
-                    // strokeWidth={0.12}
-                    lineJoin={'round'}
-                    />
-                    <Text
-                    width={width-200}
-                    text={"Prompt"}
-                    fontSize={14}
-                    fontStyle={"bold"}
-                    fontFamily={"sans-serif"}
-                    fill={"white"}
-                    align={"center"}
-                    padding={5}/>
-                </Label>
+            y={65}
+            width={width}
+            visible={isAddingCard}
+            onConfirm={()=>{
+                setIsAddingCard(false);
+                cardsRef.current.to({
+                    y:0,
+                    clipHeight:height-145,
+                    duration: 0.32
+                });
+                panelRef.current.to({
+                    y:110,
+                    height: height-110,
+                    duration: 0.32
+                })
+            }}/>
 
-                <Icon
-                x={width-50}
-                y={140}
-                type={"confirm"}
-                onClick={()=>{
-                    setIsAddingCard(false);
-                    cardsRef.current.to({
-                        y:0,
-                        clipHeight:height-145,
-                        duration: 0.32
-                    });
-                    panelRef.current.to({
-                        y:110,
-                        height: height-110,
-                        duration: 0.32
-                    })
-                }}/>
-            </Group>
+            
             {/* <Group
             x={160}
             y={35}
