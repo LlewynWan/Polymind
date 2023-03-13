@@ -128,7 +128,7 @@ export function StickyNote({
     {header ? <TaskHeader
     x={0}
     y={-45/canvasScale}
-    tasks={microTasks}
+    tasks={microTasks.filter(task=>task.inputType==="Sticky Note")}
     fontSize={14}
     width={180}
     scale={1/canvasScale}

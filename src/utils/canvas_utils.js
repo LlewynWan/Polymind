@@ -152,9 +152,17 @@ const findPathBetweenNodes = (fromAnchor, toAnchor, fromNode, toNode, canvasScal
     ...toAnchorOffset[toAnchor]]
 }
 
+const typeMap = {
+    "keyword": "Keyword",
+    "concept": "Concept",
+    "sticky_note": "Sticky Note"
+    // "Section": "#80D8FF",
+    // "Node": "#112233",
+    // "Line": "#C3E7FD"
+}
 
 const anchor_utils = {findPathBetweenVectors, findPathBetweenNodes,
     calcAnchorOffsetPositions, calcAnchorPosition}
-const node_utils = {calcFittsLawID}
+const node_utils = {calcFittsLawID, typeMap}
 
 export {anchor_utils,node_utils}
