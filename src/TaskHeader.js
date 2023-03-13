@@ -66,7 +66,6 @@ export function TaskHeader({
     }
 
     useEffect(()=>{
-        console.log(callbackTaskId)
         if (callbackTaskId !== -1 && ! isHover) {
             clearTimeout(hoverTimeout);
             curtainRef.current.to({

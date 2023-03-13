@@ -99,13 +99,13 @@ export function TaskBoard({
             type={"add"}
             onClick={()=>{
                 cardsRef.current.to({
-                    y:85,
-                    clipHeight:height-230,
+                    y:130,
+                    clipHeight:height-275,
                     duration: 0.32
                 });
                 panelRef.current.to({
-                    y:195,
-                    height: height-195,
+                    y:240,
+                    height: height-240,
                     duration: 0.32
                 })
                 setIsAddingCard(true);

@@ -135,15 +135,17 @@ const findPathBetweenNodes = (fromAnchor, toAnchor, fromNode, toNode, canvasScal
     y: fromAnchorOffset[fromAnchor][1],
     dx: (fromAnchor%2)*parseInt(2*(fromAnchor/2-1)),
     dy: ((fromAnchor+1)%2)*parseInt(2*(fromAnchor/2-0.5)),
-    width: (fromNode.width + 35)*fromNode.scaleX + 40/canvasScale,
-    height: (fromNode.height + 70)*fromNode.scaleY + 40/canvasScale}
+    // width: (fromNode.width + 35)*fromNode.scaleX + 40/canvasScale,
+    // height: (fromNode.height + 70)*fromNode.scaleY + 40/canvasScale
+    }
 
     const to = {x: toAnchorOffset[toAnchor][0],
         y: toAnchorOffset[toAnchor][1],
         dx: (toAnchor%2)*parseInt(2*(toAnchor/2-1)),
         dy: ((toAnchor+1)%2)*parseInt(2*(toAnchor/2-0.5)),
-        width: (toNode.width + 35)*toNode.scaleX + 40/canvasScale,
-        height: (toNode.height + 70)*toNode.scaleY + 40/canvasScale}
+        // width: (toNode.width + 35)*toNode.scaleX + 40/canvasScale,
+        // height: (toNode.height + 70)*toNode.scaleY + 40/canvasScale
+    }
 
     return [...fromAnchorOffset[fromAnchor],
     ...findPathBetweenVectors(from,to),
