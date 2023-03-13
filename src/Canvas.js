@@ -164,6 +164,13 @@ export function Canvas({dimensions})
             e.preventDefault();
         }
         UnselectAllNodes();
+        setSections(prevState => {
+            return prevState.map((state)=>{
+                let tmp = state;
+                tmp.selected = false;
+                return tmp;
+            });
+        });
 
         setIsDrawingArrow(false);
         setIsDrawingDoubleArrow(false);
@@ -367,7 +374,9 @@ export function Canvas({dimensions})
                 })
                 return [
                     ...prevState,
-                    {x: Math.min(position1[0], position2[0]),
+                    {id: prevState.length, selected: false,
+                    callbackTaskId: -1, scaleX: 1, scaleY: 1,
+                    x: Math.min(position1[0], position2[0]),
                     y: Math.min(position1[1], position2[1]),
                     width: Math.abs(position1[0]-position2[0]),
                     height: Math.abs(position1[1]-position2[1]),
@@ -575,16 +584,75 @@ export function Canvas({dimensions})
         >
             <Group>
             <CanvasContext.Provider value={{canvasX, canvasY, canvasScale, microTasks}}>
-            {sections.map((section,index)=>{
+            {sections.map(section=>{
                 return (<Section
-                key={index}
+                key={section.id}
                 x={section.x}
                 y={section.y}
+                isSelected={section.selected}
+                scaleX={section.scaleX}
+                scaleY={section.scaleY}
                 width={section.width}
                 height={section.height}
                 text={section.text}
                 fontSize={18}
-                color={"#0099FF"}/>)
+                color={"#0099FF"}
+                header={isTaskHeaderVisible}
+                onScale={(scaleX,scaleY,x,y)=>{
+                    setSections(prevState => prevState.map(state => {
+                        let tmp = state;
+                        if (tmp.id === section.id) {
+                            tmp.x = x;
+                            tmp.y = y;
+                            tmp.scaleX = scaleX;
+                            tmp.scaleY = scaleY;
+                        }
+                        return tmp;
+                    }))
+                }}
+                onTextChange={(text)=>{
+                    setSections(prevState => prevState.map(state => {
+                        let tmp = state;
+                        if (tmp.id === section.id) {
+                            tmp.text = text;
+                        }
+                        return tmp;
+                    }))
+                }}
+                onClick={(e)=>{
+                    e.cancelBubble = true;
+                    setSections(prevState => prevState.map(state => {
+                        let tmp = state;
+                        if (tmp.id === section.id) {
+                            tmp.selected = true;
+                        } else {
+                            tmp.selected = false;
+                        }
+                        return tmp;
+                    }));
+                }}
+                handleDragMove={(e)=>{
+                    setSections(prevState=>prevState.map(state=>{
+                        let tmp = state;
+                        if (tmp.id === section.id) {
+                            tmp.x = e.target.x();
+                            tmp.y = e.target.y();
+                        }
+                        return tmp;
+                    }))
+                }}
+                handleDragEnd={(e)=>{
+                    setSections(prevState=>prevState.map(state=>{
+                        let tmp = state;
+                        if (tmp.id === section.id) {
+                            tmp.x = e.target.x();
+                            tmp.y = e.target.y();
+                        }
+                        return tmp;
+                    }))
+                }}
+                callbackTaskId={section.callbackTaskId}
+                resetNodeCallbackTaskId={()=>resetNodeCallbackTaskId(section.id)}/>)
             })}
             {nodes.map((node, index) => {
                 return node.display ?
@@ -1005,7 +1073,7 @@ export function Canvas({dimensions})
             />
 
             <Rect fill="#0099FF"
-            opacity={0.22}
+            opacity={0.12}
             visible={selectionRect.visible} ref={selectionRectRef}
             x={Math.min(selectionRect.x1, selectionRect.x2)}
             y={Math.min(selectionRect.y1, selectionRect.y2)}
