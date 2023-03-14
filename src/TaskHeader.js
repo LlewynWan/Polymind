@@ -12,6 +12,9 @@ export function TaskHeader({
     scale,
     width,
     fontSize,
+    listening,
+    onTaskClick,
+    disabledSet,
     resetNodeCallbackTaskId,
     callbackTaskId=-1
 }) {
@@ -191,7 +194,8 @@ export function TaskHeader({
         setCurrentHoverId(-1);
         clearTimeout(hoverTimeout);
         setIsHoverHeader(false)
-    }}>
+    }}
+    listening={listening}>
         {/* <Rect
         x={0}
         y={-8-fontHeight}
@@ -312,6 +316,7 @@ export function TaskHeader({
                             })
                         }, 1800));
                     }
+                    e.target.getStage().container().style.cursor = "pointer"
                     e.target.parent.to({y: -1, duration: 0.15})
                     e.target.to({fontSize: fontSize+2, duration: 0.15})
                     
@@ -320,11 +325,16 @@ export function TaskHeader({
                     if (currentHoverId === task.id) {
                         clearTimeout(hoverTimeout);
                     }
+                    e.target.getStage().container().style.cursor = "default"
                     e.target.parent.to({y: 0, duration: 0.15})
                     e.target.to({fontSize: fontSize, duration: 0.15})
-                }}>
+                }}
+                onClick={()=>onTaskClick(task.id)}
+                >
                     <Tag
-                    fill={colorPalette[task.id%colorPalette.length]}
+                    fill={disabledSet.has(task.id)?
+                        "#C0C2CE":colorPalette[task.id%colorPalette.length]}
+                    opacity={disabledSet.has(task.id)?0.5:1}
                     cornerRadius={2.5}/>
                     <Text
                     text={task.goal}

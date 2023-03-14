@@ -33,6 +33,9 @@ export function Keyword({
   onDragStart,
   onDragMove,
   onDragEnd,
+  headerListening,
+  onHeaderTaskClick,
+  disabledSet,
   resetNodeCallbackTaskId,
   header=true,
   draggable=true,
@@ -142,6 +145,9 @@ export function Keyword({
     fontSize={14}
     width={150}
     scale={1/canvasScale}
+    listening={headerListening}
+    onTaskClick={onHeaderTaskClick}
+    disabledSet={disabledSet}
     callbackTaskId={callbackTaskId}
     resetNodeCallbackTaskId={resetNodeCallbackTaskId}/> : null}
 

@@ -34,7 +34,10 @@ export function Concept({
     onDragStart,
     onDragMove,
     onDragEnd,
+    onHeaderTaskClick,
+    disabledSet,
     resetNodeCallbackTaskId,
+    headerListening,
     header=true,
     draggable=true,
     callbackTaskId=-1
@@ -151,6 +154,9 @@ export function Concept({
     fontSize={14}
     width={150}
     scale={1/canvasScale}
+    listening={headerListening}
+    onTaskClick={onHeaderTaskClick}
+    disabledSet={disabledSet}
     callbackTaskId={callbackTaskId}
     resetNodeCallbackTaskId={resetNodeCallbackTaskId}/>: null}
 

@@ -34,7 +34,10 @@ export function StickyNote({
   onDragMove,
   onDragEnd,
   onOverflow,
+  onHeaderTaskClick,
+  disabledSet,
   resetNodeCallbackTaskId,
+  headerListening,
   header=true,
   draggable=true,
   callbackTaskId=-1
@@ -132,6 +135,9 @@ export function StickyNote({
     fontSize={14}
     width={180}
     scale={1/canvasScale}
+    listening={headerListening}
+    onTaskClick={onHeaderTaskClick}
+    disabledSet={disabledSet}
     callbackTaskId={callbackTaskId}
     resetNodeCallbackTaskId={resetNodeCallbackTaskId}/> : null}
     

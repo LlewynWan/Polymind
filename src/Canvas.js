@@ -92,7 +92,7 @@ export function Canvas({dimensions})
         setTaskNodes(prevState=>prevState.filter(state=>
             state.node_id!==inFocus.node&&state.task_id!==0));
 
-        handleMicroTask(0,"node",0);
+        // handleMicroTask(0,"node",0);
     }, [inFocus])
 
     useEffect(() => {
@@ -211,6 +211,21 @@ export function Canvas({dimensions})
             }
         }, 3000)
     }
+    const handleHeaderTaskClick = (task_id, object_type, object_id) => {
+        if (object_type === "node") {
+            setNodes(prevState => prevState.map(state => {
+                let tmp = state;
+                if (tmp.id === object_id) {
+                    if (tmp.disabledTaskId.has(task_id)) {
+                        tmp.disabledTaskId.delete(task_id);
+                    } else {
+                        tmp.disabledTaskId.add(task_id);
+                    }
+                }
+                return tmp;
+            }))
+        }
+    }
 
     const [promptCardIndex, setPromptCardIndex] = React.useState(1);
 
@@ -324,6 +339,7 @@ export function Canvas({dimensions})
                 width: 0, height: 0, fontSize: 20,
                 scaleX: 1/canvasScale, scaleY: 1/canvasScale,
                 selected: true, text: "", display: true,
+                disabledTaskId: new Set(),
                 callbackTaskId: -1};
                 return [...prevState, tmp];
             });
@@ -705,6 +721,8 @@ export function Canvas({dimensions})
                 onDragEnd={(e)=>{handleDragNodeEnd(e,node.id)}}
                 onTextChange={(value)=>onNodeTextChange(value,node.id)}
                 isSelected={node.selected}
+                headerListening={!isDrawingArrow &&
+                    !isDrawingDoubleArrow&&!isSectioning&&!isAddingKeyword}
                 onOverflow={(scrollHeight)=>{
                     setNodes(prevState =>{
                         return prevState.map(state => {
@@ -715,6 +733,8 @@ export function Canvas({dimensions})
                         });
                     })
                 }}
+                disabledSet={node.disabledTaskId}
+                onHeaderTaskClick={(task_id)=>handleHeaderTaskClick(task_id,"node",node.id)}
                 callbackTaskId={node.callbackTaskId}
                 resetNodeCallbackTaskId={()=>resetNodeCallbackTaskId(node.id)}
                 header={isTaskHeaderVisible}/> :
@@ -761,6 +781,10 @@ export function Canvas({dimensions})
                     setArrowTo({id: -1, anchor: -1});
                 }}
                 onConnected={(e,anchor)=>onNodeConnected(e,node.id,anchor)}
+                headerListening={!isDrawingArrow &&
+                    !isDrawingDoubleArrow&&!isSectioning&&!isAddingKeyword}
+                disabledSet={node.disabledTaskId}
+                onHeaderTaskClick={(task_id)=>handleHeaderTaskClick(task_id,"node",node.id)}
                 callbackTaskId={node.callbackTaskId}
                 resetNodeCallbackTaskId={()=>resetNodeCallbackTaskId(node.id)}
                 header={isTaskHeaderVisible}/> :
@@ -817,6 +841,10 @@ export function Canvas({dimensions})
                 onConnected={(e,anchor)=>onNodeConnected(e,node.id,anchor)}
                 onDragMove={(e)=>{handleDragNodeMove(e,node.id)}}
                 onDragEnd={(e)=>{handleDragNodeEnd(e,node.id)}}
+                headerListening={!isDrawingArrow &&
+                    !isDrawingDoubleArrow&&!isSectioning&&!isAddingKeyword}
+                disabledSet={node.disabledTaskId}
+                onHeaderTaskClick={(task_id)=>handleHeaderTaskClick(task_id,"node",node.id)}
                 callbackTaskId={node.callbackTaskId}
                 resetNodeCallbackTaskId={()=>resetNodeCallbackTaskId(node.id)}
                 header={isTaskHeaderVisible}
@@ -1053,6 +1081,7 @@ export function Canvas({dimensions})
                         radiusX: radiusX, radiusY: radiusY,
                         scaleX: 1/canvasScale, scaleY: 1/canvasScale,
                         selected: false, text: "", fontSize: 20, display: true,
+                        disabledTaskId: new Set(),
                         callbackTaskId: -1};
                         return [...prevState, tmp];
                     });
@@ -1065,6 +1094,7 @@ export function Canvas({dimensions})
                         width: width, height: height, fontSize: 18,
                         scaleX: 1/canvasScale, scaleY: 1/canvasScale,
                         selected: false, text: "", display: true,
+                        disabledTaskId: new Set(),
                         callbackTaskId: -1};
                         return [...prevState, tmp];
                     });
