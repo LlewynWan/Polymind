@@ -839,7 +839,8 @@ export function Canvas({dimensions})
                 /> : null : null
             })}
             {taskNodes.map(node=>{
-                return node.display ?
+                return node.display ||
+                microTasks.filter(task=>task.id===node.task_id)[0].display ?
                     <TaskNode
                     key={node.node_id}
                     type={node.type}
@@ -945,6 +946,13 @@ export function Canvas({dimensions})
                 setMicroTasks(prevState=>prevState.filter(state=>state.id!==id));
                 setTaskNodes(prevState=>prevState.filter(state=>state.task_id!==id));
             }}
+            toggleDisplay={(task_id)=>setMicroTasks(prevState=>prevState.map(state=>{
+                let tmp = state;
+                if (tmp.id === task_id) {
+                    tmp.display = !tmp.display;
+                }
+                return tmp;
+            }))}
             toggleTaskHeaderSwitch={()=>setIsTaskHeaderVisible(!isTaskHeaderVisible)}/>
 
             {/* {followerPositionQueue.map((position,index)=>{

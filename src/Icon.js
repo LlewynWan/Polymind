@@ -207,6 +207,7 @@ export function Icon({
         e.target.getStage().container().style.cursor = "default"
     }}
     onClick={(e)=>{
+        onClick();
         setSwitchState((switchState+1)%2);
     }}>
         <Arc

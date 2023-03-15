@@ -14,7 +14,8 @@ export function TaskCard({
     inputType,
     outputType,
     examplePrompt,
-    deleteTask
+    deleteTask,
+    toggleDisplay
 })
 {
     const [isHover, setIsHover] = useState(false);
@@ -120,6 +121,7 @@ export function TaskCard({
         x={width-50}
         y={20}
         type={"visibility"}
+        onClick={toggleDisplay}
         />
         
         <Label
