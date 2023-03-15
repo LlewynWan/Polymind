@@ -25,7 +25,7 @@ export function TaskHeader({
     const [isHover, setIsHover] = useState(false);
 
     const [offsetX, setOffsetX] = useState(25);
-    const [headerPositions, setHeaderPositions] = useState([0]);
+    const [headerPositions, setHeaderPositions] = useState(Array(tasks.length+1).fill(0));
     const [fontHeight, setFontHeight] = useState(0);
     const [isHoverHeader, setIsHoverHeader] = useState(false);
     const [hoverTimeout, setHoverTimeout] = useState(0);
@@ -92,6 +92,7 @@ export function TaskHeader({
                     setCurtainId(callbackTaskId);
                     setCallbackTimeout(setTimeout(()=>{
                         setIsCurtainDrawn(false);
+                        curtainRef.current.getStage().container().style.cursor = "default"
                         curtainRef.current.to({
                             width: 0,
                             visible: false,

@@ -68,6 +68,7 @@ export function Canvas({dimensions})
     const [promptPanelVisibility, setPromptPanelVisibility] = React.useState(false);
 
     const [inFocus, setInFocus] = React.useState({});
+    const [nodesCurtainClicked, setNodesCurtainClicked] = React.useState(new Set());
     // const followerProcess = React.useRef(null);
     // const [followerPositionQueue, setFollowerPositionQueue] = React.useState([]);
     // const [isFollowerModeEnabled, setIsFollowerModeEnabled] = React.useState(false);
@@ -197,24 +198,27 @@ export function Canvas({dimensions})
             //             task_id: 0, attached_to_id: 0, type: "keyword"}
             //     ]
             // })
-            if (object_type==="node") {
-                setNodes(prevState=>prevState.map(state=>{
-                    let tmp = state;
-                    if (tmp.id === object_id) {
-                        tmp.callbackTaskId = task_id;
-                    }
-                    return tmp;
-                }));
-                setTaskNodes(prevState=>{
-                    return [...prevState.filter(state=>
-                        state.node_id!==inFocus.node&&state.task_id!==task_id),
-                    {node_id: object_id, task_id: task_id,
-                    attached_to_id: object_id, type: "keyword",
-                    x: 500, y: 250, fontSize: 20, text: "test", display: false
-                    }]
-                });
+            if (!nodesCurtainClicked.has(object_id.toString()+task_id.toString()+object_type))
+            {
+                if (object_type==="node") {
+                    setNodes(prevState=>prevState.map(state=>{
+                        let tmp = state;
+                        if (tmp.id === object_id) {
+                            tmp.callbackTaskId = task_id;
+                        }
+                        return tmp;
+                    }));
+                    setTaskNodes(prevState=>{
+                        return [...prevState.filter(state=>
+                            state.node_id!==inFocus.node&&state.task_id!==task_id),
+                        {node_id: object_id, task_id: task_id,
+                        attached_to_id: object_id, type: "keyword",
+                        x: 500, y: 250, fontSize: 20, text: "test", display: false
+                        }]
+                    });
+                }
             }
-        }, 5000)
+        }, 5000);
     }
     const handleHeaderTaskClick = (task_id, object_type, object_id) => {
         if (object_type === "node") {
@@ -433,6 +437,9 @@ export function Canvas({dimensions})
             }
             return tmp;
         }));
+        nodesCurtainClicked.add
+            (node_id.toString()+task_id.toString()+"node");
+        setNodesCurtainClicked(nodesCurtainClicked);
     }
     const resetNodeHeaderCurtain = (node_id, task_id) => {
         setTaskNodes(prevState=>prevState.map(state=>{
@@ -441,7 +448,10 @@ export function Canvas({dimensions})
                 tmp.display = false;
             }
             return tmp;
-        }))
+        }));
+        nodesCurtainClicked.delete
+            (node_id.toString()+task_id.toString()+"node")
+        setNodesCurtainClicked(nodesCurtainClicked);
     }
     const resetNodeCallbackTaskId = (id) => {
         setNodes(prevState => prevState.map(state=>{
