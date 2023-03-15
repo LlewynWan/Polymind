@@ -64,15 +64,15 @@ export function Icon({
         radius={10}
         fill={"transparent"}
         stroke={"#8B0000"}
-        strokeWidth={1.5}/>
+        strokeWidth={1.75}/>
         <Line
         points={[-5,-5,5,5]}
         stroke={"#8B0000"}
-        strokeWidth={1.5}/>
+        strokeWidth={1.75}/>
         <Line
         points={[-5,5,5,-5]}
         stroke={"#8B0000"}
-        strokeWidth={1.5}/>
+        strokeWidth={1.75}/>
     </Group>)
     : type === "switch" ?
     <Group
@@ -235,7 +235,7 @@ export function Icon({
         <Line
         x={0}
         y={0}
-        visible={switchState===1}
+        visible={switchState===0}
         points={[-10,-10,10,10]}
         stroke={isHover?"#323232":"gray"}
         strokeWidth={2.5}/>
@@ -245,6 +245,68 @@ export function Icon({
         width={30}
         height={20}
         fill={"transparent"}/>
+    </Group>
+    : type === "forward" ?
+    <Group
+    x={x}
+    y={y}
+    onMouseEnter={(e)=>{
+        setIsHover(true);
+        e.target.getStage().container().style.cursor = "pointer"
+    }}
+    onMouseLeave={(e)=>{
+        setIsHover(false);
+        e.target.getStage().container().style.cursor = "default"
+    }}
+    onClick={onClick}>
+        <Line
+        x={0}
+        y={0}
+        points={[-7.5,-7.5,0,0,-7.5,7.5]}
+        stroke={isHover?"#646464":"silver"}
+        strokeWidth={2.5}/>
+        <Line
+        x={0}
+        y={0}
+        points={[0,-7.5,7.5,0,0,7.5]}
+        stroke={isHover?"#646464":"silver"}
+        strokeWidth={2.5}/>
+        <Rect
+        x={-7.5}
+        y={-7.5}
+        width={15}
+        height={15}/>
+    </Group>
+    : type === "backward" ?
+    <Group
+    x={x}
+    y={y}
+    onMouseEnter={(e)=>{
+        setIsHover(true);
+        e.target.getStage().container().style.cursor = "pointer"
+    }}
+    onMouseLeave={(e)=>{
+        setIsHover(false);
+        e.target.getStage().container().style.cursor = "default"
+    }}
+    onClick={onClick}>
+        <Line
+        x={0}
+        y={0}
+        points={[0,-7.5,-7.5,0,0,7.5]}
+        stroke={isHover?"#646464":"silver"}
+        strokeWidth={2.5}/>
+        <Line
+        x={0}
+        y={0}
+        points={[7.5,-7.5,0,0,7.5,7.5]}
+        stroke={isHover?"#646464":"silver"}
+        strokeWidth={2.5}/>
+        <Rect
+        x={-7.5}
+        y={-7.5}
+        width={15}
+        height={15}/>
     </Group>
     : null
     // return type === "add" ?

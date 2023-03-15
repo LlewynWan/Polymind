@@ -35,6 +35,8 @@ export function Keyword({
   onDragEnd,
   headerListening,
   onHeaderTaskClick,
+  onHeaderCurtainClick,
+  resetHeaderCurtain,
   disabledSet,
   resetNodeCallbackTaskId,
   header=true,
@@ -147,6 +149,8 @@ export function Keyword({
     scale={1/canvasScale}
     listening={headerListening}
     onTaskClick={onHeaderTaskClick}
+    onCurtainClick={onHeaderCurtainClick}
+    resetCurtain={resetHeaderCurtain}
     disabledSet={disabledSet}
     callbackTaskId={callbackTaskId}
     resetNodeCallbackTaskId={resetNodeCallbackTaskId}/> : null}

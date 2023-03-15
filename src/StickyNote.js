@@ -35,6 +35,8 @@ export function StickyNote({
   onDragEnd,
   onOverflow,
   onHeaderTaskClick,
+  onHeaderCurtainClick,
+  resetHeaderCurtain,
   disabledSet,
   resetNodeCallbackTaskId,
   headerListening,
@@ -137,6 +139,8 @@ export function StickyNote({
     scale={1/canvasScale}
     listening={headerListening}
     onTaskClick={onHeaderTaskClick}
+    onCurtainClick={onHeaderCurtainClick}
+    resetCurtain={resetHeaderCurtain}
     disabledSet={disabledSet}
     callbackTaskId={callbackTaskId}
     resetNodeCallbackTaskId={resetNodeCallbackTaskId}/> : null}

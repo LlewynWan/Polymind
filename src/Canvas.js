@@ -89,10 +89,7 @@ export function Canvas({dimensions})
     }
 
     useEffect(()=>{
-        setTaskNodes(prevState=>prevState.filter(state=>
-            state.node_id!==inFocus.node&&state.task_id!==0));
-
-        // handleMicroTask(0,"node",0);
+        handleMicroTask(0,"node",0);
     }, [inFocus])
 
     useEffect(() => {
@@ -208,8 +205,16 @@ export function Canvas({dimensions})
                     }
                     return tmp;
                 }));
+                setTaskNodes(prevState=>{
+                    return [...prevState.filter(state=>
+                        state.node_id!==inFocus.node&&state.task_id!==task_id),
+                    {node_id: object_id, task_id: task_id,
+                    attached_to_id: object_id, type: "keyword",
+                    x: 500, y: 250, fontSize: 20, text: "test", display: false
+                    }]
+                });
             }
-        }, 3000)
+        }, 5000)
     }
     const handleHeaderTaskClick = (task_id, object_type, object_id) => {
         if (object_type === "node") {
@@ -228,58 +233,6 @@ export function Canvas({dimensions})
     }
 
     const [promptCardIndex, setPromptCardIndex] = React.useState(1);
-
-    const updatePromptCards = (prompt) => {
-        const lastPromptCardIndex = promptCardIndex === 1 ? 5 : promptCardIndex-1;
-        promptCardsRef.current.map((promptCardRef,index)=>{
-            if (index !== 0) {
-                if (index !== lastPromptCardIndex) {
-                    const indexOffset = index >= promptCardIndex ?
-                    index-promptCardIndex+1 : 6-(promptCardIndex-index);
-                    promptCardRef.current.to({
-                        y: promptCardRef.current.y()+175,
-                        duration: 0.1+(5-indexOffset)*0.15,
-                        easing: Konva.Easings.EaseInOut,
-                    })
-                }
-            }
-        });
-
-        promptCardsRef.current[lastPromptCardIndex].current.to({
-            y: dimensions.height*0.05,
-            opacity: 0.12,
-            duration: 0.75,
-            easing: Konva.Easings.EaseOut,
-            onFinish: ()=>{
-                // PromptGPT("Life is short,",
-                //     100,
-                //     (text)=>{
-                //         setPromptCards(prevState=>{
-                //             // prevState.splice(0,0,prevState.pop());
-                //             return prevState.map((state,index)=>{
-                //                 if (index+1 === lastPromptCardIndex) {
-                //                     state.text = 'Life is short,'+text;
-                //                 }
-                //                 // state.y = dimensions.height*0.05 + 175*index;
-                //                 return state;
-                //             });
-                //         });
-                //     });
-                            
-                promptCardsRef.current[lastPromptCardIndex].current.to({
-                    opacity: 1,
-                    duration: 0.5,
-                    easing: Konva.Easings.EaseIn,
-                    onFinish: ()=> {
-                        // promptCardsRef.current.splice(1, 0, promptCardsRef.current.pop());
-                        
-                        
-                        setPromptCardIndex(lastPromptCardIndex);
-                    }
-                });
-            }
-        });
-    }
 
     const keyMap = {
         UNSELECT_ALL: "escape",
@@ -471,7 +424,26 @@ export function Canvas({dimensions})
             });
         });
     }
-    const resetNodeCallbackTaskId = (id) =>{
+
+    const handleNodeHeaderCurtainClick = (node_id, task_id) => {
+        setTaskNodes(prevState=>prevState.map(state=>{
+            let tmp = state;
+            if (tmp.node_id === node_id && tmp.task_id === task_id) {
+                tmp.display = true;
+            }
+            return tmp;
+        }));
+    }
+    const resetNodeHeaderCurtain = (node_id, task_id) => {
+        setTaskNodes(prevState=>prevState.map(state=>{
+            let tmp = state;
+            if (tmp.node_id === node_id && tmp.task_id === task_id) {
+                tmp.display = false;
+            }
+            return tmp;
+        }))
+    }
+    const resetNodeCallbackTaskId = (id) => {
         setNodes(prevState => prevState.map(state=>{
             let tmp = state;
             if (tmp.id === id) {
@@ -735,6 +707,8 @@ export function Canvas({dimensions})
                 }}
                 disabledSet={node.disabledTaskId}
                 onHeaderTaskClick={(task_id)=>handleHeaderTaskClick(task_id,"node",node.id)}
+                onHeaderCurtainClick={(task_id)=>handleNodeHeaderCurtainClick(node.id, task_id)}
+                resetHeaderCurtain={(task_id)=>resetNodeHeaderCurtain(node.id, task_id)}
                 callbackTaskId={node.callbackTaskId}
                 resetNodeCallbackTaskId={()=>resetNodeCallbackTaskId(node.id)}
                 header={isTaskHeaderVisible}/> :
@@ -785,6 +759,8 @@ export function Canvas({dimensions})
                     !isDrawingDoubleArrow&&!isSectioning&&!isAddingKeyword}
                 disabledSet={node.disabledTaskId}
                 onHeaderTaskClick={(task_id)=>handleHeaderTaskClick(task_id,"node",node.id)}
+                onHeaderCurtainClick={(task_id)=>handleNodeHeaderCurtainClick(node.id, task_id)}
+                resetHeaderCurtain={(task_id)=>resetNodeHeaderCurtain(node.id, task_id)}
                 callbackTaskId={node.callbackTaskId}
                 resetNodeCallbackTaskId={()=>resetNodeCallbackTaskId(node.id)}
                 header={isTaskHeaderVisible}/> :
@@ -845,13 +821,15 @@ export function Canvas({dimensions})
                     !isDrawingDoubleArrow&&!isSectioning&&!isAddingKeyword}
                 disabledSet={node.disabledTaskId}
                 onHeaderTaskClick={(task_id)=>handleHeaderTaskClick(task_id,"node",node.id)}
+                onHeaderCurtainClick={(task_id)=>handleNodeHeaderCurtainClick(node.id, task_id)}
+                resetHeaderCurtain={(task_id)=>resetNodeHeaderCurtain(node.id, task_id)}
                 callbackTaskId={node.callbackTaskId}
                 resetNodeCallbackTaskId={()=>resetNodeCallbackTaskId(node.id)}
                 header={isTaskHeaderVisible}
                 /> : null : null
             })}
             {taskNodes.map(node=>{
-                return (
+                return node.display ?
                     <TaskNode
                     key={node.node_id}
                     type={node.type}
@@ -863,7 +841,7 @@ export function Canvas({dimensions})
                     text={node.text}
                     fontSize={node.fontSize}
                     color={colorPalette[node.task_id]}/>
-                )
+                : null
             })}
             {arrows.map((arrow,index)=>{
                 const arrow_size = 10 / canvasScale;
@@ -1264,4 +1242,57 @@ export function Canvas({dimensions})
     //     return [...fromAnchorOffset[fromAnchor],
     //     ...findPathBetweenVectors(from,to),
     //     ...toAnchorOffset[toAnchor]]
+    // }
+    
+
+    // const updatePromptCards = (prompt) => {
+    //     const lastPromptCardIndex = promptCardIndex === 1 ? 5 : promptCardIndex-1;
+    //     promptCardsRef.current.map((promptCardRef,index)=>{
+    //         if (index !== 0) {
+    //             if (index !== lastPromptCardIndex) {
+    //                 const indexOffset = index >= promptCardIndex ?
+    //                 index-promptCardIndex+1 : 6-(promptCardIndex-index);
+    //                 promptCardRef.current.to({
+    //                     y: promptCardRef.current.y()+175,
+    //                     duration: 0.1+(5-indexOffset)*0.15,
+    //                     easing: Konva.Easings.EaseInOut,
+    //                 })
+    //             }
+    //         }
+    //     });
+
+    //     promptCardsRef.current[lastPromptCardIndex].current.to({
+    //         y: dimensions.height*0.05,
+    //         opacity: 0.12,
+    //         duration: 0.75,
+    //         easing: Konva.Easings.EaseOut,
+    //         onFinish: ()=>{
+    //             // PromptGPT("Life is short,",
+    //             //     100,
+    //             //     (text)=>{
+    //             //         setPromptCards(prevState=>{
+    //             //             // prevState.splice(0,0,prevState.pop());
+    //             //             return prevState.map((state,index)=>{
+    //             //                 if (index+1 === lastPromptCardIndex) {
+    //             //                     state.text = 'Life is short,'+text;
+    //             //                 }
+    //             //                 // state.y = dimensions.height*0.05 + 175*index;
+    //             //                 return state;
+    //             //             });
+    //             //         });
+    //             //     });
+                            
+    //             promptCardsRef.current[lastPromptCardIndex].current.to({
+    //                 opacity: 1,
+    //                 duration: 0.5,
+    //                 easing: Konva.Easings.EaseIn,
+    //                 onFinish: ()=> {
+    //                     // promptCardsRef.current.splice(1, 0, promptCardsRef.current.pop());
+                        
+                        
+    //                     setPromptCardIndex(lastPromptCardIndex);
+    //                 }
+    //             });
+    //         }
+    //     });
     // }

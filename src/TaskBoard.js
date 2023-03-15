@@ -31,7 +31,6 @@ export function TaskBoard({
         e.evt.preventDefault();
         e.cancelBubble=true;
         const offset = e.evt.deltaY < 0 ? 20 : -20;
-        console.log(taskCardOffset+offset )
         if (taskCardOffset+offset <= 120 &&
             taskCardOffset+offset >= height-(tasks.length-1)*160-205)
             {

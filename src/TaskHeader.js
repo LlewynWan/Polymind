@@ -5,6 +5,8 @@ import Konva from "konva";
 import { colorPalette } from "./utils/color_utils";
 import { Group, Label, Tag, Text, Rect, Arrow } from "react-konva";
 
+import { Icon } from "./Icon";
+
 
 export function TaskHeader({
     x,y,
@@ -14,6 +16,8 @@ export function TaskHeader({
     fontSize,
     listening,
     onTaskClick,
+    onCurtainClick,
+    resetCurtain,
     disabledSet,
     resetNodeCallbackTaskId,
     callbackTaskId=-1
@@ -25,16 +29,21 @@ export function TaskHeader({
     const [fontHeight, setFontHeight] = useState(0);
     const [isHoverHeader, setIsHoverHeader] = useState(false);
     const [hoverTimeout, setHoverTimeout] = useState(0);
+    const [callbackTimeout, setCallbackTimeout] = useState(-1);
     const [currentHoverId, setCurrentHoverId] = useState(-1);
+    const [curtainId, setCurtainId] = useState(-1);
 
     const [isHoverLeftArrow, setIsHoverLeftArrow] = useState(false);
     const [isHoverRightArrow, setIsHoverRightArrow] = useState(false);
     const [hoverLeftArrowInterval, setHoverLeftArrowInterval] = useState(null);
     const [hoverRightArrowInterval, setHoverRightArrowInterval] = useState(null);
 
+    const [isCurtainDrawn, setIsCurtainDrawn] = useState(false);
+    const [isCurtainFixed, setIsCurtainFixed] = useState(false);
+
     const curtainRef = useRef(null);
-    const promptRectRef = useRef(null);
-    const promptCircleRef = useRef(null);
+    // const promptRectRef = useRef(null);
+    // const promptCircleRef = useRef(null);
 
 
     const handleScroll = (offset) => {
@@ -69,8 +78,9 @@ export function TaskHeader({
     }
 
     useEffect(()=>{
-        if (callbackTaskId !== -1 && ! isHover) {
+        if (callbackTaskId !== -1 && !isHover && !isCurtainFixed) {
             clearTimeout(hoverTimeout);
+            clearTimeout(callbackTimeout);
             curtainRef.current.to({
                 fill: colorPalette[callbackTaskId%colorPalette.length],
                 width: width,
@@ -78,18 +88,23 @@ export function TaskHeader({
                 duration: 0.25,
                 easing: Konva.Easings.EaseOut,
                 onFinish: ()=>{
-                    setTimeout(()=>{
+                    setIsCurtainDrawn(true);
+                    setCurtainId(callbackTaskId);
+                    setCallbackTimeout(setTimeout(()=>{
+                        setIsCurtainDrawn(false);
                         curtainRef.current.to({
                             width: 0,
                             visible: false,
                             duration: 0.15,
-                            onFinish: ()=>{resetNodeCallbackTaskId()}
+                            onFinish: ()=>resetNodeCallbackTaskId()
                         });
-                    }, 1500);
+                    }, 2000));
                 }
             })
         }
+    }, [callbackTaskId]);
 
+    useEffect(()=>{
         var positions = [0];
         const test = new Konva.Text({text: "test", fontSize: fontSize, fontStyle: "bold",
             align: "center", verticalAlign: "middle", padding: 2.5});
@@ -102,7 +117,12 @@ export function TaskHeader({
         });
         setHeaderPositions(positions);
         setFontHeight(test.height());
-    }, [tasks, fontSize, offsetX, callbackTaskId])
+    }, [tasks, fontSize, offsetX])
+
+    useEffect(()=>{
+        clearTimeout(callbackTimeout);
+        resetNodeCallbackTaskId();
+    }, [isCurtainFixed])
 
     // return (
     //     <Group
@@ -193,7 +213,7 @@ export function TaskHeader({
         setIsHover(false);
         setCurrentHoverId(-1);
         clearTimeout(hoverTimeout);
-        setIsHoverHeader(false)
+        // setIsHoverHeader(false);
     }}
     listening={listening}>
         {/* <Rect
@@ -301,6 +321,10 @@ export function TaskHeader({
                                 width: width,
                                 duration: 0.25,
                                 easing: Konva.Easings.EaseOut,
+                                onFinish: ()=>{
+                                    setIsCurtainDrawn(true);
+                                    setCurtainId(task.id);
+                                }
                                 // onFinish: ()=>{
                                 //     promptRectRef.current.to({
                                 //         fill: colorPalette[task.id%colorPalette.length],
@@ -406,6 +430,34 @@ export function TaskHeader({
         }}/>
     </Group>
 
+    <Group
+    onMouseLeave={()=>{
+        if (!isCurtainFixed) {
+            setCurrentHoverId(-1);
+            setCurtainId(-1);
+            clearTimeout(hoverTimeout);
+            setIsCurtainDrawn(false);
+            curtainRef.current.to({
+                width: 0,
+                duration: 0.25,
+                easing: Konva.Easings.EaseOut,
+                onFinish: ()=> {
+                    setIsHoverHeader(false);
+                    // setIsCurtainDrawn(false);
+                    // promptRectRef.current.to({
+                    //     fill: "silver",
+                    //     opacity: 1,
+                    //     duration: 0.25
+                    // });
+                    // promptCircleRef.current.to({
+                    //     fill: "silver",
+                    //     opacity: 1,
+                    //     duration: 0.25
+                    // });
+                }
+            });
+        }
+    }}>
     <Rect
     x={0}
     y={-4}
@@ -414,28 +466,40 @@ export function TaskHeader({
     cornerRadius={2.5}
     visible={isHoverHeader}
     ref={curtainRef}
-    onMouseLeave={()=>{
+    />
+    {isCurtainDrawn && ! isCurtainFixed ? <Icon
+    x={width-15}
+    y={fontHeight/2}
+    type={"forward"}
+    onClick={()=>{
+        // clearTimeout(callbackTimeout);
+        setIsCurtainFixed(true);
+        onCurtainClick(curtainId);
+    }}/> : null}
+    {isCurtainDrawn && isCurtainFixed ? <Icon
+    x={width-15}
+    y={fontHeight/2}
+    type={"backward"}
+    onClick={(e)=>{
+        e.target.getStage().container().style.cursor = "default"
+
+        resetCurtain(curtainId);
+        setIsCurtainFixed(false);
         setCurrentHoverId(-1);
-        clearTimeout(hoverTimeout)
+        setCurtainId(-1);
+        clearTimeout(hoverTimeout);
+        setIsCurtainDrawn(false);
         curtainRef.current.to({
             width: 0,
             duration: 0.25,
             easing: Konva.Easings.EaseOut,
             onFinish: ()=> {
                 setIsHoverHeader(false);
-                // promptRectRef.current.to({
-                //     fill: "silver",
-                //     opacity: 1,
-                //     duration: 0.25
-                // });
-                // promptCircleRef.current.to({
-                //     fill: "silver",
-                //     opacity: 1,
-                //     duration: 0.25
-                // });
             }
         });
-    }}/>
+    }}
+    /> : null}
+    </Group>
     </Group>
     )
 }

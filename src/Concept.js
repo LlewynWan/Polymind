@@ -35,6 +35,8 @@ export function Concept({
     onDragMove,
     onDragEnd,
     onHeaderTaskClick,
+    onHeaderCurtainClick,
+    resetHeaderCurtain,
     disabledSet,
     resetNodeCallbackTaskId,
     headerListening,
@@ -156,6 +158,8 @@ export function Concept({
     scale={1/canvasScale}
     listening={headerListening}
     onTaskClick={onHeaderTaskClick}
+    onCurtainClick={onHeaderCurtainClick}
+    resetCurtain={resetHeaderCurtain}
     disabledSet={disabledSet}
     callbackTaskId={callbackTaskId}
     resetNodeCallbackTaskId={resetNodeCallbackTaskId}/>: null}
