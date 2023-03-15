@@ -116,6 +116,11 @@ export function TaskCard({
         y={20}
         type={"delete"}
         onClick={deleteTask}/>
+        <Icon
+        x={width-50}
+        y={20}
+        type={"visibility"}
+        />
         
         <Label
         x={10}

@@ -1,5 +1,5 @@
 import React, { useRef, useState } from "react";
-import { Group, Line, Circle, Rect } from "react-konva";
+import { Group, Line, Circle, Rect, Arc } from "react-konva";
 
 
 export function Icon({
@@ -193,6 +193,58 @@ export function Icon({
         points={[-7,7,7,-7]}
         stroke={"#8B0000"}
         strokeWidth={2.5}/>
+    </Group>
+    : type === "visibility" ?
+    <Group
+    x={x}
+    y={y}
+    onMouseEnter={(e)=>{
+        setIsHover(true);
+        e.target.getStage().container().style.cursor = "pointer"
+    }}
+    onMouseLeave={(e)=>{
+        setIsHover(false);
+        e.target.getStage().container().style.cursor = "default"
+    }}
+    onClick={(e)=>{
+        setSwitchState((switchState+1)%2);
+    }}>
+        <Arc
+        x={0}
+        y={-5}
+        innerRadius={13}
+        outerRadius={15}
+        fill={isHover?"#323232":"gray"}
+        rotation={15}
+        angle={150}/>
+        <Circle
+        x={0}
+        y={0}
+        radius={5}
+        fill={"transparent"}
+        stroke={isHover?"#323232":"gray"}
+        strokeWidth={1.75}/>
+        <Arc
+        x={0}
+        y={5}
+        innerRadius={13}
+        outerRadius={15}
+        fill={isHover?"#323232":"gray"}
+        rotation={195}
+        angle={150}/>
+        <Line
+        x={0}
+        y={0}
+        visible={switchState===1}
+        points={[-10,-10,10,10]}
+        stroke={isHover?"#323232":"gray"}
+        strokeWidth={2.5}/>
+        <Rect
+        x={-15}
+        y={-10}
+        width={30}
+        height={20}
+        fill={"transparent"}/>
     </Group>
     : null
     // return type === "add" ?
