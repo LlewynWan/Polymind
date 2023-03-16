@@ -5,9 +5,10 @@ import Konva from "konva";
 
 import { CanvasContext } from "./state";
 import { TextInput } from "./TextInput"
-import { TaskHeader } from "./TaskHeader";
+import { Icon } from "./Icon";
 
 import { sizeMap } from "./utils/size_utils";
+
 
 const RETURN_KEY = 13;
 const ESCAPE_KEY = 27;
@@ -22,10 +23,14 @@ export function TaskNode({
     radiusY,
     color,
     text,
-    fontSize
+    fontSize,
+    onDragEnd,
+    onConfirm
 }) {
     const {canvasX, canvasY, canvasScale, microTasks} = useContext(CanvasContext);
     const [textHeight, setTextHeight] = useState(0);
+
+    const [isHover, setIsHover] = useState(false);
 
     useEffect(() => {
         // if (!isSelected && isEditing) {
@@ -41,8 +46,67 @@ export function TaskNode({
     <Group
     x={x}
     y={y}
-    opacity={0.25}
-    draggable>
+    onDragEnd={(e)=>{
+        if (onDragEnd)
+          onDragEnd(e);
+      }}
+    draggable
+    onMouseEnter={()=>setIsHover(true)}
+    onMouseLeave={()=>setIsHover(false)}>
+    {type === "concept" ?
+    <Group
+    x={0}
+    y={-radiusY-12}
+    scaleX={0.75}
+    scaleY={0.75}
+    opacity={0.75}>
+    <Rect
+    x={-20}
+    y={-10}
+    width={45}
+    height={30}
+    fill={"transparent"}/>
+    <Icon
+    x={-10}
+    y={0}
+    type={"cross"}
+    />
+    <Icon
+    x={10}
+    y={0}
+    type={"confirm"}
+    onClick={onConfirm}
+    />
+    </Group>
+    :
+    <Group
+    x={12}
+    y={-15}
+    scaleX={0.75}
+    scaleY={0.75}
+    opacity={0.75}>
+    <Rect
+    x={-10}
+    y={-10}
+    width={45}
+    height={30}
+    fill={"transparent"}/>
+    <Icon
+    x={0}
+    y={0}
+    type={"cross"}
+    />
+    <Icon
+    x={20}
+    y={0}
+    type={"confirm"}
+    onClick={onConfirm}
+    />
+    </Group>}
+    <Group
+    x={0}
+    y={0}
+    opacity={isHover?0.6:0.25}>
         {type === "keyword" ?
         <Label>
             <Tag
@@ -110,6 +174,7 @@ export function TaskNode({
         verticalAlign={"middle"}
         />
         </Group>}
+    </Group>
     </Group>
     )
 }

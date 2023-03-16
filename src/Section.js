@@ -89,7 +89,7 @@ export function Section({
     onDragEnd={handleDragEnd}
     draggable={true}
     onClick={onClick}>
-    {header ? <TaskHeader
+    {/* {header ? <TaskHeader
     x={0}
     y={-80/canvasScale}
     tasks={microTasks.filter(task=>task.inputType==="Section")}
@@ -97,7 +97,7 @@ export function Section({
     width={180}
     scale={1/canvasScale}
     callbackTaskId={callbackTaskId}
-    resetNodeCallbackTaskId={resetNodeCallbackTaskId}/> : null}
+    resetNodeCallbackTaskId={resetNodeCallbackTaskId}/> : null} */}
         <Label
         x={0}
         y={-40/canvasScale}

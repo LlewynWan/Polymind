@@ -6,7 +6,9 @@ export function Icon({
     x,
     y,
     type,
-    onClick
+    onClick,
+    scaleX=1,
+    scaleY=1,
 }) {
     const [isHover, setIsHover] = useState(false);
     
@@ -144,6 +146,8 @@ export function Icon({
     <Group
     x={x}
     y={y}
+    scaleX={scaleX}
+    scaleY={scaleY}
     opacity={isHover?1:0.64}
     onMouseEnter={(e)=>{
         setIsHover(true);
@@ -169,6 +173,8 @@ export function Icon({
     <Group
     x={x}
     y={y}
+    scaleX={scaleX}
+    scaleY={scaleY}
     opacity={isHover?1:0.64}
     onMouseEnter={(e)=>{
         setIsHover(true);

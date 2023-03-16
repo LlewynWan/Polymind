@@ -209,9 +209,16 @@ export function Canvas({dimensions})
                         return tmp;
                     }));
                     setTaskNodes(prevState=>{
+                        const sameState = prevState.filter(state=>
+                            state.node_id===inFocus.node&&state.task_id===task_id
+                            && !state.display)
+                                // && !microTasks.filter(task=>task.id===state.task_id)[0].display));
                         return [...prevState.filter(state=>
-                            state.node_id!==inFocus.node&&state.task_id!==task_id),
-                        {node_id: object_id, task_id: task_id,
+                            (state.node_id!==inFocus.node&&state.task_id!==task_id)
+                            || state.display),
+                            //  || microTasks.filter(task=>task.id===state.task_id)[0].display),
+                        {id: sameState.length>0 ? sameState[0].id : prevState.length,
+                        node_id: object_id, task_id: task_id,
                         attached_to_id: object_id, type: "keyword",
                         x: 500, y: 250, fontSize: 20, text: "test", display: false
                         }]
@@ -842,7 +849,7 @@ export function Canvas({dimensions})
                 return node.display ||
                 microTasks.filter(task=>task.id===node.task_id)[0].display ?
                     <TaskNode
-                    key={node.node_id}
+                    key={node.id}
                     type={node.type}
                     x={node.x}
                     y={node.y}
@@ -851,7 +858,44 @@ export function Canvas({dimensions})
                     radiusY={node.radiusY}
                     text={node.text}
                     fontSize={node.fontSize}
-                    color={colorPalette[node.task_id]}/>
+                    color={colorPalette[node.task_id]}
+                    onDragEnd={(e)=>{
+                        setTaskNodes(prevState => {
+                            return prevState.map((state) => {
+                                let tmp = state;
+                                if (tmp.id === node.id) {
+                                    tmp.x = e.target.x();
+                                    tmp.y = e.target.y();
+                                }
+                                return tmp;
+                            });
+                        });
+                    }}
+                    onConfirm={()=>{
+                        const newNode = node.type === "sticky_note" ?
+                        {id: nodes.length, type: node.type, scaleX: 1, scaleY: 1,
+                        x: node.x, y: node.y, display: true, text: node.text,
+                        width: node.width, height: node.height, fontSize: 18,
+                        selected: false, disabledTaskId: new Set(),
+                        callbackTaskId: -1}
+                        : node.type === "concept" ? {id: nodes.length, type: node.type,
+                        scaleX: 1, scaleY: 1, x: node.x, y: node.y,
+                        radiusX: node.radiusX, radiusY: node.radiusY,
+                        selected: false, text: node.text, fontSize: 20, display: true,
+                        disabledTaskId: new Set(), callbackTaskId: -1}
+                        : node.type === "keyword" ? {id: nodes.length, type: node.type,
+                        scaleX: 1, scaleY: 1, x: node.x, y: node.y,
+                        width: node.width, height: node.height, fontSize: 20,
+                        selected: false, text: node.text, display: true,
+                        disabledTaskId: new Set(), callbackTaskId: -1}
+                        : null
+                        setNodes(prevState => {
+                            return [...prevState,newNode];
+                        })
+
+                        setTaskNodes(prevState => prevState.filter(state=>state.id!==node.id));
+                        stageRef.current.container().style.cursor = "default"
+                    }}/>
                 : null
             })}
             {arrows.map((arrow,index)=>{
