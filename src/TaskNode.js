@@ -25,12 +25,18 @@ export function TaskNode({
     text,
     fontSize,
     onDragEnd,
-    onConfirm
+    onConfirm,
+    onDelete,
+    listening,
+    suggestions=["Provide more examples", "Be more specific"]
 }) {
     const {canvasX, canvasY, canvasScale, microTasks} = useContext(CanvasContext);
     const [textHeight, setTextHeight] = useState(0);
 
     const [isHover, setIsHover] = useState(false);
+    const [isHoverIcons, setIsHoverIcons] = useState(false);
+
+    const suggestionRef = useRef(null);
 
     useEffect(() => {
         // if (!isSelected && isEditing) {
@@ -52,31 +58,63 @@ export function TaskNode({
       }}
     draggable
     onMouseEnter={()=>setIsHover(true)}
-    onMouseLeave={()=>setIsHover(false)}>
+    onMouseLeave={()=>setIsHover(false)}
+    listening={listening}>
     {type === "concept" ?
     <Group
     x={0}
     y={-radiusY-12}
     scaleX={0.75}
     scaleY={0.75}
-    opacity={0.75}>
-    <Rect
-    x={-20}
-    y={-10}
-    width={45}
-    height={30}
-    fill={"transparent"}/>
-    <Icon
-    x={-10}
-    y={0}
-    type={"cross"}
-    />
-    <Icon
-    x={10}
-    y={0}
-    type={"confirm"}
-    onClick={onConfirm}
-    />
+    opacity={0.75}
+    onMouseEnter={()=>{
+        suggestionRef.current.setAttrs({text: suggestions[Math.floor(Math.random()*suggestions.length)]})
+        setIsHoverIcons(true);
+    }}
+    onMouseLeave={()=>setIsHoverIcons(false)}>
+        <Rect
+        x={-20}
+        y={-15}
+        width={45}
+        height={30}
+        fill={"transparent"}/>
+        <Group
+        x={0}
+        y={-15}>
+            <Label
+            x={0}
+            y={0}
+            visible={isHoverIcons}
+            onMouseEnter={(e)=>{e.target.getStage().container().style.cursor = "pointer"}}
+            onMouseLeave={(e)=>{e.target.getStage().container().style.cursor = "default"}}
+            >
+                <Tag
+                fill={"silver"}
+                cornerRadius={5}
+                pointerDirection={"down"}
+                />
+                <Text
+                ref={suggestionRef}
+                text={suggestions[0]}
+                fontSize={16}
+                fontStyle={"bold"}
+                fontFamily={"sans-serif"}
+                fill={"white"}
+                padding={5}/>
+            </Label>
+        </Group>
+        <Icon
+        x={-10}
+        y={0}
+        type={"cross"}
+        onClick={onDelete}
+        />
+        <Icon
+        x={10}
+        y={0}
+        type={"confirm"}
+        onClick={onConfirm}
+        />
     </Group>
     :
     <Group
@@ -84,24 +122,79 @@ export function TaskNode({
     y={-15}
     scaleX={0.75}
     scaleY={0.75}
-    opacity={0.75}>
-    <Rect
-    x={-10}
-    y={-10}
-    width={45}
-    height={30}
-    fill={"transparent"}/>
-    <Icon
-    x={0}
-    y={0}
-    type={"cross"}
-    />
-    <Icon
-    x={20}
-    y={0}
-    type={"confirm"}
-    onClick={onConfirm}
-    />
+    opacity={0.75}
+    onMouseEnter={()=>{
+        suggestionRef.current.setAttrs({text: suggestions[Math.floor(Math.random()*suggestions.length)]})
+        setIsHoverIcons(true);
+    }}
+    onMouseLeave={()=>setIsHoverIcons(false)}>
+        <Rect
+        x={-10}
+        y={-15}
+        width={50}
+        height={35}
+        fill={"transparent"}/>
+        {type === "sticky_note" ? <Group
+        x={35}
+        y={0}>
+            <Label
+            x={0}
+            y={0}
+            visible={isHoverIcons}
+            onMouseEnter={(e)=>{e.target.getStage().container().style.cursor = "pointer"}}
+            onMouseLeave={(e)=>{e.target.getStage().container().style.cursor = "default"}}
+            >
+                <Tag
+                fill={"silver"}
+                cornerRadius={5}
+                pointerDirection={"left"}
+                />
+                <Text
+                ref={suggestionRef}
+                text={suggestions[0]}
+                fontSize={16}
+                fontStyle={"bold"}
+                fontFamily={"sans-serif"}
+                fill={"white"}
+                padding={5}/>
+            </Label>
+        </Group> : <Group
+        x={-10}
+        y={-25}>
+            <Label
+            x={0}
+            y={0}
+            visible={isHoverIcons}
+            onMouseEnter={(e)=>{e.target.getStage().container().style.cursor = "pointer"}}
+            onMouseLeave={(e)=>{e.target.getStage().container().style.cursor = "default"}}
+            >
+                <Tag
+                fill={"silver"}
+                cornerRadius={5}
+                pointerDirection={"left"}
+                />
+                <Text
+                ref={suggestionRef}
+                text={suggestions[0]}
+                fontSize={16}
+                fontStyle={"bold"}
+                fontFamily={"sans-serif"}
+                fill={"white"}
+                padding={5}/>
+            </Label>
+        </Group>}
+        <Icon
+        x={0}
+        y={0}
+        type={"cross"}
+        onClick={onDelete}
+        />
+        <Icon
+        x={20}
+        y={0}
+        type={"confirm"}
+        onClick={onConfirm}
+        />
     </Group>}
     <Group
     x={0}

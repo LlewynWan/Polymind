@@ -895,7 +895,13 @@ export function Canvas({dimensions})
 
                         setTaskNodes(prevState => prevState.filter(state=>state.id!==node.id));
                         stageRef.current.container().style.cursor = "default"
-                    }}/>
+                    }}
+                    onDelete={()=>{
+                        setTaskNodes(prevState => prevState.filter(state=>state.id!==node.id));
+                        stageRef.current.container().style.cursor = "default"
+                    }}
+                    listening={!isDrawingArrow && !isDrawingDoubleArrow
+                        && !isSectioning && ! isAddingKeyword}/>
                 : null
             })}
             {arrows.map((arrow,index)=>{
