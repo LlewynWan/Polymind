@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Group, Rect, Label, Tag, Text, Line } from "react-konva";
 
 import { Icon } from "./Icon";
+import { TextInput } from "./TextInput";
 import { colorMap } from "./utils/color_utils";
 
 
@@ -15,11 +16,13 @@ export function TaskCard({
     outputType,
     examplePrompt,
     deleteTask,
-    toggleDisplay
+    toggleDisplay,
+    handlePromptTextChange
 })
 {
     const [isHover, setIsHover] = useState(false);
     const [pageNum, setPageNum] = useState(0);
+    const [isEditingPrompt, setIsEditingPrompt] = useState(false);
     
     const rectRef = React.useRef(null);
     const cardRef = React.useRef(null);
@@ -34,6 +37,14 @@ export function TaskCard({
     //     "Nodes": "#112233",
     //     "Lines": "#C3E7FD"
     // }
+
+    const RETURN_KEY = 13;
+    const ESCAPE_KEY = 27;
+    function handleEscapeKeys(e) {
+        if ((e.keyCode === RETURN_KEY && !e.shiftKey) || e.keyCode === ESCAPE_KEY) {
+            setIsEditingPrompt(false);
+        }
+    }
 
     useEffect(()=>{
         if (pageNum===0) {
@@ -145,7 +156,7 @@ export function TaskCard({
         ref={page1Ref}
         visible={!pageNum}>
         <Label
-        x={width/2}
+        x={width/2-15}
         y={65}
         >
             <Tag
@@ -192,7 +203,7 @@ export function TaskCard({
         </Label>
         
         <Label
-        x={width/2}
+        x={width/2-15}
         y={95}
         >
             <Tag
@@ -243,7 +254,7 @@ export function TaskCard({
         ref={page2Ref}
         visible={pageNum===1}>
         <Label
-        x={width/2-15}
+        x={width/2-50}
         y={80}
         >
             <Tag
@@ -258,39 +269,61 @@ export function TaskCard({
             lineJoin={'round'}
             />
             <Text
-            text={"Example Prompt"}
-            fontSize={12}
+            text={"Prompt"}
+            fontSize={14}
             fontStyle={"bold"}
             fontFamily={"sans-serif"}
             fill={"white"}
             padding={5}/>
         </Label>
+        <Group
+        x={width/2-45}
+        y={45}>
         <Label
-        x={width/2-12}
-        y={80}
-        >
+        x={0}
+        y={0}>
             <Tag
-            x={0}
-            y={-17}
-            fill={"#AFAFAF"}
+            // x={0}
+            // y={-17}
+            fill={"silver"}
+            opacity={0.85}
             cornerRadius={5}
-            pointerDirection={"left"}
-            lineJoin={'round'}
+            // pointerDirection={"left"}
+            // lineJoin={'round'}
             />
-            <Text
-            x={0}
-            y={-17}
+            {isEditingPrompt && pageNum===1 ?
+            <TextInput
+            x={5}
+            y={4.5}
+            // x={5}
+            // y={-12-0.5}
+            width={width/2+35}
+            height={height-79}
+            fontSize={12}
+            fontStyle={"bold"}
+            fontColor={"white"}
+            value={examplePrompt}
+            onChange={(e)=>handlePromptTextChange(e.currentTarget.value)}
+            onKeyDown={handleEscapeKeys}/>
+            : <Text
+            // x={0}
+            // y={-17}
             text={examplePrompt}
-            width={width/2+5}
-            height={height-80}
+            width={width/2+35}
+            height={height-70}
             ellipsis={true}
             fontSize={12}
             fontStyle={"bold"}
             fontFamily={"sans-serif"}
             fill={"white"}
             padding={5}
-            />
+            onDblClick={(e)=>{
+                e.cancelBubble = true;
+                setIsEditingPrompt(!isEditingPrompt);
+            }}
+            />}
         </Label>
+        </Group>
         </Group>
         {/* <Label
         x={width/2-50}

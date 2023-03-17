@@ -210,11 +210,11 @@ export function Canvas({dimensions})
                     }));
                     setTaskNodes(prevState=>{
                         const sameState = prevState.filter(state=>
-                            state.node_id===inFocus.node&&state.task_id===task_id
+                            state.node_id===object_id&&state.task_id===task_id
                             && !state.display)
                                 // && !microTasks.filter(task=>task.id===state.task_id)[0].display));
                         return [...prevState.filter(state=>
-                            (state.node_id!==inFocus.node&&state.task_id!==task_id)
+                            (state.node_id!==object_id&&state.task_id!==task_id)
                             || state.display),
                             //  || microTasks.filter(task=>task.id===state.task_id)[0].display),
                         {id: sameState.length>0 ? sameState[0].id : prevState.length,
@@ -1003,7 +1003,22 @@ export function Canvas({dimensions})
                 }
                 return tmp;
             }))}
-            toggleTaskHeaderSwitch={()=>setIsTaskHeaderVisible(!isTaskHeaderVisible)}/>
+            toggleTaskHeaderSwitch={()=>{
+                if (isTaskHeaderVisible) {
+                    setNodesCurtainClicked(new Set());
+                }
+                setIsTaskHeaderVisible(!isTaskHeaderVisible);
+            }}
+            handlePromptTextChange={(value,id)=>{
+                setMicroTasks(prevState=>prevState.map(state=>{
+                    let tmp = state;
+                    if (tmp.id === id) {
+                        tmp.examplePrompt = value;
+                    }
+                    return tmp;
+                }))
+            }}
+            />
 
             {/* {followerPositionQueue.map((position,index)=>{
                 return <TaskPrompt

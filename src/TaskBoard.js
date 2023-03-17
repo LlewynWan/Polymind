@@ -17,7 +17,8 @@ export function TaskBoard({
     listening,
     deleteTask,
     toggleTaskHeaderSwitch,
-    toggleDisplay
+    toggleDisplay,
+    handlePromptTextChange
 })
 {
     // const colorPalette = ["#FFB347", "#966FD6", "#71C562", "#FB6B89", "#B39EB5", "#D64A4A"]
@@ -200,6 +201,7 @@ export function TaskBoard({
                     examplePrompt={task.examplePrompt}
                     deleteTask={()=>deleteTask(task.id)}
                     toggleDisplay={()=>toggleDisplay(task.id)}
+                    handlePromptTextChange={(value)=>handlePromptTextChange(value,task.id)}
                     />
                 )
             })}

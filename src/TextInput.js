@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { Html } from "react-konva-utils";
 
-function getStyle(width, height, fontSize, fontStyle, fontAlign) {
+function getStyle(width, height, fontSize, fontStyle, fontAlign, fontColor) {
   const isFirefox = navigator.userAgent.toLowerCase().indexOf("firefox") > -1;
   const baseStyle = {
     width: `${width}px`,
@@ -13,7 +13,7 @@ function getStyle(width, height, fontSize, fontStyle, fontAlign) {
     background: "none",
     outline: "none",
     resize: "none",
-    colour: "black",
+    color: fontColor,
     fontSize: `${fontSize}px`,
     fontFamily: "sans-serif",
     lineHeight: "1",
@@ -42,8 +42,9 @@ export function TextInput({
   onChange,
   onKeyDown,
   onOverflow,
+  fontColor="black"
 }) {
-  const style = getStyle(width, height, fontSize, fontStyle, fontAlign);
+  const style = getStyle(width, height, fontSize, fontStyle, fontAlign, fontColor);
   const textareaRef = useRef(null);
   const [textareaHeight, setTextareaHeight] = useState(0);
 
@@ -62,7 +63,9 @@ export function TextInput({
         onChange={(e)=>{
           onChange(e);
           if (textareaRef.current.scrollHeight > textareaHeight) {
-            onOverflow(textareaRef.current.scrollHeight);
+            if (onOverflow) {
+              onOverflow(textareaRef.current.scrollHeight);
+            }
           }
         }}
         onKeyDown={onKeyDown}

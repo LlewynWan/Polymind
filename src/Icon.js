@@ -90,7 +90,7 @@ export function Icon({
     }}
     onClick={()=>{
         if (!switchState) {
-            switchPanelRef.current.to({fill: "grey", duration: 0.15});
+            switchPanelRef.current.to({fill: "gray", duration: 0.15});
             switchRef.current.to({
                 x: 12.5,
                 duration: 0.15,
@@ -121,6 +121,7 @@ export function Icon({
         width={50}
         height={25}
         fill={"#4BB543"}
+        // fill={"#212121"}
         cornerRadius={25}
         ref={switchPanelRef}
         // stroke={"silver"}
