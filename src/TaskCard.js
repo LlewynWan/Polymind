@@ -395,7 +395,9 @@ export function TaskCard({
                     fill={"#444444"}
                     onMouseEnter={(e)=>{
                         if (getTextWidth(suggestion,11,"bold",3.5) > 55)
-                            e.target.setAttrs({Ellipsis: false, width: null})
+                            e.target.setAttrs({Ellipsis: false, width: Math.max(
+                                getTextWidth(suggestion,11,"bold",3.5), (3-index)*55
+                            )})
                     }}
                     onMouseLeave={(e)=>{e.target.setAttrs({Ellipsis: true, width: 55})}}
                     />
