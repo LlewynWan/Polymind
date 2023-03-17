@@ -4,10 +4,11 @@ import { Group, Rect, Label, Tag, Text, Transformer, Ellipse } from "react-konva
 import Konva from "konva";
 
 import { CanvasContext } from "./state";
-import { TextInput } from "./TextInput"
-import { Icon } from "./Icon";
-
 import { sizeMap } from "./utils/size_utils";
+
+import { Icon } from "./Icon";
+// import { TextInput } from "./TextInput"
+import { SuggestionPanel } from "./SuggestionPanel";
 
 
 const RETURN_KEY = 13;
@@ -28,7 +29,7 @@ export function TaskNode({
     onConfirm,
     onDelete,
     listening,
-    suggestions=["Provide more examples", "Be more specific"]
+    suggestions=["Rephrase", "Be more specific", "Not creative"]
 }) {
     const {canvasX, canvasY, canvasScale, microTasks} = useContext(CanvasContext);
     const [textHeight, setTextHeight] = useState(0);
@@ -66,9 +67,9 @@ export function TaskNode({
     y={-radiusY-12}
     scaleX={0.75}
     scaleY={0.75}
-    opacity={0.75}
+    opacity={0.9}
     onMouseEnter={()=>{
-        suggestionRef.current.setAttrs({text: suggestions[Math.floor(Math.random()*suggestions.length)]})
+        // suggestionRef.current.setAttrs({text: suggestions[Math.floor(Math.random()*suggestions.length)]})
         setIsHoverIcons(true);
     }}
     onMouseLeave={()=>setIsHoverIcons(false)}>
@@ -80,8 +81,16 @@ export function TaskNode({
         fill={"transparent"}/>
         <Group
         x={0}
-        y={-15}>
-            <Label
+        y={-15}
+        opacity={isHoverIcons?1:0}>
+            <SuggestionPanel
+            x={0}
+            y={0}
+            fontSize={14}
+            fontColor={"#444444"}
+            pointerDirection={"down"}
+            suggestions={suggestions.slice(0,3)}/>
+            {/* <Label
             x={0}
             y={0}
             visible={isHoverIcons}
@@ -101,7 +110,7 @@ export function TaskNode({
                 fontFamily={"sans-serif"}
                 fill={"white"}
                 padding={5}/>
-            </Label>
+            </Label> */}
         </Group>
         <Icon
         x={-10}
@@ -122,9 +131,9 @@ export function TaskNode({
     y={-15}
     scaleX={0.75}
     scaleY={0.75}
-    opacity={0.75}
+    opacity={0.9}
     onMouseEnter={()=>{
-        suggestionRef.current.setAttrs({text: suggestions[Math.floor(Math.random()*suggestions.length)]})
+        // suggestionRef.current.setAttrs({text: suggestions[Math.floor(Math.random()*suggestions.length)]})
         setIsHoverIcons(true);
     }}
     onMouseLeave={()=>setIsHoverIcons(false)}>
@@ -135,9 +144,17 @@ export function TaskNode({
         height={35}
         fill={"transparent"}/>
         {type === "sticky_note" ? <Group
-        x={35}
-        y={0}>
-            <Label
+        x={40}
+        y={0}
+        opacity={isHoverIcons?1:0}>
+            <SuggestionPanel
+            x={0}
+            y={0}
+            fontSize={14}
+            fontColor={"#444444"}
+            pointerDirection={"left"}
+            suggestions={suggestions.slice(0,3)}/>
+            {/* <Label
             x={0}
             y={0}
             visible={isHoverIcons}
@@ -157,11 +174,19 @@ export function TaskNode({
                 fontFamily={"sans-serif"}
                 fill={"white"}
                 padding={5}/>
-            </Label>
+            </Label> */}
         </Group> : <Group
-        x={-10}
-        y={-25}>
-            <Label
+        x={-12}
+        y={-27}
+        opacity={isHoverIcons?1:0}>
+            <SuggestionPanel
+            x={0}
+            y={0}
+            fontSize={14}
+            fontColor={"#444444"}
+            pointerDirection={"left"}
+            suggestions={suggestions.slice(0,3)}/>
+            {/* <Label
             x={0}
             y={0}
             visible={isHoverIcons}
@@ -181,7 +206,7 @@ export function TaskNode({
                 fontFamily={"sans-serif"}
                 fill={"white"}
                 padding={5}/>
-            </Label>
+            </Label> */}
         </Group>}
         <Icon
         x={0}
@@ -199,7 +224,7 @@ export function TaskNode({
     <Group
     x={0}
     y={0}
-    opacity={isHover?0.6:0.25}>
+    opacity={isHover?0.75:0.3}>
         {type === "keyword" ?
         <Label>
             <Tag

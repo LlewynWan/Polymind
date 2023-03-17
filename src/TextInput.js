@@ -1,13 +1,13 @@
 import React, { useEffect, useRef, useState } from "react";
 import { Html } from "react-konva-utils";
 
-function getStyle(width, height, fontSize, fontStyle, fontAlign, fontColor) {
+function getStyle(width, height, fontSize, fontStyle, fontAlign, fontColor, padding) {
   const isFirefox = navigator.userAgent.toLowerCase().indexOf("firefox") > -1;
   const baseStyle = {
     width: `${width}px`,
     height: `${height}px`,
     border: "none",
-    padding: "0px",
+    padding: `${padding}px`,
     margin: "0px",
     marginTop: "-1px",
     background: "none",
@@ -42,9 +42,10 @@ export function TextInput({
   onChange,
   onKeyDown,
   onOverflow,
+  padding=0,
   fontColor="black"
 }) {
-  const style = getStyle(width, height, fontSize, fontStyle, fontAlign, fontColor);
+  const style = getStyle(width, height, fontSize, fontStyle, fontAlign, fontColor, padding);
   const textareaRef = useRef(null);
   const [textareaHeight, setTextareaHeight] = useState(0);
 

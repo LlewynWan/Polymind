@@ -1,3 +1,5 @@
+import Konva from "konva";
+
 const sizeMap = {
     "sticky_note": {
         width: 145,
@@ -9,4 +11,10 @@ const sizeMap = {
     }
 }
 
-export {sizeMap}
+const getTextWidth = (text, fontSize, fontStyle, padding) => {
+    const tmp = new Konva.Text({text: text, fontSize: fontSize,
+        fontStyle: fontStyle, padding: padding});
+    return tmp.width();
+}
+
+export {sizeMap, getTextWidth}

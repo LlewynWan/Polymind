@@ -34,14 +34,15 @@ export function TaskBoard({
     const cardsRef = React.useRef(null);
 
     const handleTaskBoardWheel = e => {
+        e.cancelBubble = true;
         e.evt.preventDefault();
         e.cancelBubble=true;
         const offset = e.evt.deltaY < 0 ? 20 : -20;
         if (taskCardOffset+offset <= 120 &&
-            taskCardOffset+offset >= height-(tasks.length-1)*160-205)
+            taskCardOffset+offset >= height-(tasks.length-1)*190-235)
             {
                 setTaskCardOffset(taskCardOffset+offset)
-            } else if (taskCardOffset < height-(tasks.length-1)*160-205
+            } else if (taskCardOffset < height-(tasks.length-1)*190-235
             && taskCardOffset+offset <= 120 && offset > 0) {
                 setTaskCardOffset(taskCardOffset+offset)
             }
@@ -213,11 +214,12 @@ export function TaskBoard({
                     <TaskCard
                     key={task.id}
                     x={15}
-                    y={taskCardOffset+160*index}
+                    y={taskCardOffset+190*index}
                     width={width-30}
-                    height={140}
+                    height={170}
                     color={colorPalette[task.id%colorPalette.length]}
                     goal={task.goal}
+                    suggestions={task.suggestions}
                     inputType={task.inputType}
                     outputType={task.outputType}
                     examplePrompt={task.examplePrompt}

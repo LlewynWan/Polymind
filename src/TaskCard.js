@@ -3,8 +3,9 @@ import { Group, Rect, Label, Tag, Text, Line } from "react-konva";
 
 import { Icon } from "./Icon";
 import { TextInput } from "./TextInput";
-import { colorMap } from "./utils/color_utils";
 
+import { colorMap } from "./utils/color_utils";
+import { getTextWidth } from "./utils/size_utils";
 import { nextType, prevType } from "./utils/task_utils";
 
 
@@ -14,6 +15,7 @@ export function TaskCard({
     height,
     color,
     goal,
+    suggestions,
     inputType,
     outputType,
     examplePrompt,
@@ -26,6 +28,7 @@ export function TaskCard({
     const [isHover, setIsHover] = useState(false);
     const [pageNum, setPageNum] = useState(0);
     const [isEditingPrompt, setIsEditingPrompt] = useState(false);
+    const [suggestionIndex, setSuggestionIndex] = useState(0);
     
     const rectRef = React.useRef(null);
     const cardRef = React.useRef(null);
@@ -161,28 +164,28 @@ export function TaskCard({
 
         <Icon
         x={width/2-5}
-        y={65}
+        y={80}
         type={"LArrow"}
         onClick={()=>setIOType(prevType(inputType),"input")}/>
         <Icon
         x={width-20}
-        y={65}
+        y={80}
         type={"RArrow"}
         onClick={()=>setIOType(nextType(inputType),"input")}/>
         <Icon
         x={width/2-5}
-        y={95}
+        y={110}
         type={"LArrow"}
         onClick={()=>setIOType(prevType(outputType),"output")}/>
         <Icon
         x={width-20}
-        y={95}
+        y={110}
         type={"RArrow"}
         onClick={()=>setIOType(nextType(outputType),"output")}/>
         
         <Label
         x={width/2-20}
-        y={65}
+        y={80}
         >
             <Tag
             // fill={"#B0B3B8"}
@@ -205,7 +208,7 @@ export function TaskCard({
         </Label>
         <Label
         x={width/2+10}
-        y={65}
+        y={80}
         >
             <Tag
             fill={colorMap[inputType]}
@@ -231,7 +234,7 @@ export function TaskCard({
         
         <Label
         x={width/2-20}
-        y={95}
+        y={110}
         >
             <Tag
             // fill={"#B0B3B8"}
@@ -254,7 +257,7 @@ export function TaskCard({
         </Label>
         <Label
         x={width/2+10}
-        y={95}
+        y={110}
         >
             <Tag
             fill={colorMap[outputType]}
@@ -283,8 +286,8 @@ export function TaskCard({
         ref={page2Ref}
         visible={pageNum===1}>
         <Label
-        x={width/2-50}
-        y={80}
+        x={width/2-57.5}
+        y={95}
         >
             <Tag
             // fill={"#B0B3B8"}
@@ -306,8 +309,8 @@ export function TaskCard({
             padding={5}/>
         </Label>
         <Group
-        x={width/2-45}
-        y={45}>
+        x={width/2-47.5}
+        y={70}>
         <Label
         x={0}
         y={0}>
@@ -324,13 +327,14 @@ export function TaskCard({
             <TextInput
             x={5}
             y={4.5}
-            // x={5}
-            // y={-12-0.5}
             width={width/2+18}
-            height={height-79}
+            height={61}
+            // height={height-79}
+            // height={height-99}
             fontSize={12}
             fontStyle={"bold"}
             fontColor={"silver"}
+            // padding={5}
             value={examplePrompt}
             onChange={(e)=>handlePromptTextChange(e.currentTarget.value)}
             onKeyDown={handleEscapeKeys}/>
@@ -339,7 +343,8 @@ export function TaskCard({
             // y={-17}
             text={examplePrompt}
             width={width/2+35}
-            height={height-70}
+            // height={height-70}
+            height={70}
             ellipsis={true}
             fontSize={12}
             fontStyle={"bold"}
@@ -352,6 +357,60 @@ export function TaskCard({
             }}
             />}
         </Label>
+        {suggestions.length>0 ?
+        <Group
+        x={0}
+        y={-10}>
+            {/* <Icon
+            // x={width/2+25-getTextWidth(suggestions[suggestionIndex], 11, "bold", 3.5)}
+            x={width/2+30}
+            y={0}
+            type={"RArrow"}
+            onClick={()=>{
+                setSuggestionIndex((suggestionIndex+1)%suggestions.length);
+            }}/> */}
+            {suggestions.slice(0,3).map((suggestion,index)=>{
+                // return width/2+35-(index+1)*55 > 0 ?
+                return <Label
+                key={index}
+                x={width/2+35-(2-index)*55}
+                y={0}
+                onMouseEnter={(e)=>{e.target.getStage().container().style.cursor = "pointer"}}
+                onMouseLeave={(e)=>{e.target.getStage().container().style.cursor = "default"}}>
+                    <Tag
+                    cornerRadius={5}
+                    // stroke={"#222233"}
+                    // strokeWidth={1.5}
+                    fill={"silver"}
+                    pointerDirection={"right"}/>
+                    <Text
+                    text={suggestion}
+                    width={55}
+                    height={18}
+                    padding={3.5}
+                    fontSize={11}
+                    align={"center"}
+                    ellipsis={true}
+                    fontStyle={"bold"}
+                    fill={"#444444"}
+                    onMouseEnter={(e)=>{
+                        if (getTextWidth(suggestion,11,"bold",3.5) > 55)
+                            e.target.setAttrs({Ellipsis: false, width: null})
+                    }}
+                    onMouseLeave={(e)=>{e.target.setAttrs({Ellipsis: true, width: 55})}}
+                    />
+                </Label>
+            })}
+        </Group> : null}
+        {/* <SuggestionPanel
+        x={width/2+35}
+        y={-11}
+        padding={1}
+        fontSize={10}
+        fontColor={"#444444"}
+        pointerDirection={"right"}
+        // stroke={false}
+        suggestions={suggestions.slice(0,1)}/> */}
         </Group>
         </Group>
         {/* <Label

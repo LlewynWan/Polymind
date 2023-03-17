@@ -24,12 +24,12 @@ function App() {
     arrows: [],
     sections: [],
     microtasks: [
-      {id: 0, goal: "Brainstorm", inputType: "Keyword", outputType: "Keyword", display: false, examplePrompt: "Brainstorm five keywords related to [Keyword]. Output should be in a list, each no more than 3 words."},
-      {id: 1, goal: "Summarise", inputType: "Sticky Note", outputType: "Keyword", display: false, examplePrompt: []},
-      {id: 2, goal: "Elaborate", inputType: "Concept", outputType: "Sticky Note", display: false, examplePrompt: []},
-      {id: 3, goal: "Draft", inputType: "Section", outputType: "Sticky Note", display: false, examplePrompt: []},
-      {id: 4, goal: "Freewrite", inputType: "Sticky Note", outputType: "Sticky Note", display: false, examplePrompt: []},
-      {id: 5, goal: "Associate", inputType: "Node", outputType: "Line", display: false, examplePrompt: []},
+      {id: 0, goal: "Brainstorm", inputType: "Keyword", outputType: "Keyword", display: false, suggestions: ["Related", "Synonym", "Random"], examplePrompt: "Brainstorm five keywords related to [Keyword]. Output should be in a list, each no more than 3 words."},
+      {id: 1, goal: "Summarise", inputType: "Sticky Note", outputType: "Keyword", display: false, suggestions: ["TLDR", "Top 3 keywords", "Abstract"], examplePrompt: []},
+      {id: 2, goal: "Elaborate", inputType: "Concept", outputType: "Sticky Note", display: false, suggestions: [], examplePrompt: []},
+      {id: 3, goal: "Draft", inputType: "Section", outputType: "Sticky Note", display: false, suggestions: [], examplePrompt: []},
+      {id: 4, goal: "Freewrite", inputType: "Sticky Note", outputType: "Sticky Note", display: false, suggestions: [], examplePrompt: []},
+      {id: 5, goal: "Associate", inputType: "Node", outputType: "Line", display: false, suggestions: [], examplePrompt: []},
       // {id: 6, goal: "Clarify", inputType: "Concept", outputType: "Sticky Note", examplePrompt: []},
       // {id: 7, goal: "Draft", inputType: "Section", outputType: "Sticky Note", examplePrompt: []}
     ],
