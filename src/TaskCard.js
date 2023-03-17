@@ -5,6 +5,8 @@ import { Icon } from "./Icon";
 import { TextInput } from "./TextInput";
 import { colorMap } from "./utils/color_utils";
 
+import { nextType, prevType } from "./utils/task_utils";
+
 
 export function TaskCard({
     x,y,
@@ -17,7 +19,8 @@ export function TaskCard({
     examplePrompt,
     deleteTask,
     toggleDisplay,
-    handlePromptTextChange
+    handlePromptTextChange,
+    setIOType
 })
 {
     const [isHover, setIsHover] = useState(false);
@@ -155,8 +158,30 @@ export function TaskCard({
         <Group
         ref={page1Ref}
         visible={!pageNum}>
+
+        <Icon
+        x={width/2-5}
+        y={65}
+        type={"LArrow"}
+        onClick={()=>setIOType(prevType(inputType),"input")}/>
+        <Icon
+        x={width-20}
+        y={65}
+        type={"RArrow"}
+        onClick={()=>setIOType(nextType(inputType),"input")}/>
+        <Icon
+        x={width/2-5}
+        y={95}
+        type={"LArrow"}
+        onClick={()=>setIOType(prevType(outputType),"output")}/>
+        <Icon
+        x={width-20}
+        y={95}
+        type={"RArrow"}
+        onClick={()=>setIOType(nextType(outputType),"output")}/>
+        
         <Label
-        x={width/2-15}
+        x={width/2-20}
         y={65}
         >
             <Tag
@@ -179,7 +204,7 @@ export function TaskCard({
             padding={5}/>
         </Label>
         <Label
-        x={width/2+5}
+        x={width/2+10}
         y={65}
         >
             <Tag
@@ -194,6 +219,8 @@ export function TaskCard({
             lineJoin={'round'}
             />
             <Text
+            width={width/2-45}
+            align={"center"}
             text={inputType}
             fontSize={14}
             fontStyle={"bold"}
@@ -203,7 +230,7 @@ export function TaskCard({
         </Label>
         
         <Label
-        x={width/2-15}
+        x={width/2-20}
         y={95}
         >
             <Tag
@@ -226,7 +253,7 @@ export function TaskCard({
             padding={5}/>
         </Label>
         <Label
-        x={width/2+5}
+        x={width/2+10}
         y={95}
         >
             <Tag
@@ -241,6 +268,8 @@ export function TaskCard({
             lineJoin={'round'}
             />
             <Text
+            width={width/2-45}
+            align={"center"}
             text={outputType}
             fontSize={14}
             fontStyle={"bold"}
@@ -285,7 +314,7 @@ export function TaskCard({
             <Tag
             // x={0}
             // y={-17}
-            fill={"silver"}
+            fill={"#222233"}
             opacity={0.85}
             cornerRadius={5}
             // pointerDirection={"left"}
@@ -297,11 +326,11 @@ export function TaskCard({
             y={4.5}
             // x={5}
             // y={-12-0.5}
-            width={width/2+35}
+            width={width/2+18}
             height={height-79}
             fontSize={12}
             fontStyle={"bold"}
-            fontColor={"white"}
+            fontColor={"silver"}
             value={examplePrompt}
             onChange={(e)=>handlePromptTextChange(e.currentTarget.value)}
             onKeyDown={handleEscapeKeys}/>
@@ -315,7 +344,7 @@ export function TaskCard({
             fontSize={12}
             fontStyle={"bold"}
             fontFamily={"sans-serif"}
-            fill={"white"}
+            fill={"silver"}
             padding={5}
             onDblClick={(e)=>{
                 e.cancelBubble = true;

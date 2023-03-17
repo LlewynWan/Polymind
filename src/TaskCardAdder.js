@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Group, Rect, Label, Tag, Text, Arrow } from "react-konva";
 
 import { Icon } from "./Icon";
+import { TextInput } from "./TextInput";
 
 
 export function TaskCardAdder({
@@ -9,15 +10,27 @@ export function TaskCardAdder({
     y,
     width,
     visible,
-    onConfirm
+    onConfirm,
+    onCancel,
+    taskName,
+    handleTaskNameChange
 }) {
-    const handleArrowHover = (e) => {
+    const handleTextHover = (e) => {
         e.target.getStage().container().style.cursor = "pointer"
-        e.target.setAttrs({fill: "black", stroke: "black"});
+        // e.target.setAttrs({fill: "black", stroke: "black"});
     }
-    const handleArrowUnhover = (e) => {
+    const handleTextUnhover = (e) => {
         e.target.getStage().container().style.cursor = "default"
-        e.target.setAttrs({fill: "#646464", stroke: "#646464"});
+        // e.target.setAttrs({fill: "#646464", stroke: "#646464"});
+    }
+
+    const [isEditingTaskName, setIsEditingTaskName] = useState(false);
+    const RETURN_KEY = 13;
+    const ESCAPE_KEY = 27;
+    function handleEscapeKeys(e) {
+        if ((e.keyCode === RETURN_KEY && !e.shiftKey) || e.keyCode === ESCAPE_KEY) {
+            setIsEditingTaskName(false);
+        }
     }
 
     return (
@@ -28,7 +41,7 @@ export function TaskCardAdder({
         <Rect
         x={15}
         y={0}
-        height={165}
+        height={50}
         width={width-30}
         fill={"silver"}
         cornerRadius={5}
@@ -41,17 +54,52 @@ export function TaskCardAdder({
             <Tag
             fill={"#646464"}
             cornerRadius={5}
+            visible={!isEditingTaskName}
             />
+            {isEditingTaskName ?
+            <TextInput
+            x={5}
+            y={4.5}
+            width={width-110}
+            height={20}
+            value={taskName}
+            fontSize={18}
+            fontStyle={"bold"}
+            fontColor={"white"}
+            onKeyDown={handleEscapeKeys}
+            onChange={(e)=>handleTaskNameChange(e.target.value)}
+            /> :
             <Text
-            text={"Task Name"}
+            text={taskName}
             fontSize={18}
             fontStyle={"bold"}
             fontFamily={"sans-serif"}
             fill={"white"}
-            padding={5}/>
+            padding={5}
+            onMouseEnter={handleTextHover}
+            onMouseLeave={handleTextUnhover}
+            onClick={()=>setIsEditingTaskName(true)}/>
+            }
         </Label>
 
-        <Label
+        <Icon
+        x={width-35}
+        y={32}
+        type={"confirm"}
+        onClick={()=>{
+            setIsEditingTaskName(false);
+            onConfirm();
+        }}/>
+        <Icon
+        x={width-60}
+        y={32}
+        type={"cross"}
+        onClick={()=>{
+            setIsEditingTaskName(false);
+            onCancel();
+        }}/>
+
+        {/* <Label
         x={width/2-25}
         y={65}
         >
@@ -227,7 +275,7 @@ export function TaskCardAdder({
         pointerWidth={12}
         strokeWidth={1}
         onMouseEnter={handleArrowHover}
-        onMouseLeave={handleArrowUnhover}/>
+        onMouseLeave={handleArrowUnhover}/> */}
     </Group>
     )
 }

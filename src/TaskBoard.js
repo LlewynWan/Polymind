@@ -18,13 +18,17 @@ export function TaskBoard({
     deleteTask,
     toggleTaskHeaderSwitch,
     toggleDisplay,
-    handlePromptTextChange
+    handlePromptTextChange,
+    setIOType,
+    onAddTask
 })
 {
     // const colorPalette = ["#FFB347", "#966FD6", "#71C562", "#FB6B89", "#B39EB5", "#D64A4A"]
     const [isHover, setIsHover] = useState(false);
     const [isAddingCard, setIsAddingCard] = useState(false);
     const [taskCardOffset, setTaskCardOffset] = useState(120);
+
+    const [newTaskName, setNewTaskName] = useState("Task Name");
 
     const panelRef = React.useRef(null);
     const cardsRef = React.useRef(null);
@@ -100,13 +104,13 @@ export function TaskBoard({
             type={"add"}
             onClick={()=>{
                 cardsRef.current.to({
-                    y:130,
-                    clipHeight:height-275,
+                    y:30,
+                    clipHeight:height-175,
                     duration: 0.32
                 });
                 panelRef.current.to({
-                    y:240,
-                    height: height-240,
+                    y:140,
+                    height: height-140,
                     duration: 0.32
                 })
                 setIsAddingCard(true);
@@ -122,8 +126,11 @@ export function TaskBoard({
             y={65}
             width={width}
             visible={isAddingCard}
+            taskName={newTaskName}
             onConfirm={()=>{
                 setIsAddingCard(false);
+                onAddTask(newTaskName);
+                setNewTaskName("Task Name");
                 cardsRef.current.to({
                     y:0,
                     clipHeight:height-145,
@@ -134,7 +141,22 @@ export function TaskBoard({
                     height: height-110,
                     duration: 0.32
                 })
-            }}/>
+            }}
+            onCancel={()=>{
+                setIsAddingCard(false);
+                setNewTaskName("Task Name");
+                cardsRef.current.to({
+                    y:0,
+                    clipHeight:height-145,
+                    duration: 0.32
+                });
+                panelRef.current.to({
+                    y:110,
+                    height: height-110,
+                    duration: 0.32
+                });
+            }}
+            handleTaskNameChange={(value)=>setNewTaskName(value)}/>
 
             
             {/* <Group
@@ -202,6 +224,7 @@ export function TaskBoard({
                     deleteTask={()=>deleteTask(task.id)}
                     toggleDisplay={()=>toggleDisplay(task.id)}
                     handlePromptTextChange={(value)=>handlePromptTextChange(value,task.id)}
+                    setIOType={(type, IOType) => setIOType(task.id, type, IOType)}
                     />
                 )
             })}

@@ -1018,6 +1018,28 @@ export function Canvas({dimensions})
                     return tmp;
                 }))
             }}
+            setIOType={(id, type, IOType) => {
+                setMicroTasks(prevState=>prevState.map(state=>{
+                    let tmp = state;
+                    if (id === state.id) {
+                        if (IOType === "input") {
+                            tmp.inputType = type;
+                        } else {
+                            tmp.outputType = type;
+                        }
+                    }
+                    return tmp;
+                }))
+            }}
+            onAddTask={(taskName) => {
+                setMicroTasks(prevState=>{
+                    return [
+                        ...prevState,
+                        {id: Math.max(...prevState.map(state=>state.id))+1,
+                            goal: taskName, inputType: "Keyword", outputType: "Keyword", display: false, examplePrompt: ""}
+                    ]
+                });
+            }}
             />
 
             {/* {followerPositionQueue.map((position,index)=>{

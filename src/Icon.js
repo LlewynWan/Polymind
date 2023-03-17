@@ -1,5 +1,5 @@
 import React, { useRef, useState } from "react";
-import { Group, Line, Circle, Rect, Arc } from "react-konva";
+import { Group, Line, Circle, Rect, Arc, Arrow } from "react-konva";
 
 
 export function Icon({
@@ -315,6 +315,30 @@ export function Icon({
         y={-7.5}
         width={15}
         height={15}/>
+    </Group>
+    : type.slice(-5) === "Arrow" ?
+    <Group
+    x={x}
+    y={y}
+    onMouseEnter={(e)=>{
+        setIsHover(true);
+        e.target.getStage().container().style.cursor = "pointer"
+    }}
+    onMouseLeave={(e)=>{
+        setIsHover(false);
+        e.target.getStage().container().style.cursor = "default"
+    }}
+    onClick={onClick}>
+        <Arrow
+        x={0}
+        y={0}
+        points={type[0]==="L"?[2.5,0,0,0,-2.5,0]
+        :[-2.5,0,0,0,2.5,0]}
+        fill={isHover?"#646464":"gray"}
+        stroke={isHover?"#646464":"gray"}
+        pointerLength={8}
+        pointerWidth={12}
+        strokeWidth={1}/>
     </Group>
     : null
     // return type === "add" ?
