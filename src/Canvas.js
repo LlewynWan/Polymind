@@ -209,15 +209,15 @@ export function Canvas({dimensions})
                         return tmp;
                     }));
                     setTaskNodes(prevState=>{
-                        const sameState = prevState.filter(state=>
-                            state.node_id===object_id&&state.task_id===task_id
-                            && !state.display)
+                        // const sameState = prevState.filter(state=>
+                        //     state.node_id===object_id&&state.task_id===task_id
+                        //     && !state.display)
                                 // && !microTasks.filter(task=>task.id===state.task_id)[0].display));
                         return [...prevState.filter(state=>
                             (state.node_id!==object_id&&state.task_id!==task_id)
                             || state.display),
                             //  || microTasks.filter(task=>task.id===state.task_id)[0].display),
-                        {id: sameState.length>0 ? sameState[0].id : prevState.length,
+                        {id: Math.max(...prevState.map(state=>state.id))+1,
                         node_id: object_id, task_id: task_id,
                         attached_to_id: object_id, type: "keyword",
                         x: 500, y: 250, fontSize: 20, text: "test", display: false
@@ -892,6 +892,7 @@ export function Canvas({dimensions})
                         setNodes(prevState => {
                             return [...prevState,newNode];
                         })
+                        setNumNodes(numNodes+1);
 
                         setTaskNodes(prevState => prevState.filter(state=>state.id!==node.id));
                         stageRef.current.container().style.cursor = "default"

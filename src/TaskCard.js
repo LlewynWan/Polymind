@@ -336,6 +336,7 @@ export function TaskCard({
             fontColor={"silver"}
             // padding={5}
             value={examplePrompt}
+            // autoFocus={false}
             onChange={(e)=>handlePromptTextChange(e.currentTarget.value)}
             onKeyDown={handleEscapeKeys}/>
             : <Text

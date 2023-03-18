@@ -43,7 +43,8 @@ export function TextInput({
   onKeyDown,
   onOverflow,
   padding=0,
-  fontColor="black"
+  fontColor="black",
+  autoFocus=true,
 }) {
   const style = getStyle(width, height, fontSize, fontStyle, fontAlign, fontColor, padding);
   const textareaRef = useRef(null);
@@ -70,7 +71,7 @@ export function TextInput({
           }
         }}
         onKeyDown={onKeyDown}
-        autoFocus={true}
+        autoFocus={autoFocus}
         style={style}
       />
     </Html>
