@@ -67,7 +67,7 @@ export function TaskNode({
     y={-radiusY-12}
     scaleX={0.75}
     scaleY={0.75}
-    opacity={0.9}
+    // opacity={0.9}
     onMouseEnter={()=>{
         // suggestionRef.current.setAttrs({text: suggestions[Math.floor(Math.random()*suggestions.length)]})
         setIsHoverIcons(true);
@@ -132,7 +132,7 @@ export function TaskNode({
     y={-15}
     scaleX={0.75}
     scaleY={0.75}
-    opacity={0.9}
+    // opacity={0.9}
     onMouseEnter={()=>{
         // suggestionRef.current.setAttrs({text: suggestions[Math.floor(Math.random()*suggestions.length)]})
         setIsHoverIcons(true);
@@ -225,7 +225,7 @@ export function TaskNode({
     <Group
     x={0}
     y={0}
-    opacity={isHover?0.75:0.3}>
+    opacity={isHover?1:0.64}>
         {type === "keyword" ?
         <Label>
             <Tag
