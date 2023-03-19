@@ -354,7 +354,10 @@ export function TaskHeader({
                     e.target.parent.to({y: 0, duration: 0.15})
                     e.target.to({fontSize: fontSize, duration: 0.15})
                 }}
-                onClick={()=>onTaskClick(task.id)}
+                onClick={(e)=>{
+                    e.cancelBubble = true;
+                    onTaskClick(task.id)
+                }}
                 >
                     <Tag
                     fill={disabledSet.has(task.id)?

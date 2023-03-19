@@ -72,7 +72,8 @@ export function TaskNode({
         // suggestionRef.current.setAttrs({text: suggestions[Math.floor(Math.random()*suggestions.length)]})
         setIsHoverIcons(true);
     }}
-    onMouseLeave={()=>setIsHoverIcons(false)}>
+    onMouseLeave={()=>setIsHoverIcons(false)}
+    >
         <Rect
         x={-20}
         y={-15}
@@ -228,7 +229,10 @@ export function TaskNode({
         {type === "keyword" ?
         <Label>
             <Tag
-            fill={color}
+            // fill={color}
+            fill={"white"}
+            stroke={color}
+            strokeWidth={2.5}
             cornerRadius={5}/>
             <Text
             text={text}
@@ -245,7 +249,10 @@ export function TaskNode({
             y={0}
             width={width+35}
             height={Math.max(sizeMap[type].height+70,textHeight+70)}
-            fill={color}
+            // fill={color}
+            fill={"white"}
+            stroke={color}
+            strokeWidth={2.5}
             shadowOffsetX={0}
             shadowOffsetY={5}
             shadowBlur={12}
@@ -276,9 +283,12 @@ export function TaskNode({
         y={0}
         radiusX={radiusX}
         radiusY={Math.max(sizeMap[type].radiusY,textHeight)}
-        fill={color}
-        stroke={"#010203"}
-        strokeWidth={0.2}
+        // fill={color}
+        fill={"white"}
+        stroke={color}
+        strokeWidth={2.5}
+        // stroke={"#010203"}
+        // strokeWidth={0.2}
         opacity={0.85}
         />
         <Text

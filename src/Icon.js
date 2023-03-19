@@ -7,6 +7,8 @@ export function Icon({
     y,
     type,
     onClick,
+    onMouseEnter,
+    onMouseLeave,
     scaleX=1,
     scaleY=1,
 }) {
@@ -179,10 +181,16 @@ export function Icon({
     opacity={isHover?1:0.64}
     onMouseEnter={(e)=>{
         setIsHover(true);
+        // if (onMouseEnter) {
+        //     onMouseEnter();
+        // }
         e.target.getStage().container().style.cursor = "pointer"
     }}
     onMouseLeave={(e)=>{
         setIsHover(false);
+        // if (onMouseLeave) {
+        //     onMouseLeave();
+        // }
         e.target.getStage().container().style.cursor = "default"
     }}
     onClick={onClick}>
