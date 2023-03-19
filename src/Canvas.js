@@ -179,6 +179,10 @@ export function Canvas({dimensions})
         if (e) {
             e.preventDefault();
         }
+        setArrows(prevState=>prevState.filter(arrow=>{
+            return !nodes.filter(node=>node.id===arrow.from_id)[0].selected
+            && !nodes.filter(node=>node.id===arrow.to_id)[0].selected;
+        }));
         setNodes(prevState => {
             return prevState.map((state)=>{
                 let tmp = state;
@@ -187,6 +191,7 @@ export function Canvas({dimensions})
                 return tmp;
             })
         });
+        setSections(prevState=>prevState.filter(state=>!state.selected));
     }
 
     const handleMicroTask = (task_id, object_type, object_id) => {
@@ -554,7 +559,7 @@ export function Canvas({dimensions})
 
 
     return (
-    <HotKeys keyMap={keyMap} handlers={handlers}>
+    <HotKeys keyMap={keyMap} handlers={handlers} allowChanges={true}>
     <Stage
     width={dimensions.width}
     height={dimensions.height}
