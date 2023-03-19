@@ -19,6 +19,11 @@ export function Section({
     text,
     fontSize,
     header,
+    headerListening,
+    disabledSet,
+    onHeaderTaskClick,
+    onHeaderCurtainClick,
+    resetHeaderCurtain,
     onClick,
     onScale,
     onTextChange,
@@ -26,7 +31,7 @@ export function Section({
     handleDragMove,
     handleDragEnd,
     callbackTaskId,
-    resetNodeCallbackTaskId
+    resetCallbackTaskId
 }) {
     const [isHover, setIsHover] = useState(false);
     const [isEditing, setIsEditing] = useState(false);
@@ -89,15 +94,20 @@ export function Section({
     onDragEnd={handleDragEnd}
     draggable={true}
     onClick={onClick}>
-    {/* {header ? <TaskHeader
+    {header ? <TaskHeader
     x={0}
     y={-80/canvasScale}
     tasks={microTasks.filter(task=>task.inputType==="Section")}
     fontSize={14}
     width={180}
     scale={1/canvasScale}
+    listening={headerListening}
+    disabledSet={disabledSet}
+    onTaskClick={onHeaderTaskClick}
+    onCurtainClick={onHeaderCurtainClick}
+    resetCurtain={resetHeaderCurtain}
     callbackTaskId={callbackTaskId}
-    resetNodeCallbackTaskId={resetNodeCallbackTaskId}/> : null} */}
+    resetCallbackTaskId={resetCallbackTaskId}/> : null}
         <Label
         x={0}
         y={-40/canvasScale}

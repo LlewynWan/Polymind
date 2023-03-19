@@ -68,7 +68,7 @@ export function Canvas({dimensions})
     const [promptPanelVisibility, setPromptPanelVisibility] = React.useState(false);
 
     const [inFocus, setInFocus] = React.useState({});
-    const [nodesCurtainClicked, setNodesCurtainClicked] = React.useState(new Set());
+    const [objectsCurtainClicked, setObjectsCurtainClicked] = React.useState(new Set());
     // const followerProcess = React.useRef(null);
     // const [followerPositionQueue, setFollowerPositionQueue] = React.useState([]);
     // const [isFollowerModeEnabled, setIsFollowerModeEnabled] = React.useState(false);
@@ -198,7 +198,7 @@ export function Canvas({dimensions})
             //             task_id: 0, attached_to_id: 0, type: "keyword"}
             //     ]
             // })
-            if (!nodesCurtainClicked.has(object_id.toString()+task_id.toString()+object_type))
+            if (!objectsCurtainClicked.has(object_id.toString()+task_id.toString()+object_type))
             {
                 if (object_type==="node") {
                     setNodes(prevState=>prevState.map(state=>{
@@ -230,6 +230,18 @@ export function Canvas({dimensions})
     const handleHeaderTaskClick = (task_id, object_type, object_id) => {
         if (object_type === "node") {
             setNodes(prevState => prevState.map(state => {
+                let tmp = state;
+                if (tmp.id === object_id) {
+                    if (tmp.disabledTaskId.has(task_id)) {
+                        tmp.disabledTaskId.delete(task_id);
+                    } else {
+                        tmp.disabledTaskId.add(task_id);
+                    }
+                }
+                return tmp;
+            }))
+        } else if (object_type === "section") {
+            setSections(prevState => prevState.map(state => {
                 let tmp = state;
                 if (tmp.id === object_id) {
                     if (tmp.disabledTaskId.has(task_id)) {
@@ -355,7 +367,8 @@ export function Canvas({dimensions})
                 return [
                     ...prevState,
                     {id: prevState.length, selected: false,
-                    callbackTaskId: -1, scaleX: 1, scaleY: 1,
+                    callbackTaskId: -1, disabledTaskId: new Set(),
+                    scaleX: 1, scaleY: 1,
                     x: Math.min(position1[0], position2[0]),
                     y: Math.min(position1[1], position2[1]),
                     width: Math.abs(position1[0]-position2[0]),
@@ -436,29 +449,29 @@ export function Canvas({dimensions})
         });
     }
 
-    const handleNodeHeaderCurtainClick = (node_id, task_id) => {
+    const handleHeaderCurtainClick = (object_id, object_type, task_id) => {
         setTaskNodes(prevState=>prevState.map(state=>{
             let tmp = state;
-            if (tmp.node_id === node_id && tmp.task_id === task_id) {
+            if (tmp.attached_to_id === object_id && tmp.task_id === task_id) {
                 tmp.display = true;
             }
             return tmp;
         }));
-        nodesCurtainClicked.add
-            (node_id.toString()+task_id.toString()+"node");
-        setNodesCurtainClicked(nodesCurtainClicked);
+        objectsCurtainClicked.add
+            (object_id.toString()+task_id.toString()+object_type);
+        setObjectsCurtainClicked(objectsCurtainClicked);
     }
-    const resetNodeHeaderCurtain = (node_id, task_id) => {
+    const resetHeaderCurtain = (object_id, object_type, task_id) => {
         setTaskNodes(prevState=>prevState.map(state=>{
             let tmp = state;
-            if (tmp.node_id === node_id && tmp.task_id === task_id) {
+            if (tmp.attached_to_id === object_id && tmp.task_id === task_id) {
                 tmp.display = false;
             }
             return tmp;
         }));
-        nodesCurtainClicked.delete
-            (node_id.toString()+task_id.toString()+"node")
-        setNodesCurtainClicked(nodesCurtainClicked);
+        objectsCurtainClicked.delete
+            (object_id.toString()+task_id.toString()+object_type);
+        setObjectsCurtainClicked(objectsCurtainClicked);
     }
     const resetNodeCallbackTaskId = (id) => {
         setNodes(prevState => prevState.map(state=>{
@@ -603,6 +616,8 @@ export function Canvas({dimensions})
                 fontSize={18}
                 color={"#0099FF"}
                 header={isTaskHeaderVisible}
+                headerListening={!isDrawingArrow &&
+                    !isDrawingDoubleArrow&&!isSectioning&&!isAddingKeyword}
                 onScale={(scaleX,scaleY,x,y)=>{
                     setSections(prevState => prevState.map(state => {
                         let tmp = state;
@@ -656,8 +671,19 @@ export function Canvas({dimensions})
                         return tmp;
                     }))
                 }}
+                onHeaderTaskClick={(task_id)=>handleHeaderTaskClick(task_id,"section",section.id)}
+                onHeaderCurtainClick={(task_id)=>handleHeaderCurtainClick(section.id, "section", task_id)}
+                resetHeaderCurtain={(task_id)=>resetHeaderCurtain(section.id, "section", task_id)}
                 callbackTaskId={section.callbackTaskId}
-                resetNodeCallbackTaskId={()=>resetNodeCallbackTaskId(section.id)}/>)
+                resetCallbackTaskId={()=>setSections(prevState=>prevState.map(state=>{
+                    let tmp = state;
+                    if (tmp.id === section.id) {
+                        tmp.callbackTaskId = -1;
+                    }
+                    return tmp;
+                }))}
+                disabledSet={section.disabledTaskId}
+                />)
             })}
             {nodes.map((node, index) => {
                 return node.display ?
@@ -724,8 +750,8 @@ export function Canvas({dimensions})
                 }}
                 disabledSet={node.disabledTaskId}
                 onHeaderTaskClick={(task_id)=>handleHeaderTaskClick(task_id,"node",node.id)}
-                onHeaderCurtainClick={(task_id)=>handleNodeHeaderCurtainClick(node.id, task_id)}
-                resetHeaderCurtain={(task_id)=>resetNodeHeaderCurtain(node.id, task_id)}
+                onHeaderCurtainClick={(task_id)=>handleHeaderCurtainClick(node.id, "node", task_id)}
+                resetHeaderCurtain={(task_id)=>resetHeaderCurtain(node.id, "node", task_id)}
                 callbackTaskId={node.callbackTaskId}
                 resetNodeCallbackTaskId={()=>resetNodeCallbackTaskId(node.id)}
                 header={isTaskHeaderVisible}/> :
@@ -776,8 +802,8 @@ export function Canvas({dimensions})
                     !isDrawingDoubleArrow&&!isSectioning&&!isAddingKeyword}
                 disabledSet={node.disabledTaskId}
                 onHeaderTaskClick={(task_id)=>handleHeaderTaskClick(task_id,"node",node.id)}
-                onHeaderCurtainClick={(task_id)=>handleNodeHeaderCurtainClick(node.id, task_id)}
-                resetHeaderCurtain={(task_id)=>resetNodeHeaderCurtain(node.id, task_id)}
+                onHeaderCurtainClick={(task_id)=>handleHeaderCurtainClick(node.id, "node", task_id)}
+                resetHeaderCurtain={(task_id)=>resetHeaderCurtain(node.id, "node", task_id)}
                 callbackTaskId={node.callbackTaskId}
                 resetNodeCallbackTaskId={()=>resetNodeCallbackTaskId(node.id)}
                 header={isTaskHeaderVisible}/> :
@@ -838,8 +864,8 @@ export function Canvas({dimensions})
                     !isDrawingDoubleArrow&&!isSectioning&&!isAddingKeyword}
                 disabledSet={node.disabledTaskId}
                 onHeaderTaskClick={(task_id)=>handleHeaderTaskClick(task_id,"node",node.id)}
-                onHeaderCurtainClick={(task_id)=>handleNodeHeaderCurtainClick(node.id, task_id)}
-                resetHeaderCurtain={(task_id)=>resetNodeHeaderCurtain(node.id, task_id)}
+                onHeaderCurtainClick={(task_id)=>handleHeaderCurtainClick(node.id, "node", task_id)}
+                resetHeaderCurtain={(task_id)=>resetHeaderCurtain(node.id, "node", task_id)}
                 callbackTaskId={node.callbackTaskId}
                 resetNodeCallbackTaskId={()=>resetNodeCallbackTaskId(node.id)}
                 header={isTaskHeaderVisible}
@@ -1006,7 +1032,7 @@ export function Canvas({dimensions})
             }))}
             toggleTaskHeaderSwitch={()=>{
                 if (isTaskHeaderVisible) {
-                    setNodesCurtainClicked(new Set());
+                    objectsCurtainClicked(new Set());
                 }
                 setIsTaskHeaderVisible(!isTaskHeaderVisible);
             }}

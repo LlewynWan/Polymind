@@ -162,7 +162,7 @@ export function Concept({
     resetCurtain={resetHeaderCurtain}
     disabledSet={disabledSet}
     callbackTaskId={callbackTaskId}
-    resetNodeCallbackTaskId={resetNodeCallbackTaskId}/>: null}
+    resetCallbackTaskId={resetNodeCallbackTaskId}/>: null}
 
     <Group
     x={0}

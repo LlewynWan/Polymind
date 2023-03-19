@@ -19,7 +19,7 @@ export function TaskHeader({
     onCurtainClick,
     resetCurtain,
     disabledSet,
-    resetNodeCallbackTaskId,
+    resetCallbackTaskId,
     callbackTaskId=-1
 }) {
     const [isHover, setIsHover] = useState(false);
@@ -97,7 +97,7 @@ export function TaskHeader({
                             width: 0,
                             visible: false,
                             duration: 0.15,
-                            onFinish: ()=>resetNodeCallbackTaskId()
+                            onFinish: ()=>resetCallbackTaskId()
                         });
                     }, 2000));
                 }
@@ -122,7 +122,7 @@ export function TaskHeader({
 
     useEffect(()=>{
         clearTimeout(callbackTimeout);
-        resetNodeCallbackTaskId();
+        resetCallbackTaskId();
     }, [isCurtainFixed])
 
     // return (
