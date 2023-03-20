@@ -84,7 +84,7 @@ export function Keyword({
       if (onTextSizeChange) {
         onTextSizeChange(nodeRef.current.getClientRect());
       }
-    }  
+    }
 
     if (transformerRef.current !== null) {
       transformerRef.current.nodes([nodeRef.current]);

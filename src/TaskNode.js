@@ -25,9 +25,11 @@ export function TaskNode({
     color,
     text,
     fontSize,
+    onDragMove,
     onDragEnd,
     onConfirm,
     onDelete,
+    onTextSizeChange,
     listening,
     suggestions=["Rephrase", "Be more specific", "Not creative"]
 }) {
@@ -37,12 +39,20 @@ export function TaskNode({
     const [isHover, setIsHover] = useState(false);
     const [isHoverIcons, setIsHoverIcons] = useState(false);
 
+    const nodeRef = useRef(null);
     const suggestionRef = useRef(null);
 
     useEffect(() => {
         // if (!isSelected && isEditing) {
         //   setIsEditing(false);
         // }
+        if (nodeRef.current) {
+            // setAnchorPosition(calcAnchorPosition());
+            if (onTextSizeChange) {
+              onTextSizeChange(nodeRef.current.getClientRect());
+            }
+        }  
+        
         const tmp = type === "concept" ?
         new Konva.Text({text: text, width: radiusX*2, fontSize: fontSize})
         : new Konva.Text({text: text, width: width, fontSize: fontSize});
@@ -53,10 +63,14 @@ export function TaskNode({
     <Group
     x={x}
     y={y}
+    onDragMove={(e)=>{
+        if (onDragMove)
+            onDragMove(e);
+    }}
     onDragEnd={(e)=>{
         if (onDragEnd)
           onDragEnd(e);
-      }}
+    }}
     draggable
     onMouseEnter={()=>setIsHover(true)}
     onMouseLeave={()=>setIsHover(false)}
@@ -225,6 +239,7 @@ export function TaskNode({
     <Group
     x={0}
     y={0}
+    ref={nodeRef}
     opacity={isHover?1:0.64}>
         {type === "keyword" ?
         <Label>

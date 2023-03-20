@@ -20,6 +20,7 @@ import { PromptPanel } from "./PromptPanel";
 import { PromptGPT } from "./utils/GPT_utils";
 
 import { colorPalette } from "./utils/color_utils";
+import { toLowerCase } from "./utils/task_utils";
 import { anchor_utils, node_utils } from "./utils/canvas_utils";
 import { GlobalContext, CanvasContext, PrompterContext } from "./state";
 
@@ -67,7 +68,13 @@ export function Canvas({dimensions})
     const [promptPanelPosition, setPromptPanelPosition] = React.useState({});
     const [promptPanelVisibility, setPromptPanelVisibility] = React.useState(false);
 
-    const [inFocus, setInFocus] = React.useState({});
+    const [inFocus, setInFocus] = React.useState({
+        "node": -1,
+        "sticky_note": -1,
+        "keyword": -1,
+        "concept": -1,
+        "section": -1
+    });
     const [objectsCurtainClicked, setObjectsCurtainClicked] = React.useState(new Set());
     // const followerProcess = React.useRef(null);
     // const [followerPositionQueue, setFollowerPositionQueue] = React.useState([]);
@@ -89,9 +96,35 @@ export function Canvas({dimensions})
         return [posX, posY];
     }
 
+    const sampleFittsLawIDMin = (objects) => {
+        const position = pointer2CanvasPosition(stageRef.current.getPointerPosition());
+        var ID_inv = objects.map(object=>1/node_utils.calcFittsLawID(object,position));
+        const sumIDInv = ID_inv.reduce((sum,id_inv)=>sum+id_inv,0);
+        ID_inv = ID_inv.map(id_inv=>id_inv/sumIDInv);
+        
+        const split = Math.random();
+        var tmpSum = 0.;
+        var sample_id = -1;
+        for (var i = 0; i < ID_inv.length; i++) {
+            tmpSum += ID_inv[i];
+            if (tmpSum > split) {
+                sample_id = i;
+                break;
+            }
+        }
+
+        return sample_id === -1 ? -1 : objects[sample_id].id;
+    };
+
     useEffect(()=>{
-        handleMicroTask(0,"node",0);
-    }, [inFocus])
+        microTasks.forEach(task => {
+            const object_type = toLowerCase(task.inputType);
+            if (object_type !== "" && inFocus[object_type] !== -1) {
+                handleMicroTask(task, object_type,
+                    nodes.filter(node=>node.id===inFocus[object_type])[0]);
+            }
+        });
+    }, [inFocus]);
 
     useEffect(() => {
         // clearInterval(pointerTracker);
@@ -106,26 +139,32 @@ export function Canvas({dimensions})
         // setPointerTracker(_pointerTracker);
         // clearInterval(fittsLawTracker)
         const fittsLawTracker = setInterval(()=>{
-            const position = pointer2CanvasPosition(stageRef.current.getPointerPosition());
-            var ID_inv = nodes.map(node=>1/node_utils.calcFittsLawID(node,position));
-            const sumIDInv = ID_inv.reduce((sum,id_inv)=>sum+id_inv,0);
-            ID_inv = ID_inv.map(id_inv=>id_inv/sumIDInv);
+            // const position = pointer2CanvasPosition(stageRef.current.getPointerPosition());
+            // var ID_inv = nodes.map(node=>1/node_utils.calcFittsLawID(node,position));
+            // const sumIDInv = ID_inv.reduce((sum,id_inv)=>sum+id_inv,0);
+            // ID_inv = ID_inv.map(id_inv=>id_inv/sumIDInv);
             
-            const split = Math.random();
-            var tmpSum = 0.;
-            var sample_id = -1;
-            for (var i = 0; i < ID_inv.length; i++) {
-                tmpSum += ID_inv[i];
-                if (tmpSum > split) {
-                    sample_id = i;
-                    break;
-                }
-            }
+            // const split = Math.random();
+            // var tmpSum = 0.;
+            // var sample_id = -1;
+            // for (var i = 0; i < ID_inv.length; i++) {
+            //     tmpSum += ID_inv[i];
+            //     if (tmpSum > split) {
+            //         sample_id = i;
+            //         break;
+            //     }
+            // }
 
-            setInFocus({node: sample_id})
+            setInFocus({
+                "node": sampleFittsLawIDMin(nodes.filter(node=>node.display)),
+                "keyword": sampleFittsLawIDMin(nodes.filter(node=>node.display && node.type==="keyword")),
+                "sticky_note": sampleFittsLawIDMin(nodes.filter(node=>node.display && node.type==="sticky_note")),
+                "concept": sampleFittsLawIDMin(nodes.filter(node=>node.display && node.type==="concept")),
+                "section": -1
+            });
             // setInFocus({node: ID_inv.indexOf(Math.min(...ID_inv))});
             // console.log(ID.indexOf(Math.min(...ID)));
-        }, 5000);
+        }, 10000);
 
         if (!isHoverToolBar && stageRef) {
             stageRef.current.container().style.cursor =
@@ -194,8 +233,8 @@ export function Canvas({dimensions})
         setSections(prevState=>prevState.filter(state=>!state.selected));
     }
 
-    const handleMicroTask = (task_id, object_type, object_id) => {
-        setTimeout(()=>{
+    const handleMicroTask = (task, object_type, object) => {
+        // setTimeout(()=>{
             // setTaskNodes(prevState=>{
             //     return [
             //         ...prevState,
@@ -203,34 +242,42 @@ export function Canvas({dimensions})
             //             task_id: 0, attached_to_id: 0, type: "keyword"}
             //     ]
             // })
-            if (!objectsCurtainClicked.has(object_id.toString()+task_id.toString()+object_type))
-            {
-                if (object_type==="node") {
-                    setNodes(prevState=>prevState.map(state=>{
-                        let tmp = state;
-                        if (tmp.id === object_id) {
-                            tmp.callbackTaskId = task_id;
-                        }
-                        return tmp;
-                    }));
-                    setTaskNodes(prevState=>{
-                        // const sameState = prevState.filter(state=>
-                        //     state.node_id===object_id&&state.task_id===task_id
-                        //     && !state.display)
-                                // && !microTasks.filter(task=>task.id===state.task_id)[0].display));
-                        return [...prevState.filter(state=>
-                            (state.node_id!==object_id&&state.task_id!==task_id)
-                            || state.display),
-                            //  || microTasks.filter(task=>task.id===state.task_id)[0].display),
-                        {id: Math.max(...prevState.map(state=>state.id))+1,
-                        node_id: object_id, task_id: task_id,
-                        attached_to_id: object_id, type: "keyword",
-                        x: 500, y: 250, fontSize: 20, text: "test", display: false
-                        }]
-                    });
-                }
+        if (!objectsCurtainClicked.has(object.id.toString()+task.id.toString()+object_type))
+        {
+            if (object_type!=="section") {
+                setNodes(prevState=>prevState.map(state=>{
+                    let tmp = state;
+                    if (tmp.id === object.id) {
+                        tmp.callbackTaskId = task.id;
+                    }
+                    return tmp;
+                }));
+                setTaskNodes(prevState=>{
+                    // const sameState = prevState.filter(state=>
+                    //     state.node_id===object_id&&state.task_id===task_id
+                    //     && !state.display)
+                            // && !microTasks.filter(task=>task.id===state.task_id)[0].display));
+                    return [...prevState.filter(state=>
+                        (state.node_id!==object.id&&state.task_id!==task.id)
+                        || state.display),
+                        //  || microTasks.filter(task=>task.id===state.task_id)[0].display),
+                    {id: prevState.length === 0 ? 0 :
+                        Math.max(...prevState.map(state=>state.id))+1,
+                    width: 0, height: 0,
+                    attached_to_type: "node", task_id: task.id,
+                    attached_to_id: object.id, type: "keyword",
+                    x: object.x+100/canvasScale+Math.random()*120+object.scaleX*
+                        (object.type==="concept"?object.radiusX:object.width),
+                    y: object.type==="concept"?
+                        object.y+object.scaleY*object.radiusY+
+                        Math.ceil(Math.random()*99) * (Math.round(Math.random())?1:-1)
+                        : object.y+50+Math.random()*120+object.scaleY*object.height,
+                    fontSize: 20, text: "test", display: false
+                    }]
+                });
             }
-        }, 5000);
+        }
+        // }, 5000);
     }
     const handleHeaderTaskClick = (task_id, object_type, object_id) => {
         if (object_type === "node") {
@@ -877,8 +924,37 @@ export function Canvas({dimensions})
                 /> : null : null
             })}
             {taskNodes.map(node=>{
+
+                const from_anchor = 1;
+                const to_anchor = 3;
+                // console.log(node.width)
+                // const from_anchor = Math.floor(Math.random()*4);
+                // const to_anchor = Math.floor(Math.random()*4);
+                const arrow_size = 10 / canvasScale;
+                const arrow_dy = to_anchor===0 ? 1 : to_anchor===2 ? -1 : 0;
+                const arrow_dx = to_anchor===1 ? 1 : to_anchor===3 ? -1 : 0;
+                const finalAnchor = anchor_utils.calcAnchorPosition(
+                    to_anchor, getNodeById(node.attached_to_id), canvasScale);
                 return node.display ||
                 microTasks.filter(task=>task.id===node.task_id)[0].display ?
+                <Group
+                key={node.id}>
+                    <MyLine
+                    points={[
+                        ...anchor_utils.calcAnchorPosition(
+                            from_anchor, node, canvasScale),
+                        ...anchor_utils.findPathBetweenNodes(from_anchor, to_anchor,
+                            node,getNodeById(node.attached_to_id), canvasScale),
+                        // ...calcAnchorOffset(arrow.from_anchor, nodes[arrow.from_id]),
+                        // ...calcAnchorOffset(arrow.to_anchor, nodes[arrow.to_id]),
+                        ...finalAnchor
+                    ]}
+                    tension={0}
+                    // stroke={"gray"}
+                    opacity={0.5}
+                    stroke={colorPalette[node.task_id%colorPalette.length]}
+                    strokeWidth={2/canvasScale}
+                    />
                     <TaskNode
                     key={node.id}
                     type={node.type}
@@ -890,6 +966,18 @@ export function Canvas({dimensions})
                     text={node.text}
                     fontSize={node.fontSize}
                     color={colorPalette[node.task_id]}
+                    onDragMove={(e)=>{
+                        setTaskNodes(prevState => {
+                            return prevState.map((state) => {
+                                let tmp = state;
+                                if (tmp.id === node.id) {
+                                    tmp.x = e.target.x();
+                                    tmp.y = e.target.y();
+                                }
+                                return tmp;
+                            });
+                        });
+                    }}
                     onDragEnd={(e)=>{
                         setTaskNodes(prevState => {
                             return prevState.map((state) => {
@@ -932,9 +1020,26 @@ export function Canvas({dimensions})
                         setTaskNodes(prevState => prevState.filter(state=>state.id!==node.id));
                         stageRef.current.container().style.cursor = "default"
                     }}
+                    onTextSizeChange={(rect)=>{
+                        if (rect.width && rect.height &&
+                        (node.width !== rect.width || node.height !== rect.height)) {
+                            setTaskNodes(prevState=>{
+                                return prevState.map(state=>{
+                                    let tmp = state;
+                                    if (tmp.id === node.id) {
+                                        tmp.width = rect.width;
+                                        tmp.height = rect.height;
+                                    }
+                                    return tmp;
+                                });
+                            })
+                        }
+                    }}
                     listening={!isDrawingArrow && !isDrawingDoubleArrow
                         && !isSectioning && ! isAddingKeyword}/>
+                </Group>
                 : null
+
             })}
             {arrows.map((arrow,index)=>{
                 const arrow_size = 10 / canvasScale;

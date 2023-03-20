@@ -5,6 +5,7 @@ export function MyLine ({
     stroke,
     strokeWidth,
     listening,
+    opacity=1,
     radius=10,
 }) {
   return (
@@ -66,6 +67,7 @@ export function MyLine ({
         context.lineTo(points[numPoints*2-2],points[numPoints*2-1]);
         context.fillStrokeShape(shape);
       }}
+      opacity={opacity}
       stroke={stroke}
       strokeWidth={strokeWidth}
       listening={listening}

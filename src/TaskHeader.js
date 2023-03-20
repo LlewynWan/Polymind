@@ -339,7 +339,7 @@ export function TaskHeader({
                                 //     });
                                 // }
                             })
-                        }, 1800));
+                        }, 1200));
                     }
                     e.target.getStage().container().style.cursor = "pointer"
                     e.target.parent.to({y: -1, duration: 0.15})

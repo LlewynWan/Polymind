@@ -37,9 +37,9 @@ function App() {
       {node_id: 0, task_id: 0, prompt: "Brainstorm a list of keywords related to \"Interaction\""}
     ],
     task_nodes: [
-      {id: 0, attached_to_id: 0, task_id: 0, attached_to_type: "node", type: "keyword", x: 500, y: 250, fontSize: 20, text: "task1", display: false},
-      {id: 1, attached_to_id: 1, task_id: 1, attached_to_type: "node", type: "sticky_note", x: 1000, y: 250, width: 145, height: 110, fontSize: 18, text: "This is a very long text from task 2. very very long", display: false},
-      {id: 2, attached_to_id: 2, task_id: 2, attached_to_type: "node", type: "concept", x: 1000, y: 250, radiusX: 72, radiusY: 40, fontSize: 20, text: "a concept", display: false}
+      // {id: 0, attached_to_id: 0, task_id: 0, attached_to_type: "node", type: "keyword", x: 500, y: 250, fontSize: 20, text: "task1", display: false},
+      // {id: 1, attached_to_id: 1, task_id: 1, attached_to_type: "node", type: "sticky_note", x: 1000, y: 250, width: 145, height: 110, fontSize: 18, text: "This is a very long text from task 2. very very long", display: false},
+      // {id: 2, attached_to_id: 2, task_id: 2, attached_to_type: "node", type: "concept", x: 1000, y: 250, radiusX: 72, radiusY: 40, fontSize: 20, text: "a concept", display: false}
     ],
     task_arrows: [
       {task_id: 0, from_type: "", from_id: 0, to_type: "", to_id: 0}

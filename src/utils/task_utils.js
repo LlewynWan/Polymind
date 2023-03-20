@@ -15,6 +15,10 @@ const toUpperCase = (type) =>{
             return "Keyword";
         case 'concept':
             return "Concept";
+        case 'section':
+            return "Section";
+        case 'node':
+            return "Node";
         default:
             return "";
       }
@@ -28,6 +32,10 @@ const toLowerCase = (type) =>{
             return "keyword";
         case 'Concept':
             return "concept";
+        case 'Section':
+            return "section";
+        case 'Node':
+            return "node";
         default:
             return "";
       }
