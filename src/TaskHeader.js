@@ -312,7 +312,7 @@ export function TaskHeader({
                 y={0}
                 // onWheel={(e)=>{clearTimeout(hoverTimeout)}}
                 onMouseEnter={(e)=>{
-                    if (task.id !== currentHoverId) {
+                    if (task.id !== currentHoverId && !disabledSet.has(task.id)) {
                         clearTimeout(hoverTimeout);
                         setCurrentHoverId(task.id);
                         setHoverTimeout(setTimeout(()=>{

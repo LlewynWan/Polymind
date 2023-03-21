@@ -126,11 +126,13 @@ export function Canvas({dimensions})
                 const object_type = toLowerCase(task.inputType);
                 if (object_type !== "" && inFocus[object_type] !== -1) {
                     if (object_type!=="section") {
-                        handleMicroTask(task, object_type,
-                            nodes.filter(node=>node.id===inFocus[object_type])[0]);
+                        const node = nodes.filter(node=>node.id===inFocus[object_type])[0];
+                        if (!node.disabledTaskId.has(task.id))
+                            handleMicroTask(task, object_type, node);
                     } else {
-                        handleMicroTask(task, object_type,
-                            sections.filter(section=>section.id===inFocus[object_type])[0])   
+                        const section = sections.filter(section=>section.id===inFocus[object_type])[0];
+                        if (!section.disabledTaskId.has(task.id))
+                            handleMicroTask(task, object_type, section)   
                     }   
                 }
             });
@@ -980,14 +982,17 @@ export function Canvas({dimensions})
                         getNodeById(node.attached_to_id), canvasScale) : null;
                 const section = node.attached_to_type==="section" ? 
                 getSectionById(node.attached_to_id) : null;
+                const anchorPosition = anchor_utils.calcAnchorPosition(
+                    from_anchor, node, canvasScale);
                 return node.display ||
                 microTasks.filter(task=>task.id===node.task_id)[0].display ?
                 <Group
                 key={node.id}>
                     {node.attached_to_type==="node" ? <MyLine
                     points={[
-                        ...anchor_utils.calcAnchorPosition(
-                            from_anchor, node, canvasScale),
+                        ...anchorPosition,
+                        // ...anchor_utils.calcAnchorPosition(
+                        //     from_anchor, node, canvasScale),
                         ...anchor_utils.findPathBetweenNodes(from_anchor, to_anchor,
                             node, getNodeById(node.attached_to_id), canvasScale),
                         // ...calcAnchorOffset(arrow.from_anchor, nodes[arrow.from_id]),
@@ -1002,16 +1007,24 @@ export function Canvas({dimensions})
                     /> : <MyLine
                     points={[
                         ...anchor_utils.calcAnchorPosition(
-                            1, node, canvasScale),
-                        ...anchor_utils.findPathBetweenNodeAndPosition(
-                            [section.x+section.width*section.scaleX/2,
-                                section.y-60/canvasScale],
-                            node, 1, canvasScale
+                            from_anchor, node, canvasScale),
+                        // ...anchor_utils.findPathBetweenNodeAndPosition(
+                        //     [section.x+section.width*section.scaleX/2,
+                        //         section.y-60/canvasScale],
+                        //     node, 1, canvasScale
+                        // ),
+                        ...anchor_utils.findPathBetweenVectors(
+                            {x: anchorPosition[0], y: anchorPosition[1],
+                            dx: -1, dy: 0},
+                            {x: getTextWidth(section.text, 18, "bold", 5)/canvasScale+section.x+20/canvasScale,
+                            y: section.y-25/canvasScale, dx: 1, dy: 0}
                         ),
-                        section.x+section.width*section.scaleX/2,
-                        section.y-25/canvasScale,
                         getTextWidth(section.text, 18, "bold", 5)/canvasScale+section.x+20/canvasScale,
                         section.y-25/canvasScale
+                        // section.x+section.width*section.scaleX/2,
+                        // section.y-25/canvasScale,
+                        // getTextWidth(section.text, 18, "bold", 5)/canvasScale+section.x+20/canvasScale,
+                        // section.y-25/canvasScale
                         // ...anchor_utils.findPathBetweenVectors(
                         //     {x: section.x + section.width*section.scaleX/2,
                         //     y: section.y - 40/canvasScale,
