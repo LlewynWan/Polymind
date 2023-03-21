@@ -19,6 +19,7 @@ export function SuggestionPanel ({
     //     console.log(tmp.width())
     //     return tmp.width();
     // }
+    const [isEditing, setIsEditing] = useState(false);
 
     return (
     <Group
@@ -64,7 +65,6 @@ export function SuggestionPanel ({
             // onMouseLeave={(e)=>{e.target.setAttrs({Ellipsis: true, width: Math.min(100,getTextWidth(suggestion))})}}
             />
         </Label>
-        )
-        })}
+        )})}
     </Group>)
 }

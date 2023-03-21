@@ -8,6 +8,10 @@ const sizeMap = {
     "concept": {
         radiusX: 72,
         radiusY: 40
+    },
+    "keyword": {
+        width: 0,
+        height: 0
     }
 }
 

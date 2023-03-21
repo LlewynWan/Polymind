@@ -38,12 +38,12 @@ export function TaskNode({
 
     const [isHover, setIsHover] = useState(false);
     const [isHoverIcons, setIsHoverIcons] = useState(false);
+    const [needsExplanation, setNeedsExplanation] = useState(false);
 
     const nodeRef = useRef(null);
     const suggestionRef = useRef(null);
 
     useEffect(() => {
-        console.log(width,height)
         // if (!isSelected && isEditing) {
         //   setIsEditing(false);
         // }
@@ -140,6 +140,13 @@ export function TaskNode({
         type={"confirm"}
         onClick={onConfirm}
         />
+        <Icon
+        x={30}
+        y={0}
+        type={"question"}
+        enabled={needsExplanation}
+        onClick={()=>{setNeedsExplanation(!needsExplanation)}}
+        />
     </Group>
     :
     <Group
@@ -235,6 +242,13 @@ export function TaskNode({
         y={0}
         type={"confirm"}
         onClick={onConfirm}
+        />
+        <Icon
+        x={40}
+        y={0}
+        type={"question"}
+        enabled={needsExplanation}
+        onClick={()=>{setNeedsExplanation(!needsExplanation)}}
         />
     </Group>}
     <Group

@@ -1,5 +1,5 @@
 import React, { useRef, useState } from "react";
-import { Group, Line, Circle, Rect, Arc, Arrow } from "react-konva";
+import { Group, Line, Circle, Rect, Arc, Arrow, Text } from "react-konva";
 
 
 export function Icon({
@@ -11,6 +11,7 @@ export function Icon({
     onMouseLeave,
     scaleX=1,
     scaleY=1,
+    enabled=false
 }) {
     const [isHover, setIsHover] = useState(false);
     
@@ -353,6 +354,39 @@ export function Icon({
         pointerLength={8}
         pointerWidth={12}
         strokeWidth={1}/>
+    </Group>
+    : type === "question" ?
+    <Group
+    x={x}
+    y={y}
+    onMouseEnter={(e)=>{
+        setIsHover(true);
+        e.target.getStage().container().style.cursor = "pointer"
+    }}
+    onMouseLeave={(e)=>{
+        setIsHover(false);
+        e.target.getStage().container().style.cursor = "default"
+    }}
+    onClick={onClick}>
+        <Circle
+        x={10}
+        y={0}
+        radius={10}
+        fill={"transparent"}
+        stroke={isHover||enabled?"black":"gray"}
+        strokeWidth={1.5}
+        />
+        <Text
+        x={0}
+        y={-8.5}
+        width={20}
+        height={18}
+        text={"?"}
+        fontSize={18}
+        fontStyle={"bold"}
+        fill={isHover||enabled?"black":"gray"}
+        align={"center"}
+        verticalAlign={"middle"}/>
     </Group>
     : null
     // return type === "add" ?

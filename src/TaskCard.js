@@ -128,6 +128,12 @@ export function TaskCard({
             width={35}
             height={7.5}
             fill={"transparent"}/>
+            <Rect
+            x={-15}
+            y={0}
+            width={30}
+            height={10}
+            fill={"transparent"}/>
         </Group>
 
         <Icon

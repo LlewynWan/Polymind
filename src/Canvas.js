@@ -21,7 +21,7 @@ import { PromptGPT } from "./utils/GPT_utils";
 
 import { colorPalette } from "./utils/color_utils";
 import { toLowerCase } from "./utils/task_utils";
-import { getTextWidth } from "./utils/size_utils";
+import { getTextWidth, sizeMap } from "./utils/size_utils";
 import { anchor_utils, node_utils, calcSectionsFittsLawID } from "./utils/canvas_utils";
 import { GlobalContext, CanvasContext, PrompterContext } from "./state";
 
@@ -280,10 +280,10 @@ export function Canvas({dimensions})
                         //  || microTasks.filter(task=>task.id===state.task_id)[0].display),
                     {id: prevState.length === 0 ? 0 :
                         Math.max(...prevState.map(state=>state.id))+1,
-                    width: 0, height: 0,
+                    ...sizeMap[toLowerCase(task.outputType)],
                     scaleX: 1, scaleY: 1,
                     attached_to_type: "node", task_id: task.id,
-                    attached_to_id: object.id, type: "keyword",
+                    attached_to_id: object.id, type: toLowerCase(task.outputType),
                     x: object.x+100/canvasScale+Math.random()*120+object.scaleX*
                         (object.type==="concept"?object.radiusX:object.width),
                     y: object.type==="concept"?
@@ -307,10 +307,10 @@ export function Canvas({dimensions})
                         || state.attached_to_id!==object.id || state.task_id!==task.id),
                     {id: prevState.length === 0 ? 0 :
                         Math.max(...prevState.map(state=>state.id))+1,
-                    width: 0, height: 0,
+                    ...sizeMap[toLowerCase(task.outputType)],
                     scaleX: 1, scaleY: 1,
                     attached_to_type: "section", task_id: task.id,
-                    attached_to_id: object.id, type: "keyword",
+                    attached_to_id: object.id, type: toLowerCase(task.outputType),
                     x: object.x+Math.random()*100+object.scaleX*object.width/2,
                     y: object.y-50/canvasScale-Math.random()*120,
                     fontSize: 20, text: "test", display: false
@@ -846,9 +846,9 @@ export function Canvas({dimensions})
                     })
                 }}
                 disabledSet={node.disabledTaskId}
-                onHeaderTaskClick={(task_id)=>handleHeaderTaskClick(task_id,"node",node.id)}
-                onHeaderCurtainClick={(task_id)=>handleHeaderCurtainClick(node.id, "node", task_id)}
-                resetHeaderCurtain={(task_id)=>resetHeaderCurtain(node.id, "node", task_id)}
+                onHeaderTaskClick={(task_id)=>handleHeaderTaskClick(task_id,"sticky_note",node.id)}
+                onHeaderCurtainClick={(task_id)=>handleHeaderCurtainClick(node.id, "sticky_note", task_id)}
+                resetHeaderCurtain={(task_id)=>resetHeaderCurtain(node.id, "sticky_note", task_id)}
                 callbackTaskId={node.callbackTaskId}
                 resetNodeCallbackTaskId={()=>resetNodeCallbackTaskId(node.id)}
                 header={isTaskHeaderVisible}/> :
@@ -898,9 +898,9 @@ export function Canvas({dimensions})
                 headerListening={!isDrawingArrow &&
                     !isDrawingDoubleArrow&&!isSectioning&&!isAddingKeyword}
                 disabledSet={node.disabledTaskId}
-                onHeaderTaskClick={(task_id)=>handleHeaderTaskClick(task_id,"node",node.id)}
-                onHeaderCurtainClick={(task_id)=>handleHeaderCurtainClick(node.id, "node", task_id)}
-                resetHeaderCurtain={(task_id)=>resetHeaderCurtain(node.id, "node", task_id)}
+                onHeaderTaskClick={(task_id)=>handleHeaderTaskClick(task_id,"keyword",node.id)}
+                onHeaderCurtainClick={(task_id)=>handleHeaderCurtainClick(node.id, "keyword", task_id)}
+                resetHeaderCurtain={(task_id)=>resetHeaderCurtain(node.id, "keyword", task_id)}
                 callbackTaskId={node.callbackTaskId}
                 resetNodeCallbackTaskId={()=>resetNodeCallbackTaskId(node.id)}
                 header={isTaskHeaderVisible}/> :
@@ -960,9 +960,9 @@ export function Canvas({dimensions})
                 headerListening={!isDrawingArrow &&
                     !isDrawingDoubleArrow&&!isSectioning&&!isAddingKeyword}
                 disabledSet={node.disabledTaskId}
-                onHeaderTaskClick={(task_id)=>handleHeaderTaskClick(task_id,"node",node.id)}
-                onHeaderCurtainClick={(task_id)=>handleHeaderCurtainClick(node.id, "node", task_id)}
-                resetHeaderCurtain={(task_id)=>resetHeaderCurtain(node.id, "node", task_id)}
+                onHeaderTaskClick={(task_id)=>handleHeaderTaskClick(task_id,"concept",node.id)}
+                onHeaderCurtainClick={(task_id)=>handleHeaderCurtainClick(node.id, "concept", task_id)}
+                resetHeaderCurtain={(task_id)=>resetHeaderCurtain(node.id, "concept", task_id)}
                 callbackTaskId={node.callbackTaskId}
                 resetNodeCallbackTaskId={()=>resetNodeCallbackTaskId(node.id)}
                 header={isTaskHeaderVisible}
@@ -1111,7 +1111,7 @@ export function Canvas({dimensions})
                         setTaskNodes(prevState => prevState.filter(state=>state.id!==node.id));
                         stageRef.current.container().style.cursor = "default"
                     }}
-                    onTextSizeChange={(rect)=>{
+                    onTextSizeChange={node.type === "keyword" ? (rect)=>{
                         if (rect.width && rect.height &&
                         (node.width !== rect.width || node.height !== rect.height)) {
                             setTaskNodes(prevState=>{
@@ -1125,7 +1125,7 @@ export function Canvas({dimensions})
                                 });
                             })
                         }
-                    }}
+                    }: null}
                     listening={!isDrawingArrow && !isDrawingDoubleArrow
                         && !isSectioning && ! isAddingKeyword}/>
                 </Group>
