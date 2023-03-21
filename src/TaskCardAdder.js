@@ -55,6 +55,7 @@ export function TaskCardAdder({
             fill={"#646464"}
             cornerRadius={5}
             visible={!isEditingTaskName}
+            opacity={0.75}
             />
             {isEditingTaskName ?
             <TextInput

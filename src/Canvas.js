@@ -21,6 +21,7 @@ import { PromptGPT } from "./utils/GPT_utils";
 
 import { colorPalette } from "./utils/color_utils";
 import { toLowerCase } from "./utils/task_utils";
+import { getTextWidth } from "./utils/size_utils";
 import { anchor_utils, node_utils, calcSectionsFittsLawID } from "./utils/canvas_utils";
 import { GlobalContext, CanvasContext, PrompterContext } from "./state";
 
@@ -278,6 +279,7 @@ export function Canvas({dimensions})
                     {id: prevState.length === 0 ? 0 :
                         Math.max(...prevState.map(state=>state.id))+1,
                     width: 0, height: 0,
+                    scaleX: 1, scaleY: 1,
                     attached_to_type: "node", task_id: task.id,
                     attached_to_id: object.id, type: "keyword",
                     x: object.x+100/canvasScale+Math.random()*120+object.scaleX*
@@ -304,7 +306,7 @@ export function Canvas({dimensions})
                     {id: prevState.length === 0 ? 0 :
                         Math.max(...prevState.map(state=>state.id))+1,
                     width: 0, height: 0,
-                    scaleX: 1/canvasScale, scaleY: 1/canvasScale,
+                    scaleX: 1, scaleY: 1,
                     attached_to_type: "section", task_id: task.id,
                     attached_to_id: object.id, type: "keyword",
                     x: object.x+Math.random()*100+object.scaleX*object.width/2,
@@ -1000,12 +1002,16 @@ export function Canvas({dimensions})
                     /> : <MyLine
                     points={[
                         ...anchor_utils.calcAnchorPosition(
-                            2, node, canvasScale),
+                            1, node, canvasScale),
                         ...anchor_utils.findPathBetweenNodeAndPosition(
                             [section.x+section.width*section.scaleX/2,
-                                section.y-40/canvasScale],
-                            node, 2, canvasScale
+                                section.y-60/canvasScale],
+                            node, 1, canvasScale
                         ),
+                        section.x+section.width*section.scaleX/2,
+                        section.y-25/canvasScale,
+                        getTextWidth(section.text, 18, "bold", 5)/canvasScale+section.x+20/canvasScale,
+                        section.y-25/canvasScale
                         // ...anchor_utils.findPathBetweenVectors(
                         //     {x: section.x + section.width*section.scaleX/2,
                         //     y: section.y - 40/canvasScale,

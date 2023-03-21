@@ -205,7 +205,7 @@ export function TaskHeader({
     y={y}
     scaleX={scale}
     scaleY={scale}
-
+    onClick={(e)=>{e.cancelBubble=true}}
     onWheel={handleTaskHeaderWheel}
     onMouseEnter={()=>{
         setIsHover(true);
@@ -475,7 +475,8 @@ export function TaskHeader({
     x={width-15}
     y={fontHeight/2}
     type={"forward"}
-    onClick={()=>{
+    onClick={(e)=>{
+        e.cancelBubble = true;
         // clearTimeout(callbackTimeout);
         setIsCurtainFixed(true);
         onCurtainClick(curtainId);
@@ -485,6 +486,7 @@ export function TaskHeader({
     y={fontHeight/2}
     type={"backward"}
     onClick={(e)=>{
+        e.cancelBubble = true;
         e.target.getStage().container().style.cursor = "default"
 
         resetCurtain(curtainId);
