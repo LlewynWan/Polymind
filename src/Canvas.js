@@ -17,10 +17,10 @@ import { TaskBoard } from "./TaskBoard";
 import { Prompter } from "./Prompter";
 import { TaskPrompt } from "./TaskPrompt";
 import { PromptPanel } from "./PromptPanel";
-import { PromptGPT } from "./utils/GPT_utils";
+import { promptGPT } from "./utils/GPT_utils";
 
 import { colorPalette } from "./utils/color_utils";
-import { toLowerCase } from "./utils/task_utils";
+import { toLowerCase, outputMap } from "./utils/task_utils";
 import { getTextWidth, sizeMap } from "./utils/size_utils";
 import { anchor_utils, node_utils, section_utils } from "./utils/canvas_utils";
 import { GlobalContext, CanvasContext, PrompterContext } from "./state";
@@ -121,7 +121,7 @@ export function Canvas({dimensions})
                 if (object_type !== "" && inFocus[object_type] !== -1) {
                     if (object_type!=="section") {
                         const node = nodes.filter(node=>node.id===inFocus[object_type])[0];
-                        if (!node.disabledTaskId.has(task.id))
+                        if (node.text!=="" && !node.disabledTaskId.has(task.id))
                             handleMicroTask(task, object_type, node);
                     } else {
                         const section = sections.filter(section=>section.id===inFocus[object_type])[0];
@@ -243,7 +243,7 @@ export function Canvas({dimensions})
         setSections(prevState=>prevState.filter(state=>!state.selected));
     }
 
-    const handleMicroTask = (task, object_type, object) => {
+    const handleMicroTask = async (task, object_type, object) => {
         // setTimeout(()=>{
             // setTaskNodes(prevState=>{
             //     return [
@@ -261,37 +261,45 @@ export function Canvas({dimensions})
             &&node.attached_to_type===object_type&&node.attached_to_id===object.id).length))
         {
             if (object_type!=="section") {
-                setNodes(prevState=>prevState.map(state=>{
-                    let tmp = state;
-                    if (tmp.id === object.id) {
-                        tmp.callbackTaskId = task.id;
-                    }
-                    return tmp;
-                }));
-                setTaskNodes(prevState=>{
-                    // const sameState = prevState.filter(state=>
-                    //     state.node_id===object_id&&state.task_id===task_id
-                    //     && !state.display)
-                            // && !microTasks.filter(task=>task.id===state.task_id)[0].display));
-                    return [...prevState.filter(state=>
-                        state.attached_to_type !== object_type || state.display ||
-                        state.attached_to_id!==object.id || state.task_id!==task.id),
-                        //  || microTasks.filter(task=>task.id===state.task_id)[0].display),
-                    {id: prevState.length === 0 ? 0 :
-                        Math.max(...prevState.map(state=>state.id))+1,
-                    ...sizeMap[toLowerCase(task.outputType)],
-                    scaleX: 1, scaleY: 1,
-                    attached_to_type: object_type, task_id: task.id,
-                    attached_to_id: object.id, type: toLowerCase(task.outputType),
-                    x: object.x+100/canvasScale+Math.random()*120+object.scaleX*
-                        (object.type==="concept"?object.radiusX:object.width),
-                    y: object.type==="concept"?
-                        object.y+object.scaleY*object.radiusY+
-                        Math.ceil(Math.random()*99) * (Math.round(Math.random())?1:-1)
-                        : object.y+50+Math.random()*120+object.scaleY*object.height,
-                    fontSize: 20, text: "test", display: false
-                    }]
-                });
+                const prompt = task.examplePrompt.replace("[placeholder]",object.text);
+                const [num_items, max_word_per_item] = outputMap[task.outputType];
+                let results = await promptGPT(prompt, num_items, max_word_per_item);
+                // const results = object_type === "keyword" ?
+                // (await promptGPT(prompt, 3, 3)) : null;
+                if (results.length === num_items) {
+                    setNodes(prevState=>prevState.map(state=>{
+                        let tmp = state;
+                        if (tmp.id === object.id) {
+                            tmp.callbackTaskId = task.id;
+                        }
+                        return tmp;
+                    }));
+                    setTaskNodes(prevState=>{
+                        // const sameState = prevState.filter(state=>
+                        //     state.node_id===object_id&&state.task_id===task_id
+                        //     && !state.display)
+                                // && !microTasks.filter(task=>task.id===state.task_id)[0].display));
+                        return [...prevState.filter(state=>
+                            state.attached_to_type !== object_type || state.display ||
+                            state.attached_to_id!==object.id || state.task_id!==task.id),
+                            //  || microTasks.filter(task=>task.id===state.task_id)[0].display),
+                        ...results.map((result,index)=>{
+                            return {id: prevState.length === 0 ? index :
+                            Math.max(...prevState.map(state=>state.id))+1+index,
+                        ...sizeMap[toLowerCase(task.outputType)],
+                        scaleX: 1, scaleY: 1,
+                        attached_to_type: object_type, task_id: task.id,
+                        attached_to_id: object.id, type: toLowerCase(task.outputType),
+                        x: object.x+100/canvasScale+Math.random()*120+object.scaleX*
+                            (object.type==="concept"?object.radiusX:object.width),
+                        y: object.type==="concept"?
+                            object.y+object.scaleY*object.radiusY+
+                            Math.ceil(Math.random()*99) * (Math.round(Math.random())?1:-1)
+                            : object.y+50+Math.random()*120+object.scaleY*object.height,
+                        fontSize: 20, text: result, display: false
+                        }})]
+                    });
+                }
             } else if (object_type==="section") {
                 const outline = section_utils.calcSectionOutline(nodes.filter(node=>
                     node.x>object.x && node.x<object.x+object.width*object.scaleX

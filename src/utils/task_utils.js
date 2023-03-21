@@ -12,7 +12,14 @@ const outputTypes = [
     "Concept",
     "Sticky Note",
     "Section"
-]
+];
+
+const outputMap = {
+    "Keyword": [3,3],
+    "Concept": [3,5],
+    "Sticky Note": [1,50],
+    // "Section"
+}
 
 const toUpperCase = (type) =>{
     switch (type) {
@@ -70,4 +77,4 @@ const prevOutputType = (type) => {
 
 
 export {nextInputType, prevInputType,
-    nextOutputType, prevOutputType, toUpperCase, toLowerCase}
+    nextOutputType, prevOutputType, toUpperCase, toLowerCase, outputMap}
