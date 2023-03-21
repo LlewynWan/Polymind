@@ -373,7 +373,7 @@ export function Icon({
         y={0}
         radius={10}
         fill={"transparent"}
-        stroke={isHover||enabled?"black":"gray"}
+        stroke={enabled?"#FFBF00":isHover?"black":"gray"}
         strokeWidth={1.5}
         />
         <Text
@@ -384,7 +384,7 @@ export function Icon({
         text={"?"}
         fontSize={18}
         fontStyle={"bold"}
-        fill={isHover||enabled?"black":"gray"}
+        fill={enabled?"#FFBF00":isHover?"black":"gray"}
         align={"center"}
         verticalAlign={"middle"}/>
     </Group>

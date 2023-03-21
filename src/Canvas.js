@@ -259,7 +259,12 @@ export function Canvas({dimensions})
             //     ]
             // })
             // console.log(task, object_type, object)
-        if (!objectsCurtainClicked.has(object.id.toString()+task.id.toString()+object_type))
+        //     console.log(object_type)
+        // console.log(taskNodes.filter(node=>node.task_id===task.id
+        //     &&node.attached_to_type===object_type&&node.attached_to_id===object.id).length)
+        if (!objectsCurtainClicked.has(object.id.toString()+task.id.toString()+object_type)
+        && (!task.display || !taskNodes.filter(node=>node.task_id===task.id
+            &&node.attached_to_type===object_type&&node.attached_to_id===object.id).length))
         {
             if (object_type!=="section") {
                 setNodes(prevState=>prevState.map(state=>{
@@ -275,14 +280,14 @@ export function Canvas({dimensions})
                     //     && !state.display)
                             // && !microTasks.filter(task=>task.id===state.task_id)[0].display));
                     return [...prevState.filter(state=>
-                        state.attached_to_type !== "node" || state.display ||
+                        state.attached_to_type !== object_type || state.display ||
                         state.attached_to_id!==object.id || state.task_id!==task.id),
                         //  || microTasks.filter(task=>task.id===state.task_id)[0].display),
                     {id: prevState.length === 0 ? 0 :
                         Math.max(...prevState.map(state=>state.id))+1,
                     ...sizeMap[toLowerCase(task.outputType)],
                     scaleX: 1, scaleY: 1,
-                    attached_to_type: "node", task_id: task.id,
+                    attached_to_type: object_type, task_id: task.id,
                     attached_to_id: object.id, type: toLowerCase(task.outputType),
                     x: object.x+100/canvasScale+Math.random()*120+object.scaleX*
                         (object.type==="concept"?object.radiusX:object.width),
@@ -309,7 +314,7 @@ export function Canvas({dimensions})
                         Math.max(...prevState.map(state=>state.id))+1,
                     ...sizeMap[toLowerCase(task.outputType)],
                     scaleX: 1, scaleY: 1,
-                    attached_to_type: "section", task_id: task.id,
+                    attached_to_type: object_type, task_id: task.id,
                     attached_to_id: object.id, type: toLowerCase(task.outputType),
                     x: object.x+Math.random()*100+object.scaleX*object.width/2,
                     y: object.y-50/canvasScale-Math.random()*120,
@@ -977,7 +982,7 @@ export function Canvas({dimensions})
                 // const arrow_size = 10 / canvasScale;
                 const arrow_dy = to_anchor===0 ? 1 : to_anchor===2 ? -1 : 0;
                 const arrow_dx = to_anchor===1 ? 1 : to_anchor===3 ? -1 : 0;
-                const finalAnchor = node.attached_to_type==="node" ?
+                const finalAnchor = node.attached_to_type!=="section" ?
                     anchor_utils.calcAnchorPosition(to_anchor,
                         getNodeById(node.attached_to_id), canvasScale) : null;
                 const section = node.attached_to_type==="section" ? 
@@ -988,7 +993,7 @@ export function Canvas({dimensions})
                 microTasks.filter(task=>task.id===node.task_id)[0].display ?
                 <Group
                 key={node.id}>
-                    {node.attached_to_type==="node" ? <MyLine
+                    {node.attached_to_type!=="section" ? <MyLine
                     points={[
                         ...anchorPosition,
                         // ...anchor_utils.calcAnchorPosition(

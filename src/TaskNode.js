@@ -7,7 +7,7 @@ import { CanvasContext } from "./state";
 import { sizeMap } from "./utils/size_utils";
 
 import { Icon } from "./Icon";
-// import { TextInput } from "./TextInput"
+import { TextInput } from "./TextInput"
 import { SuggestionPanel } from "./SuggestionPanel";
 
 
@@ -39,9 +39,23 @@ export function TaskNode({
     const [isHover, setIsHover] = useState(false);
     const [isHoverIcons, setIsHoverIcons] = useState(false);
     const [needsExplanation, setNeedsExplanation] = useState(false);
+    const [explanation, setExplanation] = useState("Why ...");
 
     const nodeRef = useRef(null);
     const suggestionRef = useRef(null);
+
+    const RETURN_KEY = 13;
+    const ESCAPE_KEY = 27;
+    function handleEscapeKeys(e) {
+        if (e.keyCode === ESCAPE_KEY) {
+            setNeedsExplanation(false);
+            setExplanation("Why ...");
+        }
+
+        if ((e.keyCode === RETURN_KEY && !e.shiftKey)) {
+            setExplanation((explanation)=>explanation+"\n\nBecause ...")
+        }
+    }
 
     useEffect(() => {
         // if (!isSelected && isEditing) {
@@ -99,13 +113,14 @@ export function TaskNode({
         x={0}
         y={-15}
         opacity={isHoverIcons?1:0}>
+            {needsExplanation ? null :
             <SuggestionPanel
             x={0}
             y={0}
             fontSize={14}
             fontColor={"#444444"}
             pointerDirection={"down"}
-            suggestions={suggestions.slice(0,3)}/>
+            suggestions={suggestions.slice(0,3)}/>}
             {/* <Label
             x={0}
             y={0}
@@ -163,20 +178,44 @@ export function TaskNode({
         <Rect
         x={-10}
         y={-15}
-        width={50}
+        width={100}
         height={35}
         fill={"transparent"}/>
         {type === "sticky_note" ? <Group
-        x={40}
+        x={70}
         y={0}
-        opacity={isHoverIcons?1:0}>
+        opacity={isHoverIcons?1:needsExplanation?1:0}>
+            {needsExplanation ? 
+            <Group>
+                <Rect
+                x={-5}
+                y={-25}
+                width={150}
+                height={40}
+                cornerRadius={3}
+                fill={"transparent"}
+                stroke={color}
+                strokeWidth={1.5}
+                />
+                <TextInput
+                x={0}
+                y={-20}
+                width={140}
+                height={20}
+                fontSize={15}
+                padding={5}
+                value={explanation}
+                onKeyDown={handleEscapeKeys}
+                onChange={(e)=>{setExplanation(e.target.value)}}/>
+            </Group>
+            :
             <SuggestionPanel
             x={0}
             y={0}
             fontSize={14}
             fontColor={"#444444"}
             pointerDirection={"left"}
-            suggestions={suggestions.slice(0,3)}/>
+            suggestions={suggestions.slice(0,3)}/>}
             {/* <Label
             x={0}
             y={0}
@@ -248,7 +287,12 @@ export function TaskNode({
         y={0}
         type={"question"}
         enabled={needsExplanation}
-        onClick={()=>{setNeedsExplanation(!needsExplanation)}}
+        onClick={()=>{
+            if (needsExplanation) {
+                setExplanation("Why ...");
+            }
+            setNeedsExplanation(!needsExplanation);
+        }}
         />
     </Group>}
     <Group
