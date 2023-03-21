@@ -11,7 +11,7 @@ const outputTypes = [
     "Keyword",
     "Concept",
     "Sticky Note",
-    "Line"
+    "Section"
 ]
 
 const toUpperCase = (type) =>{

@@ -13,6 +13,34 @@ const calcSectionsFittsLawID = (section, pointerPosition) => {
     return D*2/W;
 }
 
+const DFS = (root, nodes, arrows, visited, prefix="") => {
+    visited.add(root.id);
+    var outline = prefix + root.type + ": " + root.text + "\n";
+    const children = nodes.filter(node=> !visited.has(node.id) &&
+        arrows.filter(arrow=>(arrow.directed&&arrow.from_id===root.id&&arrow.to_id===node.id)
+        || (!arrow.directed&&arrow.from_id===root.id&&arrow.to_id===node.id)
+        || (!arrow.directed&&arrow.from_id===node.id&&arrow.to_id===root.id)).length);
+    children.forEach(child=>{
+        outline += DFS(child, nodes, arrows, visited, prefix=prefix+"  ");
+    });
+    return outline;
+}
+
+const calcSectionOutline = (nodes, arrows, prefix="") => {
+    const roots = nodes.filter(node => 
+        !arrows.filter(arrow=>arrow.directed&&arrow.to_id===node.id).length);
+    var outline = "";
+    var visited = new Set();
+    roots.forEach(root => {
+        if (!visited.has(root.id)) {
+            outline += DFS(root, nodes, arrows, visited, prefix)
+        }
+        // outline += prefix + root.type + ": " + root.text + "\n";
+        // outline += calcSectionOutline(nodes.filter())
+    });
+    return outline;
+}
+
 const calcFittsLawID = (node, pointerPosition) => {
     const W = node.type === "concept" ? node.radiusX * node.scaleX
     : node.width * node.scaleX;
@@ -194,5 +222,6 @@ const typeMap = {
 const anchor_utils = {findPathBetweenVectors, findPathBetweenNodes,
     calcAnchorOffsetPositions, calcAnchorPosition, findPathBetweenNodeAndPosition}
 const node_utils = {calcFittsLawID, typeMap}
+const section_utils = {calcSectionsFittsLawID, calcSectionOutline}
 
-export {anchor_utils,node_utils,calcSectionsFittsLawID}
+export {anchor_utils,node_utils,section_utils}

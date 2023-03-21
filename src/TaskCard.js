@@ -369,49 +369,90 @@ export function TaskCard({
         <Group
         x={0}
         y={-10}>
-            {/* <Icon
-            // x={width/2+25-getTextWidth(suggestions[suggestionIndex], 11, "bold", 3.5)}
-            x={width/2+30}
+            <Icon
+            x={20}
+            y={0}
+            type={"LArrow"}
+            onClick={()=>{
+                setSuggestionIndex((suggestionIndex+suggestions.length-1)
+                    %suggestions.length);
+            }}/>
+            <Icon
+            x={width/2+15}
             y={0}
             type={"RArrow"}
             onClick={()=>{
-                setSuggestionIndex((suggestionIndex+1)%suggestions.length);
-            }}/> */}
-            {suggestions.slice(0,3).map((suggestion,index)=>{
-                // return width/2+35-(index+1)*55 > 0 ?
-                return <Label
-                key={index}
-                x={width/2+35-(2-index)*55}
-                y={0}
-                onMouseEnter={(e)=>{e.target.getStage().container().style.cursor = "pointer"}}
-                onMouseLeave={(e)=>{e.target.getStage().container().style.cursor = "default"}}>
-                    <Tag
-                    cornerRadius={5}
-                    // stroke={"#222233"}
-                    // strokeWidth={1.5}
-                    fill={"silver"}
-                    pointerDirection={"right"}/>
-                    <Text
-                    text={suggestion}
-                    width={55}
-                    height={18}
-                    padding={3.5}
-                    fontSize={11}
-                    align={"center"}
-                    ellipsis={true}
-                    fontStyle={"bold"}
-                    fill={"#444444"}
-                    onMouseEnter={(e)=>{
-                        if (getTextWidth(suggestion,11,"bold",3.5) > 55)
-                            e.target.setAttrs({Ellipsis: false, width: Math.max(
-                                getTextWidth(suggestion,11,"bold",3.5), (3-index)*55
-                            )})
-                    }}
-                    onMouseLeave={(e)=>{e.target.setAttrs({Ellipsis: true, width: 55})}}
-                    />
-                </Label>
-            })}
-        </Group> : null}
+                setSuggestionIndex((suggestionIndex+1)
+                    %suggestions.length);
+            }}
+            />
+            <Label
+            x={30}
+            y={-8.5}>
+            <Tag
+            fill={"silver"}
+            opacity={0.85}
+            cornerRadius={2.5}/>
+            <Text
+            height={17}
+            width={width/2-25}
+            text={suggestions[suggestionIndex]}
+            fontSize={12}
+            fontStyle={"bold"}
+            fill={"#444444"}
+            padding={2.5}
+            align={"center"}
+            verticalAlign={"middle"}
+            ellipsis={true}/>
+            </Label>
+        </Group>
+        // <Group
+        // x={0}
+        // y={-10}>
+        //     {/* <Icon
+        //     // x={width/2+25-getTextWidth(suggestions[suggestionIndex], 11, "bold", 3.5)}
+        //     x={width/2+30}
+        //     y={0}
+        //     type={"RArrow"}
+        //     onClick={()=>{
+        //         setSuggestionIndex((suggestionIndex+1)%suggestions.length);
+        //     }}/> */}
+        //     {suggestions.slice(0,3).map((suggestion,index)=>{
+        //         // return width/2+35-(index+1)*55 > 0 ?
+        //         return <Label
+        //         key={index}
+        //         x={width/2+35-(2-index)*55}
+        //         y={0}
+        //         onMouseEnter={(e)=>{e.target.getStage().container().style.cursor = "pointer"}}
+        //         onMouseLeave={(e)=>{e.target.getStage().container().style.cursor = "default"}}>
+        //             <Tag
+        //             cornerRadius={5}
+        //             // stroke={"#222233"}
+        //             // strokeWidth={1.5}
+        //             fill={"silver"}
+        //             pointerDirection={"right"}/>
+        //             <Text
+        //             text={suggestion}
+        //             width={55}
+        //             height={18}
+        //             padding={3.5}
+        //             fontSize={11}
+        //             align={"center"}
+        //             ellipsis={true}
+        //             fontStyle={"bold"}
+        //             fill={"#444444"}
+        //             onMouseEnter={(e)=>{
+        //                 if (getTextWidth(suggestion,11,"bold",3.5) > 55)
+        //                     e.target.setAttrs({Ellipsis: false, width: Math.max(
+        //                         getTextWidth(suggestion,11,"bold",3.5), (3-index)*55
+        //                     )})
+        //             }}
+        //             onMouseLeave={(e)=>{e.target.setAttrs({Ellipsis: true, width: 55})}}
+        //             />
+        //         </Label>
+        //     })}
+        // </Group>
+         : null}
         {/* <SuggestionPanel
         x={width/2+35}
         y={-11}

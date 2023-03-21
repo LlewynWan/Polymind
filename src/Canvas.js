@@ -22,7 +22,7 @@ import { PromptGPT } from "./utils/GPT_utils";
 import { colorPalette } from "./utils/color_utils";
 import { toLowerCase } from "./utils/task_utils";
 import { getTextWidth, sizeMap } from "./utils/size_utils";
-import { anchor_utils, node_utils, calcSectionsFittsLawID } from "./utils/canvas_utils";
+import { anchor_utils, node_utils, section_utils } from "./utils/canvas_utils";
 import { GlobalContext, CanvasContext, PrompterContext } from "./state";
 
 
@@ -77,12 +77,6 @@ export function Canvas({dimensions})
         "section": -1
     });
     const [objectsCurtainClicked, setObjectsCurtainClicked] = React.useState(new Set());
-    // const followerProcess = React.useRef(null);
-    // const [followerPositionQueue, setFollowerPositionQueue] = React.useState([]);
-    // const [isFollowerModeEnabled, setIsFollowerModeEnabled] = React.useState(false);
-
-    // const [pointerTracker, setPointerTracker] = React.useState(-1);
-    // const [fittsLawTracker, setFittsLawTracker] = React.useState(-1);
     const [pointerPosition, setPointerPosition] = React.useState({x:-1, y:-1});
 
     const pointer2CanvasPosition = (position) => {
@@ -101,7 +95,7 @@ export function Canvas({dimensions})
         const position = pointer2CanvasPosition(stageRef.current.getPointerPosition());
         var ID_inv = type === "node" ?
         objects.map(object=>1/node_utils.calcFittsLawID(object,position))
-        : objects.map(object=>1/calcSectionsFittsLawID(object,position));
+        : objects.map(object=>1/section_utils.calcSectionsFittsLawID(object,position));
 
         const sumIDInv = ID_inv.reduce((sum,id_inv)=>sum+id_inv,0);
         ID_inv = ID_inv.map(id_inv=>id_inv/sumIDInv);
@@ -183,7 +177,7 @@ export function Canvas({dimensions})
             clearInterval(pointerTracker);
             clearInterval(fittsLawTracker);
         };
-    }, [nodes, sections]);
+    }, [nodes, sections, arrows]);
 
     useEffect(()=>{
         if (!isHoverToolBar && stageRef) {
@@ -298,7 +292,11 @@ export function Canvas({dimensions})
                     fontSize: 20, text: "test", display: false
                     }]
                 });
-            } else {
+            } else if (object_type==="section") {
+                const outline = section_utils.calcSectionOutline(nodes.filter(node=>
+                    node.x>object.x && node.x<object.x+object.width*object.scaleX
+                    && node.y>object.y && node.y<object.y+object.height*object.scaleY),arrows);
+                console.log(outline);
                 setSections(prevState=>prevState.map(state=>{
                     let tmp = state;
                     if (tmp.id === object.id) {
@@ -669,30 +667,6 @@ export function Canvas({dimensions})
     // onDblClick={toggleFollowerMode}
     ref={stageRef}
     >
-        {/* <Layer>
-            <TaskPrompt
-            x={nodes[0].x}
-            y={nodes[0].y-50}
-            width={180}
-            height={21}
-            color={"purple"}
-            fontSize={12}
-            text={"Provide a tldr version of [placeholder]"}/>
-        {taskPrompts.map((taskPrompt,index)=>{
-                const node = nodes.filter(node=>node.id===taskPrompt.node_id);
-                const position = node.length === 0 ? [0,0] :
-                canvas2PointerPosition({x: node[0].x, y: node[0].y});
-                return <TaskPrompt
-                key={index}
-                x={position[0]}
-                y={position[1]-25}
-                width={180}
-                height={21}
-                color={"#FFB347"}
-                fontSize={12}
-                text={taskPrompt.prompt}/>
-            })}
-        </Layer> */}
 
         <Layer
         x={canvasX}
@@ -1276,76 +1250,6 @@ export function Canvas({dimensions})
             }}
             />
 
-            {/* {followerPositionQueue.map((position,index)=>{
-                return <TaskPrompt
-                key={index}
-                x={position.x}
-                y={position.y}
-                width={120}
-                height={20}
-                color={"orange"}
-                fontSize={10}
-                text={"Brainstorm a list of keywords related to \"Interaction\""}/>
-            })} */}
-            
-            {/* <Group>
-            {followerPositionQueue.map((position,index)=>{
-                return <TaskPrompt
-                key={index}
-                x={position.x}
-                y={position.y}
-                width={200}
-                height={100}
-                color={"orange"}
-                fontSize={16}
-                text={"Brainstorm a list of keywords related to \"Interaction\""}/>
-            })}
-            </Group>   */}
-
-            {/* <Group> */}
-            {/* <PrompterContext.Provider value={{promptCardsRef}}> */}
-                {/* {promptCards.map((prompt_card,index)=>{
-                    return prompt_card.display ?
-                    <Prompter
-                    key={index+1}
-                    id={index+1}
-                    x={prompt_card.x}
-                    y={prompt_card.y}
-                    width={prompt_card.width}
-                    height={prompt_card.height}
-                    fontSize={15}
-                    text={prompt_card.text}
-                    onDragEnd={(e) => setPrompterPosition(e, index)}
-                    /> : null
-                })} */}
-                {/* <Prompter
-                id={0}
-                x={mainPrompter.x}
-                y={mainPrompter.y}
-                width={mainPrompter.width}
-                height={mainPrompter.height}
-                fontSize={18}
-                text={mainPrompter.prompt}
-                onHover={onMainPrompterHover}
-                onUnhover={onMainPrompterUnhover}
-                // onTextChange={(value)=>{setGlobalState("prompt",value);}}
-                draggable={false}
-                /> */}
-            {/* </PrompterContext.Provider> */}
-            {/* </Group> */}
-            {/* <PromptPanel
-            x={promptPanelPosition.x}
-            y={promptPanelPosition.y}
-            width={300}
-            height={40}
-            fontSize={12}
-            visible={promptPanelVisibility}
-            prompts={["prompt_1",
-            "Brainstorm keywords related to \"recursive\"",
-            "What are some potential subtopics related to \"recursive\" in the context of \"prewriting\"?",
-            "How is \"unstructured\" related to \"prewriting\"?",
-            "prompt_5"]}
-            /> */}
             <ToolBar
                 x={mainPrompter.x+mainPrompter.width/2-285}
                 y={mainPrompter.y-50}
@@ -1434,6 +1338,102 @@ export function Canvas({dimensions})
 
 
 /* deprecated */
+
+    {/* <Layer>
+        <TaskPrompt
+        x={nodes[0].x}
+        y={nodes[0].y-50}
+        width={180}
+        height={21}
+        color={"purple"}
+        fontSize={12}
+        text={"Provide a tldr version of [placeholder]"}/>
+    {taskPrompts.map((taskPrompt,index)=>{
+            const node = nodes.filter(node=>node.id===taskPrompt.node_id);
+            const position = node.length === 0 ? [0,0] :
+            canvas2PointerPosition({x: node[0].x, y: node[0].y});
+            return <TaskPrompt
+            key={index}
+            x={position[0]}
+            y={position[1]-25}
+            width={180}
+            height={21}
+            color={"#FFB347"}
+            fontSize={12}
+            text={taskPrompt.prompt}/>
+        })}
+    </Layer> */}
+
+    {/* {followerPositionQueue.map((position,index)=>{
+        return <TaskPrompt
+        key={index}
+        x={position.x}
+        y={position.y}
+        width={120}
+        height={20}
+        color={"orange"}
+        fontSize={10}
+        text={"Brainstorm a list of keywords related to \"Interaction\""}/>
+    })} */}
+    
+    {/* <Group>
+    {followerPositionQueue.map((position,index)=>{
+        return <TaskPrompt
+        key={index}
+        x={position.x}
+        y={position.y}
+        width={200}
+        height={100}
+        color={"orange"}
+        fontSize={16}
+        text={"Brainstorm a list of keywords related to \"Interaction\""}/>
+    })}
+    </Group>   */}
+
+    {/* <Group> */}
+    {/* <PrompterContext.Provider value={{promptCardsRef}}> */}
+        {/* {promptCards.map((prompt_card,index)=>{
+            return prompt_card.display ?
+            <Prompter
+            key={index+1}
+            id={index+1}
+            x={prompt_card.x}
+            y={prompt_card.y}
+            width={prompt_card.width}
+            height={prompt_card.height}
+            fontSize={15}
+            text={prompt_card.text}
+            onDragEnd={(e) => setPrompterPosition(e, index)}
+            /> : null
+        })} */}
+        {/* <Prompter
+        id={0}
+        x={mainPrompter.x}
+        y={mainPrompter.y}
+        width={mainPrompter.width}
+        height={mainPrompter.height}
+        fontSize={18}
+        text={mainPrompter.prompt}
+        onHover={onMainPrompterHover}
+        onUnhover={onMainPrompterUnhover}
+        // onTextChange={(value)=>{setGlobalState("prompt",value);}}
+        draggable={false}
+        /> */}
+    {/* </PrompterContext.Provider> */}
+    {/* </Group> */}
+    {/* <PromptPanel
+    x={promptPanelPosition.x}
+    y={promptPanelPosition.y}
+    width={300}
+    height={40}
+    fontSize={12}
+    visible={promptPanelVisibility}
+    prompts={["prompt_1",
+    "Brainstorm keywords related to \"recursive\"",
+    "What are some potential subtopics related to \"recursive\" in the context of \"prewriting\"?",
+    "How is \"unstructured\" related to \"prewriting\"?",
+    "prompt_5"]}
+    /> */}
 
     // const toggleFollowerMode = () => {
     //     if (!isFollowerModeEnabled) {
