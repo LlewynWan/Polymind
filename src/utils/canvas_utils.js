@@ -1,6 +1,18 @@
 import Konva from "konva";
 
 
+const calcSectionsFittsLawID = (section, pointerPosition) => {
+    const W = section.width*section.scaleX;
+    const sectionCenter = [
+        section.x + (section.width)*section.scaleX/2,
+        section.y + (section.height)*section.scaleY/2
+    ];
+    const D = Math.sqrt((pointerPosition[0]-sectionCenter[0])**2 +
+    (pointerPosition[1]-sectionCenter[1])**2)
+
+    return D*2/W;
+}
+
 const calcFittsLawID = (node, pointerPosition) => {
     const W = node.type === "concept" ? node.radiusX * node.scaleX
     : node.width * node.scaleX;
@@ -44,6 +56,7 @@ const calcAnchorPosition = (anchor, node, canvasScale) => {
 }
 
 const calcAnchorOffsetPositions = (node, canvasScale) => {
+    // console.log(node, canvasScale)
     const anchorOffset = node.type === "sticky_note" ? [
         [node.x + (node.width + 35)*node.scaleX / 2, node.y-50/canvasScale],
         [node.x-50/canvasScale, node.y + (node.height + 70)*node.scaleY / 2],
@@ -152,6 +165,23 @@ const findPathBetweenNodes = (fromAnchor, toAnchor, fromNode, toNode, canvasScal
     ...toAnchorOffset[toAnchor]]
 }
 
+const findPathBetweenNodeAndPosition = (position, node, anchor, canvasScale) => {
+    // console.log(node)
+    const anchorOffset = calcAnchorOffsetPositions(node,canvasScale);
+
+    const [anchorX,anchorY] = anchorOffset[anchor];
+    const dx = (anchor%2)*parseInt(2*(anchor/2-1));
+    const dy = ((anchor+1)%2)*parseInt(2*(anchor/2-0.5));
+    if ((dx !== 0 && (position[0]-anchorX)*dx > 0)
+    || ((dx === 0) && (position[1]-anchorY)*dy < 0)) {
+        return [anchorX, anchorY, position[0], anchorY,
+        position[0], position[1]];
+    } else {
+        return [anchorX, anchorY, anchorX, position[1],
+        position[0], position[1]];
+    }
+}
+
 const typeMap = {
     "keyword": "Keyword",
     "concept": "Concept",
@@ -162,7 +192,7 @@ const typeMap = {
 }
 
 const anchor_utils = {findPathBetweenVectors, findPathBetweenNodes,
-    calcAnchorOffsetPositions, calcAnchorPosition}
+    calcAnchorOffsetPositions, calcAnchorPosition, findPathBetweenNodeAndPosition}
 const node_utils = {calcFittsLawID, typeMap}
 
-export {anchor_utils,node_utils}
+export {anchor_utils,node_utils,calcSectionsFittsLawID}

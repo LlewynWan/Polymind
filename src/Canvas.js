@@ -21,7 +21,7 @@ import { PromptGPT } from "./utils/GPT_utils";
 
 import { colorPalette } from "./utils/color_utils";
 import { toLowerCase } from "./utils/task_utils";
-import { anchor_utils, node_utils } from "./utils/canvas_utils";
+import { anchor_utils, node_utils, calcSectionsFittsLawID } from "./utils/canvas_utils";
 import { GlobalContext, CanvasContext, PrompterContext } from "./state";
 
 
@@ -96,34 +96,44 @@ export function Canvas({dimensions})
         return [posX, posY];
     }
 
-    const sampleFittsLawIDMin = (objects) => {
+    const sampleFittsLawIDMin = (objects, type="node") => {
         const position = pointer2CanvasPosition(stageRef.current.getPointerPosition());
-        var ID_inv = objects.map(object=>1/node_utils.calcFittsLawID(object,position));
+        var ID_inv = type === "node" ?
+        objects.map(object=>1/node_utils.calcFittsLawID(object,position))
+        : objects.map(object=>1/calcSectionsFittsLawID(object,position));
+
         const sumIDInv = ID_inv.reduce((sum,id_inv)=>sum+id_inv,0);
         ID_inv = ID_inv.map(id_inv=>id_inv/sumIDInv);
         
         const split = Math.random();
         var tmpSum = 0.;
-        var sample_id = -1;
+        var sample_idx = -1;
         for (var i = 0; i < ID_inv.length; i++) {
             tmpSum += ID_inv[i];
             if (tmpSum > split) {
-                sample_id = i;
+                sample_idx = i;
                 break;
             }
         }
 
-        return sample_id === -1 ? -1 : objects[sample_id].id;
+        return sample_idx === -1 ? -1 : objects[sample_idx].id;
     };
 
     useEffect(()=>{
-        microTasks.forEach(task => {
-            const object_type = toLowerCase(task.inputType);
-            if (object_type !== "" && inFocus[object_type] !== -1) {
-                handleMicroTask(task, object_type,
-                    nodes.filter(node=>node.id===inFocus[object_type])[0]);
-            }
-        });
+        if (isTaskHeaderVisible) {
+            microTasks.forEach(task => {
+                const object_type = toLowerCase(task.inputType);
+                if (object_type !== "" && inFocus[object_type] !== -1) {
+                    if (object_type!=="section") {
+                        handleMicroTask(task, object_type,
+                            nodes.filter(node=>node.id===inFocus[object_type])[0]);
+                    } else {
+                        handleMicroTask(task, object_type,
+                            sections.filter(section=>section.id===inFocus[object_type])[0])   
+                    }   
+                }
+            });
+        }
     }, [inFocus]);
 
     useEffect(() => {
@@ -160,12 +170,19 @@ export function Canvas({dimensions})
                 "keyword": sampleFittsLawIDMin(nodes.filter(node=>node.display && node.type==="keyword")),
                 "sticky_note": sampleFittsLawIDMin(nodes.filter(node=>node.display && node.type==="sticky_note")),
                 "concept": sampleFittsLawIDMin(nodes.filter(node=>node.display && node.type==="concept")),
-                "section": -1
+                "section": sampleFittsLawIDMin(sections, "section")
             });
             // setInFocus({node: ID_inv.indexOf(Math.min(...ID_inv))});
             // console.log(ID.indexOf(Math.min(...ID)));
-        }, 10000);
+        }, 5000);
 
+        return () => {
+            clearInterval(pointerTracker);
+            clearInterval(fittsLawTracker);
+        };
+    }, [nodes, sections]);
+
+    useEffect(()=>{
         if (!isHoverToolBar && stageRef) {
             stageRef.current.container().style.cursor =
             (isDrawingArrow || isDrawingDoubleArrow) ? "crosshair"
@@ -178,17 +195,13 @@ export function Canvas({dimensions})
             setArrowFrom({id: -1, anchor: -1});
             setArrowTo({id: -1, anchor: -1});
         }
-
-        return () => {
-            clearInterval(pointerTracker);
-            clearInterval(fittsLawTracker);
-        };
-    }, [dimensions, canvasScale, isHoverToolBar,
+    }, [dimensions, nodes, sections, canvasScale, isHoverToolBar,
         isDrawingArrow, isDrawingDoubleArrow, isAddingKeyword]);
 
 
     const UnselectAllNodes = () => {
         setNodes(prevState => {
+
             return prevState.map((state)=>{
                 let tmp = state;
                 tmp.selected = false;
@@ -242,6 +255,7 @@ export function Canvas({dimensions})
             //             task_id: 0, attached_to_id: 0, type: "keyword"}
             //     ]
             // })
+            // console.log(task, object_type, object)
         if (!objectsCurtainClicked.has(object.id.toString()+task.id.toString()+object_type))
         {
             if (object_type!=="section") {
@@ -258,8 +272,8 @@ export function Canvas({dimensions})
                     //     && !state.display)
                             // && !microTasks.filter(task=>task.id===state.task_id)[0].display));
                     return [...prevState.filter(state=>
-                        (state.node_id!==object.id&&state.task_id!==task.id)
-                        || state.display),
+                        state.attached_to_type !== "node" || state.display ||
+                        state.attached_to_id!==object.id || state.task_id!==task.id),
                         //  || microTasks.filter(task=>task.id===state.task_id)[0].display),
                     {id: prevState.length === 0 ? 0 :
                         Math.max(...prevState.map(state=>state.id))+1,
@@ -272,6 +286,29 @@ export function Canvas({dimensions})
                         object.y+object.scaleY*object.radiusY+
                         Math.ceil(Math.random()*99) * (Math.round(Math.random())?1:-1)
                         : object.y+50+Math.random()*120+object.scaleY*object.height,
+                    fontSize: 20, text: "test", display: false
+                    }]
+                });
+            } else {
+                setSections(prevState=>prevState.map(state=>{
+                    let tmp = state;
+                    if (tmp.id === object.id) {
+                        tmp.callbackTaskId = task.id;
+                    }
+                    return tmp;
+                }));
+                setTaskNodes(prevState=>{
+                    return [...prevState.filter(state=>
+                        state.attached_to_type !== "section" || state.display
+                        || state.attached_to_id!==object.id || state.task_id!==task.id),
+                    {id: prevState.length === 0 ? 0 :
+                        Math.max(...prevState.map(state=>state.id))+1,
+                    width: 0, height: 0,
+                    scaleX: 1/canvasScale, scaleY: 1/canvasScale,
+                    attached_to_type: "section", task_id: task.id,
+                    attached_to_id: object.id, type: "keyword",
+                    x: object.x+Math.random()*100+object.scaleX*object.width/2,
+                    y: object.y-50/canvasScale-Math.random()*120,
                     fontSize: 20, text: "test", display: false
                     }]
                 });
@@ -455,6 +492,10 @@ export function Canvas({dimensions})
                 }
             })
         });
+    }
+
+    const getSectionById = (id) => {
+        return sections.filter(section=>section.id===id)[0];
     }
 
     const getNodeById = (id) => {
@@ -924,27 +965,29 @@ export function Canvas({dimensions})
                 /> : null : null
             })}
             {taskNodes.map(node=>{
-
                 const from_anchor = 1;
                 const to_anchor = 3;
                 // console.log(node.width)
                 // const from_anchor = Math.floor(Math.random()*4);
                 // const to_anchor = Math.floor(Math.random()*4);
-                const arrow_size = 10 / canvasScale;
+                // const arrow_size = 10 / canvasScale;
                 const arrow_dy = to_anchor===0 ? 1 : to_anchor===2 ? -1 : 0;
                 const arrow_dx = to_anchor===1 ? 1 : to_anchor===3 ? -1 : 0;
-                const finalAnchor = anchor_utils.calcAnchorPosition(
-                    to_anchor, getNodeById(node.attached_to_id), canvasScale);
+                const finalAnchor = node.attached_to_type==="node" ?
+                    anchor_utils.calcAnchorPosition(to_anchor,
+                        getNodeById(node.attached_to_id), canvasScale) : null;
+                const section = node.attached_to_type==="section" ? 
+                getSectionById(node.attached_to_id) : null;
                 return node.display ||
                 microTasks.filter(task=>task.id===node.task_id)[0].display ?
                 <Group
                 key={node.id}>
-                    <MyLine
+                    {node.attached_to_type==="node" ? <MyLine
                     points={[
                         ...anchor_utils.calcAnchorPosition(
                             from_anchor, node, canvasScale),
                         ...anchor_utils.findPathBetweenNodes(from_anchor, to_anchor,
-                            node,getNodeById(node.attached_to_id), canvasScale),
+                            node, getNodeById(node.attached_to_id), canvasScale),
                         // ...calcAnchorOffset(arrow.from_anchor, nodes[arrow.from_id]),
                         // ...calcAnchorOffset(arrow.to_anchor, nodes[arrow.to_id]),
                         ...finalAnchor
@@ -954,13 +997,42 @@ export function Canvas({dimensions})
                     opacity={0.5}
                     stroke={colorPalette[node.task_id%colorPalette.length]}
                     strokeWidth={2/canvasScale}
-                    />
+                    /> : <MyLine
+                    points={[
+                        ...anchor_utils.calcAnchorPosition(
+                            2, node, canvasScale),
+                        ...anchor_utils.findPathBetweenNodeAndPosition(
+                            [section.x+section.width*section.scaleX/2,
+                                section.y-40/canvasScale],
+                            node, 2, canvasScale
+                        ),
+                        // ...anchor_utils.findPathBetweenVectors(
+                        //     {x: section.x + section.width*section.scaleX/2,
+                        //     y: section.y - 40/canvasScale,
+                        //     dx: 1, dy:0},
+                        //     {x: }
+                        // ),
+                        // ...anchor_utils.calcAnchorPosition(
+                        //     from_anchor, node, canvasScale),
+                        // ...anchor_utils.findPathBetweenNodes(from_anchor, to_anchor,
+                        //     node,getNodeById(node.attached_to_id), canvasScale),
+                        // ...calcAnchorOffset(arrow.from_anchor, nodes[arrow.from_id]),
+                        // ...calcAnchorOffset(arrow.to_anchor, nodes[arrow.to_id]),
+                        // ...finalAnchor
+                    ]}
+                    tension={0}
+                    // stroke={"gray"}
+                    opacity={0.5}
+                    stroke={colorPalette[node.task_id%colorPalette.length]}
+                    strokeWidth={2/canvasScale}
+                    />}
                     <TaskNode
                     key={node.id}
                     type={node.type}
                     x={node.x}
                     y={node.y}
                     width={node.width}
+                    height={node.height}
                     radiusX={node.radiusX}
                     radiusY={node.radiusY}
                     text={node.text}

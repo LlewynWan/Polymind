@@ -339,7 +339,7 @@ export function TaskHeader({
                                 //     });
                                 // }
                             })
-                        }, 1200));
+                        }, 1000));
                     }
                     e.target.getStage().container().style.cursor = "pointer"
                     e.target.parent.to({y: -1, duration: 0.15})
@@ -471,7 +471,7 @@ export function TaskHeader({
     visible={isHoverHeader}
     ref={curtainRef}
     />
-    {isCurtainDrawn && ! isCurtainFixed ? <Icon
+    {isCurtainDrawn && !isCurtainFixed ? <Icon
     x={width-15}
     y={fontHeight/2}
     type={"forward"}

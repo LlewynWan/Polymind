@@ -6,7 +6,8 @@ import { TextInput } from "./TextInput";
 
 import { colorMap } from "./utils/color_utils";
 import { getTextWidth } from "./utils/size_utils";
-import { nextType, prevType } from "./utils/task_utils";
+import { nextInputType, prevInputType,
+    nextOutputType, prevOutputType } from "./utils/task_utils";
 
 
 export function TaskCard({
@@ -166,22 +167,22 @@ export function TaskCard({
         x={width/2-5}
         y={80}
         type={"LArrow"}
-        onClick={()=>setIOType(prevType(inputType),"input")}/>
+        onClick={()=>setIOType(prevInputType(inputType),"input")}/>
         <Icon
         x={width-20}
         y={80}
         type={"RArrow"}
-        onClick={()=>setIOType(nextType(inputType),"input")}/>
+        onClick={()=>setIOType(nextInputType(inputType),"input")}/>
         <Icon
         x={width/2-5}
         y={110}
         type={"LArrow"}
-        onClick={()=>setIOType(prevType(outputType),"output")}/>
+        onClick={()=>setIOType(prevOutputType(outputType),"output")}/>
         <Icon
         x={width-20}
         y={110}
         type={"RArrow"}
-        onClick={()=>setIOType(nextType(outputType),"output")}/>
+        onClick={()=>setIOType(nextOutputType(outputType),"output")}/>
         
         <Label
         x={width/2-20}

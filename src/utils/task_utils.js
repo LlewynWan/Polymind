@@ -1,11 +1,18 @@
-const objectTypes = [
-    "Sticky Note",
+const inputTypes = [
     "Keyword",
     "Concept",
-    "Section",
+    "Sticky Note",
     "Node",
-    "Line"
+    "Section"
+    // "Line"
 ];
+
+const outputTypes = [
+    "Keyword",
+    "Concept",
+    "Sticky Note",
+    "Line"
+]
 
 const toUpperCase = (type) =>{
     switch (type) {
@@ -41,15 +48,26 @@ const toLowerCase = (type) =>{
       }
 }
 
-const nextType = (type) => {
-    const currentIndex = objectTypes.findIndex((objType=>objType===type));
-    return objectTypes[(currentIndex + 1) % 6];
+const nextInputType = (type) => {
+    const currentIndex = inputTypes.findIndex((objType=>objType===type));
+    return inputTypes[(currentIndex + 1) % 5];
 }
 
-const prevType = (type) => {
-    const currentIndex = objectTypes.findIndex((objType=>objType===type));
-    return objectTypes[(currentIndex + 5) % 6];
+const prevInputType = (type) => {
+    const currentIndex = inputTypes.findIndex((objType=>objType===type));
+    return inputTypes[(currentIndex + 4) % 5];
+}
+
+const nextOutputType = (type) => {
+    const currentIndex = outputTypes.findIndex((objType=>objType===type));
+    return outputTypes[(currentIndex + 1) % 4];
+}
+
+const prevOutputType = (type) => {
+    const currentIndex = outputTypes.findIndex((objType=>objType===type));
+    return outputTypes[(currentIndex + 3) % 4];
 }
 
 
-export {objectTypes, nextType, prevType, toUpperCase, toLowerCase}
+export {nextInputType, prevInputType,
+    nextOutputType, prevOutputType, toUpperCase, toLowerCase}

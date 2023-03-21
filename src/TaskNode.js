@@ -43,6 +43,7 @@ export function TaskNode({
     const suggestionRef = useRef(null);
 
     useEffect(() => {
+        console.log(width,height)
         // if (!isSelected && isEditing) {
         //   setIsEditing(false);
         // }
@@ -57,7 +58,7 @@ export function TaskNode({
         new Konva.Text({text: text, width: radiusX*2, fontSize: fontSize})
         : new Konva.Text({text: text, width: width, fontSize: fontSize});
         setTextHeight(tmp.height());
-    }, [fontSize]);
+    }, [fontSize, canvasScale]);
     
     return (
     <Group

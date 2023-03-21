@@ -117,7 +117,8 @@ export function ToolBar({
         shadowOffsetX={0}
         strokeWidth={0.25}
         stroke={"grey"}
-        shadowBlur={5}
+        // shadowBlur={5}
+        shadowBlur={10}
         shadowOpacity={0.25}
         />
 

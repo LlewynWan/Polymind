@@ -337,6 +337,12 @@ export function Icon({
         e.target.getStage().container().style.cursor = "default"
     }}
     onClick={onClick}>
+        <Rect
+        x={-6}
+        y={-6}
+        width={12}
+        height={12}
+        fill={"transparent"}/>
         <Arrow
         x={0}
         y={0}
