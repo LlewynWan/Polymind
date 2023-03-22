@@ -11,6 +11,7 @@ export function SuggestionPanel ({
     pointerDirection,
     suggestions,
     fontColor,
+    handleRegenerate,
     fill="transparent"
 }) {
     // const getTextWidth = (text) => {
@@ -42,6 +43,7 @@ export function SuggestionPanel ({
         key={index}
         x={0}
         y={-(fontSize+15)*index}
+        onClick={()=>handleRegenerate(suggestion)}
         onMouseEnter={(e)=>{e.target.getStage().container().style.cursor = "pointer"}}
         onMouseLeave={(e)=>{e.target.getStage().container().style.cursor = "default"}}>
             <Tag

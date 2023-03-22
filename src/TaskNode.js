@@ -10,6 +10,8 @@ import { Icon } from "./Icon";
 import { TextInput } from "./TextInput"
 import { SuggestionPanel } from "./SuggestionPanel";
 
+import { explain } from "./utils/GPT_utils";
+
 
 const RETURN_KEY = 13;
 const ESCAPE_KEY = 27;
@@ -24,14 +26,17 @@ export function TaskNode({
     radiusY,
     color,
     text,
+    prompt,
     fontSize,
     onDragMove,
     onDragEnd,
     onConfirm,
     onDelete,
     onTextSizeChange,
+    onTextHeightOverflow,
+    handleRegenerate,
     listening,
-    suggestions=["Rephrase", "Be more specific", "Not creative"]
+    suggestions=["Rephrase.", "Be more specific.", "Be creative."]
 }) {
     const {canvasX, canvasY, canvasScale, microTasks} = useContext(CanvasContext);
     const [textHeight, setTextHeight] = useState(0);
@@ -39,23 +44,29 @@ export function TaskNode({
     const [isHover, setIsHover] = useState(false);
     const [isHoverIcons, setIsHoverIcons] = useState(false);
     const [needsExplanation, setNeedsExplanation] = useState(false);
-    const [explanation, setExplanation] = useState("Why ...");
+    const [explanation, setExplanation] = useState("");
 
     const nodeRef = useRef(null);
     const suggestionRef = useRef(null);
 
-    const RETURN_KEY = 13;
-    const ESCAPE_KEY = 27;
-    function handleEscapeKeys(e) {
-        if (e.keyCode === ESCAPE_KEY) {
-            setNeedsExplanation(false);
-            setExplanation("Why ...");
-        }
+    // const RETURN_KEY = 13;
+    // const ESCAPE_KEY = 27;
+    // function handleEscapeKeys(e) {
+    //     if (e.keyCode === ESCAPE_KEY) {
+    //         setNeedsExplanation(false);
+    //         setExplanation("Why ...");
+    //     }
 
-        if ((e.keyCode === RETURN_KEY && !e.shiftKey)) {
-            setExplanation((explanation)=>explanation+"\n\nBecause ...")
+    //     if ((e.keyCode === RETURN_KEY && !e.shiftKey)) {
+    //         setExplanation((explanation)=>explanation+"\n\nBecause ...")
+    //     }
+    // }
+
+    useEffect(()=>{
+        if (onTextHeightOverflow) {
+            onTextHeightOverflow(textHeight);
         }
-    }
+    }, [textHeight]);
 
     useEffect(() => {
         // if (!isSelected && isEditing) {
@@ -93,7 +104,7 @@ export function TaskNode({
     {type === "concept" ?
     <Group
     x={0}
-    y={-radiusY-12}
+    y={-Math.max(sizeMap[type].radiusY,textHeight)-12}
     scaleX={0.75}
     scaleY={0.75}
     // opacity={0.9}
@@ -113,14 +124,30 @@ export function TaskNode({
         x={0}
         y={-15}
         opacity={isHoverIcons?1:0}>
-            {needsExplanation ? null :
+            {needsExplanation ? 
+            <Label
+            x={0}
+            y={0}>
+                <Tag
+                fill={"white"}
+                stroke={color}
+                strokeWidth={1.5}
+                cornerRadius={5}
+                pointerDirection={"down"}/>
+                <Text
+                text={explanation}
+                fontSize={13}
+                fontStyle={"bold"}
+                padding={5}/>
+            </Label> :
             <SuggestionPanel
             x={0}
             y={0}
             fontSize={14}
             fontColor={"#444444"}
             pointerDirection={"down"}
-            suggestions={suggestions.slice(0,3)}/>}
+            suggestions={suggestions.slice(0,3)}
+            handleRegenerate={handleRegenerate}/>}
             {/* <Label
             x={0}
             y={0}
@@ -144,23 +171,29 @@ export function TaskNode({
             </Label> */}
         </Group>
         <Icon
-        x={-10}
+        x={-20}
         y={0}
         type={"cross"}
         onClick={onDelete}
         />
         <Icon
-        x={10}
+        x={0}
         y={0}
         type={"confirm"}
         onClick={onConfirm}
         />
         <Icon
-        x={30}
+        x={20}
         y={0}
         type={"question"}
         enabled={needsExplanation}
-        onClick={()=>{setNeedsExplanation(!needsExplanation)}}
+        onClick={()=>{
+            explain(prompt, text, (result)=>{
+                // console.log(result.replace(/(.{30})/g,"$1\n"))
+                setExplanation(result.replace(/(.{30})/g,"$1\n"));
+            });
+            setNeedsExplanation(!needsExplanation);
+        }}
         />
     </Group>
     :
@@ -185,37 +218,52 @@ export function TaskNode({
         x={70}
         y={0}
         opacity={isHoverIcons?1:needsExplanation?1:0}>
-            {needsExplanation ? 
-            <Group>
-                <Rect
-                x={-5}
-                y={-25}
-                width={150}
-                height={40}
-                cornerRadius={3}
-                fill={"transparent"}
+            {needsExplanation ?
+            <Label
+            x={0}
+            y={0}>
+                <Tag
+                fill={"white"}
                 stroke={color}
                 strokeWidth={1.5}
-                />
-                <TextInput
-                x={0}
-                y={-20}
-                width={140}
-                height={20}
-                fontSize={15}
-                padding={5}
-                value={explanation}
-                onKeyDown={handleEscapeKeys}
-                onChange={(e)=>{setExplanation(e.target.value)}}/>
-            </Group>
-            :
-            <SuggestionPanel
+                cornerRadius={5}
+                pointerDirection={"down"}/>
+                <Text
+                text={explanation}
+                fontSize={13}
+                fontStyle={"bold"}
+                padding={5}/>
+            </Label>
+            // <Group>
+            //     <Rect
+            //     x={-5}
+            //     y={-25}
+            //     width={150}
+            //     height={40}
+            //     cornerRadius={3}
+            //     fill={"transparent"}
+            //     stroke={color}
+            //     strokeWidth={1.5}
+            //     />
+            //     <TextInput
+            //     x={0}
+            //     y={-20}
+            //     width={140}
+            //     height={20}
+            //     fontSize={15}
+            //     padding={5}
+            //     value={explanation}
+            //     onKeyDown={handleEscapeKeys}
+            //     onChange={(e)=>{setExplanation(e.target.value)}}/>
+            // </Group>
+            : <SuggestionPanel
             x={0}
             y={0}
             fontSize={14}
             fontColor={"#444444"}
             pointerDirection={"left"}
-            suggestions={suggestions.slice(0,3)}/>}
+            suggestions={suggestions.slice(0,3)}
+            handleRegenerate={handleRegenerate}/>}
             {/* <Label
             x={0}
             y={0}
@@ -240,14 +288,31 @@ export function TaskNode({
         </Group> : <Group
         x={-12}
         y={-27}
-        opacity={isHoverIcons?1:0}>
+        opacity={isHoverIcons?1:needsExplanation?1:0}>
+            {needsExplanation ?
+            <Label
+            x={0}
+            y={0}>
+                <Tag
+                fill={"white"}
+                stroke={color}
+                strokeWidth={1.5}
+                cornerRadius={5}
+                pointerDirection={"down"}/>
+                <Text
+                text={explanation}
+                fontSize={13}
+                fontStyle={"bold"}
+                padding={5}/>
+            </Label> :
             <SuggestionPanel
             x={0}
             y={0}
             fontSize={14}
             fontColor={"#444444"}
             pointerDirection={"left"}
-            suggestions={suggestions.slice(0,3)}/>
+            suggestions={suggestions.slice(0,3)}
+            handleRegenerate={handleRegenerate}/>}
             {/* <Label
             x={0}
             y={0}
@@ -288,9 +353,10 @@ export function TaskNode({
         type={"question"}
         enabled={needsExplanation}
         onClick={()=>{
-            if (needsExplanation) {
-                setExplanation("Why ...");
-            }
+            explain(prompt, text, (result)=>{
+                // console.log(result.replace(/(.{30})/g,"$1\n"))
+                setExplanation(result.replace(/(.{30})/g,"$1\n"));
+            });
             setNeedsExplanation(!needsExplanation);
         }}
         />

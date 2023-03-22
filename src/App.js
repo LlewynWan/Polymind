@@ -24,9 +24,9 @@ function App() {
     arrows: [],
     sections: [],
     microtasks: [
-      {id: 0, goal: "Brainstorm", inputType: "Keyword", outputType: "Keyword", display: false, suggestions: ["Find related", "Find Synonym", ""], examplePrompt: "Brainstorm five keywords related to [placeholder]."},
+      {id: 0, goal: "Brainstorm", inputType: "Keyword", outputType: "Keyword", display: false, suggestions: ["Find related", "Find Synonym", ""], examplePrompt: "Brainstorm keywords related to [placeholder]."},
       {id: 1, goal: "Summarise", inputType: "Sticky Note", outputType: "Keyword", display: false, suggestions: ["TLDR", "Top 3 keywords", "Abstract", ""], examplePrompt: "Provide a TLDR version of the following:\n[placeholder]."},
-      {id: 2, goal: "Elaborate", inputType: "Concept", outputType: "Sticky Note", display: false, suggestions: ["Provide examples", "Clarification", ""], examplePrompt: "What are examples of [placeholder]"},
+      {id: 2, goal: "Elaborate", inputType: "Concept", outputType: "Concept", display: false, suggestions: ["Provide examples", "Clarification", ""], examplePrompt: "What are examples of [placeholder]"},
       {id: 3, goal: "Draft", inputType: "Section", outputType: "Sticky Note", display: false, suggestions: ["Abstract", "Overview", ""], examplePrompt: "[placeholder].\nWrite an abstract of the above outline."},
       {id: 4, goal: "Freewrite", inputType: "Sticky Note", outputType: "Sticky Note", display: false, suggestions: ["Co-creation"], examplePrompt: "[placeholder].\n Continue to write."},
       // {id: 5, goal: "Associate", inputType: "Node", outputType: "Section", display: false, suggestions: ["Find relationship"], examplePrompt: "Find association between [placeholder] and [placeholder]"},

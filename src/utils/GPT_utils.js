@@ -4,33 +4,165 @@ const openai = new OpenAIApi(
   new Configuration({ apiKey: process.env.REACT_APP_OPENAI_API_KEY })
 )
 
-export async function promptGPT(prompt, num_results, max_words_per_result) {
+export async function promptGPT(prompt, num_results, max_words_per_result, handleResponse) {
   const GPT35TurboMessage = [ 
-    { role: "system", content: `You are a writing expert and you're assisting user for pre-writing.` },
+    { role: "system", content: `You are a writing expert and you are assisting users in prewriting process. You should strictly follow the output specification given by the user.` },
     {   
       role: "user",
-      content: prompt + `\nThe output should be a list of ${num_results} items separated by a new line. Each item in the list should be no more than ${max_words_per_result} words`,
+      content: prompt + `\n\nThe output should be a list of ${num_results} items separated by a new line. Each item in the list should be no more than ${max_words_per_result} words`,
     },
   ];
 
-  console.log(prompt + `\nThe output should be a list of ${num_results} items separated by a new line. Each item in the list should be no more than ${max_words_per_result} words`)
+  // console.log(prompt + `\n\nThe output should be a list of ${num_results} items separated by a new line. Each item in the list should be no more than ${max_words_per_result} words`)
 
-  let GPT35Turbo = async (message) => {
-    const response = await openai.createChatCompletion({
-      model: "gpt-3.5-turbo",
-      messages: message,
-    }); 
-    
-    return response.data.choices[0].message.content;
+  const requestOptions = {
+    // mode: 'no-cors',
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer ' + String(process.env.REACT_APP_OPENAI_API_KEY)
+    },
+    body: JSON.stringify({
+      "model": "gpt-3.5-turbo",
+      'messages': GPT35TurboMessage,
+      'temperature': 0.7,
+      // 'max_tokens': maxTokens,
+      // 'top_p': 1,
+    //   'frequency_penalty': 0,
+    //   'presence_penalty': 0.5,
+    //   'stop': ["\"\"\""],
+    })
   };
-
-  let results = (await GPT35Turbo(GPT35TurboMessage)).split("\n");
-  // trim each space and remove the digital number and non-alphabetical characters
-  results = results.map((result) => {
-    return result.trim().replace(/^[0-9]+\. /, "").replace(/[^a-zA-Z ]/g, "");
-  });
-  return  results;
+  fetch('https://api.openai.com/v1/chat/completions', requestOptions)
+      .then(response => response.json())
+      .then(data => data.choices[0].message.content.split('\n'))
+      .then(results => results.map(result =>
+        result.trim().replace(/^[0-9]+\. /, "").replace(/[^a-zA-Z ]/g, "")))
+      .then(results => handleResponse(results))
+    .catch(err => {
+      console.log("Ran out of tokens for today! Try tomorrow!");
+    });
 }
+
+export async function regenerate(prevPrompt, prevOutput, prompt, handleResponse) {
+  const GPT35TurboMessage = [
+    { role: "system", content: `You are a writing expert and you are assisting users in prewriting process. You should strictly follow the output specification given by the user.` },
+    {   
+      role: "user",
+      content: prevPrompt,
+    },
+    {
+      role: "assistant",
+      content: prevOutput,
+    },
+    {
+      role: "user",
+      content: "Replace the output with a new one. " + prompt +
+      "\n\n The output should be only one item with similar word count to the previous output."
+    }
+  ];
+
+  const requestOptions = {
+    // mode: 'no-cors',
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer ' + String(process.env.REACT_APP_OPENAI_API_KEY)
+    },
+    body: JSON.stringify({
+      "model": "gpt-3.5-turbo",
+      'messages': GPT35TurboMessage,
+      'temperature': 0.7,
+      // 'max_tokens': maxTokens,
+      // 'top_p': 1,
+    //   'frequency_penalty': 0,
+    //   'presence_penalty': 0.5,
+    //   'stop': ["\"\"\""],
+    })
+  };
+  fetch('https://api.openai.com/v1/chat/completions', requestOptions)
+      .then(response => response.json())
+      .then(data => data.choices[0].message.content)
+      .then(result => handleResponse(result))
+    .catch(err => {
+      console.log("Ran out of tokens for today! Try tomorrow!");
+    });
+}
+
+export async function explain(prevPrompt, prevOutput, handleResponse) {
+  const GPT35TurboMessage = [
+    { role: "system", content: `You are a writing expert and you are assisting users in prewriting process. You should strictly follow the output specification given by the user.` },
+    {   
+      role: "user",
+      content: prevPrompt,
+    },
+    {
+      role: "assistant",
+      content: prevOutput,
+    },
+    {
+      role: "user",
+      content: "Needs some simple explanation of the answer. The explanation output should be no more than 50 words"}
+  ];
+
+  // console.log(GPT35TurboMessage)
+
+  const requestOptions = {
+    // mode: 'no-cors',
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer ' + String(process.env.REACT_APP_OPENAI_API_KEY)
+    },
+    body: JSON.stringify({
+      "model": "gpt-3.5-turbo",
+      'messages': GPT35TurboMessage,
+      'temperature': 0.7,
+      // 'max_tokens': maxTokens,
+      // 'top_p': 1,
+    //   'frequency_penalty': 0,
+    //   'presence_penalty': 0.5,
+    //   'stop': ["\"\"\""],
+    })
+  };
+  fetch('https://api.openai.com/v1/chat/completions', requestOptions)
+      .then(response => response.json())
+      .then(data => data.choices[0].message.content)
+      .then(result => handleResponse(result))
+    .catch(err => {
+      console.log("Ran out of tokens for today! Try tomorrow!");
+    });
+}
+
+
+// const GPT35TurboMessage = [ 
+//   { role: "system", content: `You are a writing expert and you're assisting user for pre-writing.` },
+//   {   
+//     role: "user",
+//     content: prompt + `\nThe output should be a list of ${num_results} items separated by a new line. Each item in the list should be no more than ${max_words_per_result} words`,
+//   },
+// ];
+
+// // console.log(prompt + `\nThe output should be a list of ${num_results} items separated by a new line. Each item in the list should be no more than ${max_words_per_result} words`)
+
+// let GPT35Turbo = async (message) => {
+//   const response = await openai.createChatCompletion({
+//     model: "gpt-3.5-turbo",
+//     messages: message,
+//   }); 
+  
+//   return response.data.choices[0].message.content;
+// };
+
+// let results = (await GPT35Turbo(GPT35TurboMessage)).split("\n");
+// // trim each space and remove the digital number and non-alphabetical characters
+// results = results.map((result) => {
+//   return result.trim().replace(/^[0-9]+\. /, "").replace(/[^a-zA-Z ]/g, "");
+// });
+// return  results;
+
+// const res = await promptGPT(1,1,1);
+// console.log(res)
 
 // export async function PromptGPT(prompt, maxTokens, handleResponse)
 // {
