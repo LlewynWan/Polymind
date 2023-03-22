@@ -298,7 +298,7 @@ export function Canvas({dimensions})
                             x: object.x+120/canvasScale+Math.random()*120+object.scaleX*
                                 (object.type==="concept"?object.radiusX:object.width),
                             y: object.type==="concept"?
-                                object.y+object.scaleY*object.radiusY+(30*index-50)/canvasScale+
+                                object.y+object.scaleY*object.radiusY+(150*index-150)/canvasScale+
                                 Math.ceil(Math.random()*99) * (Math.round(Math.random())?1:-1)
                                 : object.y+(100*index-100)/canvasScale+Math.random()*120+object.scaleY*object.height,
                             fontSize: (task.outputType==="Sticky Note"?16:20), text: result, display: false,

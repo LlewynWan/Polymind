@@ -126,8 +126,8 @@ export function TaskNode({
         opacity={isHoverIcons?1:needsExplanation?1:0}>
             {needsExplanation ? 
             <Label
-            x={0}
-            y={0}>
+            x={20}
+            y={-5}>
                 <Tag
                 fill={"white"}
                 stroke={color}
@@ -220,7 +220,7 @@ export function TaskNode({
         opacity={isHoverIcons?1:needsExplanation?1:0}>
             {needsExplanation ?
             <Label
-            x={0}
+            x={120}
             y={0}>
                 <Tag
                 fill={"white"}
@@ -291,8 +291,8 @@ export function TaskNode({
         opacity={isHoverIcons?1:needsExplanation?1:0}>
             {needsExplanation ?
             <Label
-            x={0}
-            y={0}>
+            x={20}
+            y={10}>
                 <Tag
                 fill={"white"}
                 stroke={color}
