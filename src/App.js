@@ -24,11 +24,11 @@ function App() {
     arrows: [],
     sections: [],
     microtasks: [
-      {id: 0, goal: "Brainstorm", inputType: "Keyword", outputType: "Keyword", display: false, suggestions: ["Find related", "Find Synonym", ""], examplePrompt: "Brainstorm keywords related to [placeholder]."},
-      {id: 1, goal: "Summarise", inputType: "Sticky Note", outputType: "Keyword", display: false, suggestions: ["TLDR", "Top 3 keywords", "Abstract", ""], examplePrompt: "Provide a TLDR version of the following:\n[placeholder]."},
-      {id: 2, goal: "Elaborate", inputType: "Concept", outputType: "Concept", display: false, suggestions: ["Provide examples", "Clarification", ""], examplePrompt: "What are examples of [placeholder]"},
-      {id: 3, goal: "Draft", inputType: "Section", outputType: "Sticky Note", display: false, suggestions: ["Abstract", "Overview", ""], examplePrompt: "[placeholder].\nWrite an abstract of the above outline."},
-      {id: 4, goal: "Freewrite", inputType: "Sticky Note", outputType: "Sticky Note", display: false, suggestions: ["Co-creation"], examplePrompt: "[placeholder].\n Continue to write."},
+      {id: 0, goal: "Brainstorm", inputType: "Keyword", outputType: "Keyword", display: false, suggestions: ["Find related", "Find Synonym", "Custom"], examplePrompt: "Brainstorm keywords related to [placeholder].", promptSuggestions: ["Brainstorm keywords related to [placeholder].", "Find synonyms for [placeholder].",""]},
+      {id: 1, goal: "Summarise", inputType: "Sticky Note", outputType: "Sticky Note", display: false, suggestions: ["TLDR", "Top 3 keywords", "Abstract", "Custom"], examplePrompt:"Provide a TLDR version of the following:\n[placeholder]", promptSuggestions: ["Provide a TLDR version of the following:\n[placeholder]", "Summarise Top 3 keywords of the following:\n[placeholder]", "Write an abstract of the following:\n[placeholder]",""]},
+      {id: 2, goal: "Elaborate", inputType: "Concept", outputType: "Concept", display: false, suggestions: ["Provide examples", "Clarification", "Custom"], examplePrompt:"What are examples of [placeholder].", promptSuggestions: ["What are examples of [placeholder].", "Provide a simple explanation of [placeholder].",""]},
+      {id: 3, goal: "Draft", inputType: "Section", outputType: "Sticky Note", display: false, suggestions: ["Abstract", "Overview", "Custom"], examplePrompt:"[placeholder].\n\nWrite an abstract of the above outline.", promptSuggestions: ["[placeholder].\n\nWrite an abstract of the above outline.","[placeholder].\n\nWrite an overview of the above outline.",""]},
+      {id: 4, goal: "Freewrite", inputType: "Sticky Note", outputType: "Sticky Note", display: false, suggestions: ["Co-creation"], examplePrompt: "[placeholder].\n Continue to write.", promptSuggestions: ["[placeholder].\n Continue to write.",""]},
       // {id: 5, goal: "Associate", inputType: "Node", outputType: "Section", display: false, suggestions: ["Find relationship"], examplePrompt: "Find association between [placeholder] and [placeholder]"},
       // {id: 6, goal: "Clarify", inputType: "Concept", outputType: "Sticky Note", examplePrompt: []},
       // {id: 7, goal: "Draft", inputType: "Section", outputType: "Sticky Note", examplePrompt: []}

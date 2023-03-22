@@ -17,6 +17,7 @@ export function TaskCard({
     color,
     goal,
     suggestions,
+    suggestedPrompts,
     inputType,
     outputType,
     examplePrompt,
@@ -374,16 +375,18 @@ export function TaskCard({
             y={0}
             type={"LArrow"}
             onClick={()=>{
-                setSuggestionIndex((suggestionIndex+suggestions.length-1)
-                    %suggestions.length);
+                const newSuggestionIndex = (suggestionIndex+suggestions.length-1)%suggestions.length
+                handlePromptTextChange(suggestedPrompts[newSuggestionIndex])
+                setSuggestionIndex(newSuggestionIndex);
             }}/>
             <Icon
             x={width/2+15}
             y={0}
             type={"RArrow"}
             onClick={()=>{
-                setSuggestionIndex((suggestionIndex+1)
-                    %suggestions.length);
+                const newSuggestionIndex = (suggestionIndex+1)%suggestions.length
+                handlePromptTextChange(suggestedPrompts[newSuggestionIndex])
+                setSuggestionIndex(newSuggestionIndex);
             }}
             />
             <Label

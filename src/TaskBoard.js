@@ -220,6 +220,7 @@ export function TaskBoard({
                     color={colorPalette[task.id%colorPalette.length]}
                     goal={task.goal}
                     suggestions={task.suggestions}
+                    suggestedPrompts={task.promptSuggestions}
                     inputType={task.inputType}
                     outputType={task.outputType}
                     examplePrompt={task.examplePrompt}

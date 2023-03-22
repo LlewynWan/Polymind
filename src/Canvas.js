@@ -350,7 +350,7 @@ export function Canvas({dimensions})
         // }, 5000);
     }
     const handleHeaderTaskClick = (task_id, object_type, object_id) => {
-        if (object_type === "node") {
+        if (object_type !== "section") {
             setNodes(prevState => prevState.map(state => {
                 let tmp = state;
                 if (tmp.id === object_id) {
