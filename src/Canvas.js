@@ -127,7 +127,7 @@ export function Canvas({dimensions})
                             handleMicroTask(task, object_type, node);
                     } else {
                         const section = sections.filter(section=>section.id===inFocus[object_type]);
-                        if (section.length && section[0].disabledTaskId.has(task.id))
+                        if (section.length && !section[0].disabledTaskId.has(task.id))
                             handleMicroTask(task, object_type, section[0])   
                     }   
                 }
@@ -329,12 +329,12 @@ export function Canvas({dimensions})
                             scaleX: 1, scaleY: 1, attached_from_id: attached_from_id,
                             attached_to_type: object_type, task_id: task.id,
                             attached_to_id: object.id, type: toLowerCase(task.outputType),
-                            x: object.x+120/canvasScale+Math.random()*120+object.scaleX*
-                                (object.type==="concept"?object.radiusX:object.width),
+                            x: object.x+120*canvasScale+Math.random()*120+object.scaleX*
+                                (object.type==="concept"?object.radiusX*2:object.width),
                             y: object.type==="concept"?
-                                object.y+object.scaleY*object.radiusY+(150*index-150)/canvasScale+
+                                object.y+object.scaleY*object.radiusY+(200*index-200)*canvasScale+
                                 Math.ceil(Math.random()*99) * (Math.round(Math.random())?1:-1)
-                                : object.y+(100*index-100)/canvasScale+Math.random()*120+object.scaleY*object.height,
+                                : object.y+(100*index-100)*canvasScale+Math.random()*120+object.scaleY*object.height,
                             fontSize: (task.outputType==="Sticky Note"?16:20), text: result, display: false,
                             prompt: prompt
                             }})]
@@ -369,8 +369,8 @@ export function Canvas({dimensions})
                             scaleX: 1, scaleY: 1,
                             attached_to_type: object_type, task_id: task.id,
                             attached_to_id: object.id, type: toLowerCase(task.outputType),
-                            x: object.x+75/canvasScale+Math.random()*100+object.scaleX*object.width/2,
-                            y: object.y-50/canvasScale-Math.random()*120,
+                            x: object.x+75*canvasScale+Math.random()*100+object.scaleX*object.width/2,
+                            y: object.y-150*canvasScale-Math.random()*120,
                             fontSize: (task.outputType==="Sticky Note"?16:20), text: results[0], display: false,
                             prompt: prompt
                             }]

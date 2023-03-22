@@ -13,6 +13,7 @@ export async function promptGPT(prompt, num_results, max_words_per_result, handl
     },
   ];
 
+  // console.log(prompt)
   // console.log(prompt + `\n\nThe output should be a list of ${num_results} items separated by a new line. Each item in the list should be no more than ${max_words_per_result} words`)
 
   const requestOptions = {
