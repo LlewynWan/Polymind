@@ -152,7 +152,7 @@ export function Concept({
     y={-radiusY*scaleY-40/canvasScale}
     // x={-radiusX}
     // y={-radiusY-10/canvasScale}
-    tasks={microTasks.filter(task=>task.inputType==="Concept"||task.inputType==="Node")}
+    tasks={microTasks.filter(task=>task.inputType==="Concept"||task.inputType==="Nodes")}
     fontSize={14}
     width={150}
     scale={1/canvasScale}

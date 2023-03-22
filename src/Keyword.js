@@ -143,7 +143,7 @@ export function Keyword({
     {header ? <TaskHeader
     x={0}
     y={-40/canvasScale}
-    tasks={microTasks.filter(task=>task.inputType==="Keyword"||task.inputType==="Node")}
+    tasks={microTasks.filter(task=>task.inputType==="Keyword"||task.inputType==="Nodes")}
     fontSize={14}
     width={150}
     scale={1/canvasScale}

@@ -2,7 +2,7 @@ const inputTypes = [
     "Keyword",
     "Concept",
     "Sticky Note",
-    "Node",
+    "Nodes",
     "Section"
     // "Line"
 ];
@@ -11,14 +11,14 @@ const outputTypes = [
     "Keyword",
     "Concept",
     "Sticky Note",
-    "Section"
+    // "Line"
 ];
 
 const outputMap = {
     "Keyword": [3,3],
     "Concept": [3,5],
     "Sticky Note": [1,50],
-    // "Section"
+    // "Line": [3,3]
 }
 
 const toUpperCase = (type) =>{
@@ -32,7 +32,7 @@ const toUpperCase = (type) =>{
         case 'section':
             return "Section";
         case 'node':
-            return "Node";
+            return "Nodes";
         default:
             return "";
       }
@@ -48,7 +48,7 @@ const toLowerCase = (type) =>{
             return "concept";
         case 'Section':
             return "section";
-        case 'Node':
+        case 'Nodes':
             return "node";
         default:
             return "";
@@ -57,22 +57,22 @@ const toLowerCase = (type) =>{
 
 const nextInputType = (type) => {
     const currentIndex = inputTypes.findIndex((objType=>objType===type));
-    return inputTypes[(currentIndex + 1) % 5];
+    return inputTypes[(currentIndex + 1) % inputTypes.length];
 }
 
 const prevInputType = (type) => {
     const currentIndex = inputTypes.findIndex((objType=>objType===type));
-    return inputTypes[(currentIndex + 4) % 5];
+    return inputTypes[(currentIndex + inputTypes.length-1) % inputTypes.length];
 }
 
 const nextOutputType = (type) => {
     const currentIndex = outputTypes.findIndex((objType=>objType===type));
-    return outputTypes[(currentIndex + 1) % 4];
+    return outputTypes[(currentIndex + 1) % outputTypes.length];
 }
 
 const prevOutputType = (type) => {
     const currentIndex = outputTypes.findIndex((objType=>objType===type));
-    return outputTypes[(currentIndex + 3) % 4];
+    return outputTypes[(currentIndex + outputTypes.length-1) % outputTypes.length];
 }
 
 

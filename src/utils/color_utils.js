@@ -3,7 +3,7 @@ const colorMap = {
     "Concept": "#5880A2",
     "Sticky Note": "#003A6B",
     "Section": "#80D8FF",
-    "Node": "#112233",
+    "Nodes": "#112233",
     "Line": "#C3E7FD"
 }
 

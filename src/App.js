@@ -29,7 +29,7 @@ function App() {
       {id: 2, goal: "Elaborate", inputType: "Concept", outputType: "Concept", display: false, suggestions: ["Provide examples", "Clarification", "Custom"], examplePrompt:"What are examples of [placeholder].", promptSuggestions: ["What are examples of [placeholder].", "Provide a simple explanation of [placeholder].",""]},
       {id: 3, goal: "Draft", inputType: "Section", outputType: "Sticky Note", display: false, suggestions: ["Abstract", "Overview", "Custom"], examplePrompt:"[placeholder].\n\nWrite an abstract of the above outline.", promptSuggestions: ["[placeholder].\n\nWrite an abstract of the above outline.","[placeholder].\n\nWrite an overview of the above outline.",""]},
       {id: 4, goal: "Freewrite", inputType: "Sticky Note", outputType: "Sticky Note", display: false, suggestions: ["Co-creation"], examplePrompt: "[placeholder].\n Continue to write.", promptSuggestions: ["[placeholder].\n Continue to write.",""]},
-      // {id: 5, goal: "Associate", inputType: "Node", outputType: "Section", display: false, suggestions: ["Find relationship"], examplePrompt: "Find association between [placeholder] and [placeholder]"},
+      {id: 5, goal: "Associate", inputType: "Nodes", outputType: "Keyword", display: false, suggestions: ["Find relationship"], examplePrompt: "Clarify relationship between [placeholder] and [placeholder] in simple words.", promptSuggestions: ["Clarify relationship between [placeholder] and [placeholder] in simple words."]},
       // {id: 6, goal: "Clarify", inputType: "Concept", outputType: "Sticky Note", examplePrompt: []},
       // {id: 7, goal: "Draft", inputType: "Section", outputType: "Sticky Note", examplePrompt: []}
     ],

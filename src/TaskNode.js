@@ -36,7 +36,7 @@ export function TaskNode({
     onTextHeightOverflow,
     handleRegenerate,
     listening,
-    suggestions=["Rephrase.", "Be more specific.", "Be creative."]
+    suggestions=["Be brief.", "Be more specific.", "Be creative."]
 }) {
     const {canvasX, canvasY, canvasScale, microTasks} = useContext(CanvasContext);
     const [textHeight, setTextHeight] = useState(0);
@@ -217,7 +217,9 @@ export function TaskNode({
         {type === "sticky_note" ? <Group
         x={70}
         y={0}
-        opacity={isHoverIcons?1:needsExplanation?1:0}>
+        visible={isHoverIcons?1:needsExplanation?1:0}
+        // opacity={isHoverIcons?1:needsExplanation?1:0}
+        >
             {needsExplanation ?
             <Label
             x={120}
@@ -288,7 +290,9 @@ export function TaskNode({
         </Group> : <Group
         x={-12}
         y={-27}
-        opacity={isHoverIcons?1:needsExplanation?1:0}>
+        visible={isHoverIcons?1:needsExplanation?1:0}
+        // opacity={isHoverIcons?1:needsExplanation?1:0}
+        >
             {needsExplanation ?
             <Label
             x={20}
