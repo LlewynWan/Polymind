@@ -116,7 +116,7 @@ export function TaskCardAdder({
         </Label>
 
         <Icon
-        x={width-35}
+        x={width-45}
         y={32}
         type={"confirm"}
         onClick={()=>{
@@ -124,7 +124,7 @@ export function TaskCardAdder({
             onConfirm(examplePrompt==="Requesting task prompt example ..."?"":examplePrompt);
         }}/>
         <Icon
-        x={width-60}
+        x={width-70}
         y={32}
         type={"cross"}
         onClick={()=>{

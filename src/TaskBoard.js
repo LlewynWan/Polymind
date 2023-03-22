@@ -106,7 +106,7 @@ export function TaskBoard({
             onClick={()=>{
                 cardsRef.current.to({
                     y:80,
-                    clipHeight:height-125,
+                    clipHeight:height-225,
                     duration: 0.32
                 });
                 panelRef.current.to({
