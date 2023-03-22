@@ -1328,13 +1328,13 @@ export function Canvas({dimensions})
                     return tmp;
                 }))
             }}
-            onAddTask={(taskName) => {
+            onAddTask={(taskName,examplePrompt) => {
                 setMicroTasks(prevState=>{
                     return [
                         ...prevState,
                         {id: Math.max(...prevState.map(state=>state.id))+1,
                         goal: taskName, inputType: "Keyword", outputType: "Keyword",
-                        display: false, suggestions: [], examplePrompt: ""}
+                        display: false, suggestions: [], examplePrompt: examplePrompt}
                     ]
                 });
             }}

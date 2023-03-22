@@ -105,13 +105,13 @@ export function TaskBoard({
             type={"add"}
             onClick={()=>{
                 cardsRef.current.to({
-                    y:30,
-                    clipHeight:height-175,
+                    y:80,
+                    clipHeight:height-125,
                     duration: 0.32
                 });
                 panelRef.current.to({
-                    y:140,
-                    height: height-140,
+                    y:190,
+                    height: height-190,
                     duration: 0.32
                 })
                 setIsAddingCard(true);
@@ -128,9 +128,9 @@ export function TaskBoard({
             width={width}
             visible={isAddingCard}
             taskName={newTaskName}
-            onConfirm={()=>{
+            onConfirm={(examplePrompt)=>{
                 setIsAddingCard(false);
-                onAddTask(newTaskName);
+                onAddTask(newTaskName, examplePrompt);
                 setNewTaskName("Task Name");
                 cardsRef.current.to({
                     y:0,

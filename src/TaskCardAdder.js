@@ -4,6 +4,8 @@ import { Group, Rect, Label, Tag, Text, Arrow } from "react-konva";
 import { Icon } from "./Icon";
 import { TextInput } from "./TextInput";
 
+import { requestTaskPrompt } from "./utils/GPT_utils";
+
 
 export function TaskCardAdder({
     x,
@@ -24,12 +26,17 @@ export function TaskCardAdder({
         // e.target.setAttrs({fill: "#646464", stroke: "#646464"});
     }
 
+    const [examplePrompt, setExamplePrompt] = useState("example prompt");
+
     const [isEditingTaskName, setIsEditingTaskName] = useState(false);
+
     const RETURN_KEY = 13;
     const ESCAPE_KEY = 27;
     function handleEscapeKeys(e) {
         if ((e.keyCode === RETURN_KEY && !e.shiftKey) || e.keyCode === ESCAPE_KEY) {
             setIsEditingTaskName(false);
+            setExamplePrompt("Requesting task prompt example ...")
+            requestTaskPrompt(taskName, (result)=>{setExamplePrompt(result)})
         }
     }
 
@@ -41,7 +48,7 @@ export function TaskCardAdder({
         <Rect
         x={15}
         y={0}
-        height={50}
+        height={115}
         width={width-30}
         fill={"silver"}
         cornerRadius={5}
@@ -83,13 +90,38 @@ export function TaskCardAdder({
             }
         </Label>
 
+        <Label
+        x={width/2}
+        y={50}
+        >
+            <Tag
+            fill={"#646464"}
+            cornerRadius={5}
+            // visible={!isEditingTaskName}
+            opacity={0.75}
+            pointerDirection={"up"}
+            />
+            <Text
+            width={width-50}
+            height={60}
+            text={examplePrompt}
+            fontSize={12}
+            fontStyle={"bold"}
+            fontFamily={"sans-serif"}
+            fill={"white"}
+            // align={"center"}
+            padding={5}
+            onMouseEnter={handleTextHover}
+            onMouseLeave={handleTextUnhover}/>
+        </Label>
+
         <Icon
         x={width-35}
         y={32}
         type={"confirm"}
         onClick={()=>{
             setIsEditingTaskName(false);
-            onConfirm();
+            onConfirm(examplePrompt==="Requesting task prompt example ..."?"":examplePrompt);
         }}/>
         <Icon
         x={width-60}

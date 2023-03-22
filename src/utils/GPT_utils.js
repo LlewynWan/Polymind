@@ -102,7 +102,57 @@ export async function explain(prevPrompt, prevOutput, handleResponse) {
     },
     {
       role: "user",
-      content: "Needs some simple explanation of the answer. The explanation output should be no more than 50 words"}
+      content: "Needs some simple explanation of the answer. The explanation output should be no more than 50 words"
+    }
+  ];
+
+  // console.log(GPT35TurboMessage)
+
+  const requestOptions = {
+    // mode: 'no-cors',
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer ' + String(process.env.REACT_APP_OPENAI_API_KEY)
+    },
+    body: JSON.stringify({
+      "model": "gpt-3.5-turbo",
+      'messages': GPT35TurboMessage,
+      'temperature': 0.7,
+      // 'max_tokens': maxTokens,
+      // 'top_p': 1,
+    //   'frequency_penalty': 0,
+    //   'presence_penalty': 0.5,
+    //   'stop': ["\"\"\""],
+    })
+  };
+  fetch('https://api.openai.com/v1/chat/completions', requestOptions)
+      .then(response => response.json())
+      .then(data => data.choices[0].message.content)
+      .then(result => handleResponse(result))
+    .catch(err => {
+      console.log("Ran out of tokens for today! Try tomorrow!");
+    });
+}
+
+export async function requestTaskPrompt(taskName, handleResponse) {
+  // var template = {example1: "{Task Name: Brainstorm, Example Prompt: ['Brainstorm keywords related to [placeholder].','Find synonyms for [placeholder].']}",
+  // example2: "{Task Name: Summarise, Example Prompt: ['Provide a TLDR version of the following:\n[placeholder]','Summarise Top 3 keywords of the following:\n[placeholder]','Write an abstract of the following:\n[placeholder]']}",
+  // example3: "{Task Name: Elaborate, Example Prompt: ['What are examples of [placeholder].', 'Provide a simple explanation of [placeholder]']",
+  // example4: "{Task Name: Draft, Example Prompt: ['[placeholder].\n\nWrite an abstract of the above outline.']}"}
+  // template = JSON.stringify(template);
+
+  const GPT35TurboMessage = [
+    { role: "system", content: `The user is microtasking while prewriting. Given a task name he would like to see a prompt example to communicate with ChatGPT.` },
+    {role: "user",
+    content: "Given a task name, write an example prompt to communicate with you. Below are some examples:\n\
+    Task Name: Brainstorm Prompt: Brainstorm keywords related to [placeholder].\n\
+    Task Name: Summarise Prompt: Provide a TLDR version of the following:\\n[placeholder].\n\
+    Task Name: Elaborate Prompt: Provide a simple explanation of [placeholder].\n\
+    Task Name: Draft Prompt: [placeholder].\\n\nWrite an abstract of the above outline.\n\
+    Now I'm going to give a task name, you should return a prompt. The output should be within 20 words.\n\
+    Task Name: Extend\n\
+    Prompt: "}
   ];
 
   // console.log(GPT35TurboMessage)
@@ -251,4 +301,3 @@ export async function explain(prevPrompt, prevOutput, handleResponse) {
 //     });
 //     return keywordsList;
 // }
-
