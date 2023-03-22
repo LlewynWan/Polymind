@@ -62,6 +62,20 @@ export function TaskNode({
     //     }
     // }
 
+    const handleLongText = text => {
+        var pos = 0;
+        var prev = 0;
+        while (pos !== -1) {
+            console.log(pos)
+            pos = text.indexOf(' ', pos+1);
+            if (pos - prev > 30) {
+                text = text.substring(0,pos)+'\n'+text.substring(pos+1);
+                prev = pos;
+            }
+        }
+        return text;
+    }
+
     useEffect(()=>{
         if (onTextHeightOverflow) {
             onTextHeightOverflow(textHeight);
@@ -192,7 +206,8 @@ export function TaskNode({
         onClick={()=>{
             explain(prompt, text, (result)=>{
                 // console.log(result.replace(/(.{30})/g,"$1\n"))
-                setExplanation(result.replace(/(.{30})/g,"$1\n"));
+                // setExplanation(result.replace(/(.{30})/g,"$1\n"));
+                setExplanation(handleLongText(result));
             });
             setNeedsExplanation(!needsExplanation);
         }}
@@ -361,7 +376,8 @@ export function TaskNode({
         onClick={()=>{
             explain(prompt, text, (result)=>{
                 // console.log(result.replace(/(.{30})/g,"$1\n"))
-                setExplanation(result.replace(/(.{30})/g,"$1\n"));
+                // setExplanation(result.replace(/(.{30})/g,"$1\n"));
+                setExplanation(handleLongText(result));
             });
             setNeedsExplanation(!needsExplanation);
         }}

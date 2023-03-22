@@ -184,7 +184,6 @@ export async function requestTaskPrompt(taskName, handleResponse) {
     });
 }
 
-
 // const GPT35TurboMessage = [ 
 //   { role: "system", content: `You are a writing expert and you're assisting user for pre-writing.` },
 //   {   
