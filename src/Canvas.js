@@ -126,9 +126,9 @@ export function Canvas({dimensions})
                         if (node.text!=="" && !node.disabledTaskId.has(task.id))
                             handleMicroTask(task, object_type, node);
                     } else {
-                        const section = sections.filter(section=>section.id===inFocus[object_type])[0];
-                        if (!section.disabledTaskId.has(task.id))
-                            handleMicroTask(task, object_type, section)   
+                        const section = sections.filter(section=>section.id===inFocus[object_type]);
+                        if (section.length && section[0].disabledTaskId.has(task.id))
+                            handleMicroTask(task, object_type, section[0])   
                     }   
                 }
             });
@@ -301,7 +301,7 @@ export function Canvas({dimensions})
                                 object.y+object.scaleY*object.radiusY+(30*index-50)/canvasScale+
                                 Math.ceil(Math.random()*99) * (Math.round(Math.random())?1:-1)
                                 : object.y+(100*index-100)/canvasScale+Math.random()*120+object.scaleY*object.height,
-                            fontSize: 20, text: result, display: false,
+                            fontSize: (task.outputType==="Sticky Note"?16:20), text: result, display: false,
                             prompt: prompt
                             }})]
                         });
@@ -337,7 +337,7 @@ export function Canvas({dimensions})
                             attached_to_id: object.id, type: toLowerCase(task.outputType),
                             x: object.x+75/canvasScale+Math.random()*100+object.scaleX*object.width/2,
                             y: object.y-50/canvasScale-Math.random()*120,
-                            fontSize: 20, text: results[0], display: false,
+                            fontSize: (task.outputType==="Sticky Note"?16:20), text: results[0], display: false,
                             prompt: prompt
                             }]
                         });
@@ -1364,7 +1364,7 @@ export function Canvas({dimensions})
                     setNodes(prevState => {
                         let tmp = {id: numNodes, type: "sticky_note",
                         x: (x-canvasX)/canvasScale, y: (y-canvasY)/canvasScale,
-                        width: width, height: height, fontSize: 18,
+                        width: width, height: height, fontSize: 16,
                         scaleX: 1/canvasScale, scaleY: 1/canvasScale,
                         selected: false, text: "", display: true,
                         disabledTaskId: new Set(),

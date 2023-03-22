@@ -4,6 +4,7 @@ import { Group, Rect, Line, Path, Ellipse } from "react-konva";
 import Konva from "konva";
 
 import { GlobalContext } from "./state";
+import { sizeMap } from "./utils/size_utils";
 
 
 export function ToolBar({
@@ -46,8 +47,10 @@ export function ToolBar({
 
     
     const handleStickyNoteDragEnd = e => {
+        // onAddStickyNote(e.target.x()+x+stickyNoteOffset,
+        // e.target.y()+y, 145, 110);
         onAddStickyNote(e.target.x()+x+stickyNoteOffset,
-        e.target.y()+y, 145, 110);
+        e.target.y()+y, sizeMap["sticky_note"].width, sizeMap["sticky_note"].height);
 
         stickyNoteRef.current.setAttrs({
             x: 12, y: 12, width: 60, height: 60,
@@ -477,8 +480,8 @@ export function ToolBar({
                 const stage = e.target.getStage();
                 stage.container().style.cursor = "grabbing";
                 stickyNoteRef.current.setAttrs({
-                    width: 180,
-                    height: 180,
+                    width: sizeMap["sticky_note"].width+35,
+                    height: sizeMap["sticky_note"].height+70,
                     shadowOffsetY: 7,
                     shadowOpacity: 0.2
                 });

@@ -123,7 +123,7 @@ export function TaskNode({
         <Group
         x={0}
         y={-15}
-        opacity={isHoverIcons?1:0}>
+        opacity={isHoverIcons?1:needsExplanation?1:0}>
             {needsExplanation ? 
             <Label
             x={0}

@@ -2,8 +2,8 @@ import Konva from "konva";
 
 const sizeMap = {
     "sticky_note": {
-        width: 145,
-        height: 110
+        width: 170,
+        height: 120
     },
     "concept": {
         radiusX: 72,
