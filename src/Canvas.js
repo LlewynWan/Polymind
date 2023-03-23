@@ -237,7 +237,8 @@ export function Canvas({dimensions})
         }
         // console.log(nodes[0].selected);
         const newArrows = arrows.filter(arrow=>
-            !nodes.filter(node=>node.id===arrow.from_id)[0].selected
+            !arrow.selected
+        && !nodes.filter(node=>node.id===arrow.from_id)[0].selected
         && !nodes.filter(node=>node.id===arrow.to_id)[0].selected);
         const newTaskNodes = taskNodes.filter(taskNode=>
             !nodes.filter(node=>node.id===taskNode.attached_to_id)[0].selected
@@ -305,7 +306,9 @@ export function Canvas({dimensions})
                 // const results = object_type === "keyword" ?
                 // (await promptGPT(prompt, 3, 3)) : null;
                 let handleResponse = (results) => {
+                    // console.log(results.length, num_items, results)
                     if (results.length === num_items) {
+                        // results = results.slice(0,num_items);
                         setNodes(prevState=>prevState.map(state=>{
                             let tmp = state;
                             if (tmp.id === object.id) {
@@ -334,7 +337,7 @@ export function Canvas({dimensions})
                             y: object.type==="concept"?
                                 object.y+object.scaleY*object.radiusY+(200*index-200)*canvasScale+
                                 Math.ceil(Math.random()*99) * (Math.round(Math.random())?1:-1)
-                                : object.y+(100*index-100)*canvasScale+Math.random()*120+object.scaleY*object.height,
+                                : object.y+(125*index-125)*canvasScale+Math.random()*120+object.scaleY*object.height,
                             fontSize: (task.outputType==="Sticky Note"?16:20), text: result, display: false,
                             prompt: prompt
                             }})]
@@ -344,14 +347,17 @@ export function Canvas({dimensions})
                 }
                 promptGPT(prompt, num_items, max_word_per_item, handleResponse);
             } else if (object_type==="section") {
-                const outline = section_utils.calcSectionOutline(nodes.filter(node=>
+                const outline = object.text+"\n"+section_utils.calcSectionOutline(nodes.filter(node=>
                     node.x>object.x && node.x<object.x+object.width*object.scaleX
                     && node.y>object.y && node.y<object.y+object.height*object.scaleY),arrows);
+                // console.log(outline)
                 const prompt = task.examplePrompt.replace("[placeholder]",outline);
                 const [num_items, max_word_per_item] = outputMap[task.outputType];
 
                 let handleResponse = (results) => {
-                    if (results.length === num_items) {
+                    // console.log(results.length, num_items, results)
+                    if (results.length == num_items) {
+                        // results = results.slice(0,num_items);
                         setSections(prevState=>prevState.map(state=>{
                             let tmp = state;
                             if (tmp.id === object.id) {
@@ -652,11 +658,14 @@ export function Canvas({dimensions})
                 if (isDrawingArrow || isDrawingDoubleArrow) {
                     setArrows(prevState=>{
                         return [...prevState, {
+                            id: prevState.length===0 ? 0 : 
+                            Math.max(...prevState.map(state=>state.id))+1,
                             from_id: arrowFrom.id,
                             from_anchor: arrowFrom.anchor,
                             to_id: id,
                             to_anchor: anchor,
-                            directed: isDrawingArrow
+                            directed: isDrawingArrow,
+                            selected: false
                         }]
                     });
                 }
@@ -738,217 +747,6 @@ export function Canvas({dimensions})
         >
             <Group>
             <CanvasContext.Provider value={{canvasX, canvasY, canvasScale, microTasks}}>
-            {taskNodes.map(node=>{
-                const from_anchor = 1;
-                const to_anchor = 3;
-                // console.log(node.width)
-                // const from_anchor = Math.floor(Math.random()*4);
-                // const to_anchor = Math.floor(Math.random()*4);
-                // const arrow_size = 10 / canvasScale;
-                const arrow_dy = to_anchor===0 ? 1 : to_anchor===2 ? -1 : 0;
-                const arrow_dx = to_anchor===1 ? 1 : to_anchor===3 ? -1 : 0;
-                const finalAnchor = node.attached_to_type!=="section" ?
-                    anchor_utils.calcAnchorPosition(to_anchor,
-                        getNodeById(node.attached_to_id), canvasScale) : null;
-                const section = node.attached_to_type==="section" ? 
-                getSectionById(node.attached_to_id) : null;
-                const anchorPosition = anchor_utils.calcAnchorPosition(
-                    from_anchor, node, canvasScale);
-                return node.display ||
-                microTasks.filter(task=>task.id===node.task_id)[0].display ?
-                <Group
-                key={node.id}>
-                    <TaskNode
-                    key={node.id}
-                    type={node.type}
-                    x={node.x}
-                    y={node.y}
-                    width={node.width}
-                    height={node.height}
-                    radiusX={node.radiusX}
-                    radiusY={node.radiusY}
-                    text={node.text}
-                    prompt={node.prompt}
-                    fontSize={node.fontSize}
-                    color={colorPalette[node.task_id]}
-                    onDragMove={(e)=>{
-                        setTaskNodes(prevState => {
-                            return prevState.map((state) => {
-                                let tmp = state;
-                                if (tmp.id === node.id) {
-                                    tmp.x = e.target.x();
-                                    tmp.y = e.target.y();
-                                }
-                                return tmp;
-                            });
-                        });
-                    }}
-                    onDragEnd={(e)=>{
-                        setTaskNodes(prevState => {
-                            return prevState.map((state) => {
-                                let tmp = state;
-                                if (tmp.id === node.id) {
-                                    tmp.x = e.target.x();
-                                    tmp.y = e.target.y();
-                                }
-                                return tmp;
-                            });
-                        });
-                    }}
-                    onConfirm={()=>{
-                        const newNode = node.type === "sticky_note" ?
-                        {id: nodes.length, type: node.type, scaleX: 1, scaleY: 1,
-                        x: node.x, y: node.y, display: true, text: node.text,
-                        width: node.width, height: node.height, fontSize: 18,
-                        selected: false, disabledTaskId: new Set(),
-                        callbackTaskId: -1}
-                        : node.type === "concept" ? {id: nodes.length, type: node.type,
-                        scaleX: 1, scaleY: 1, x: node.x, y: node.y,
-                        radiusX: node.radiusX, radiusY: node.radiusY,
-                        selected: false, text: node.text, fontSize: 20, display: true,
-                        disabledTaskId: new Set(), callbackTaskId: -1}
-                        : node.type === "keyword" ? {id: nodes.length, type: node.type,
-                        scaleX: 1, scaleY: 1, x: node.x, y: node.y,
-                        width: node.width, height: node.height, fontSize: 20,
-                        selected: false, text: node.text, display: true,
-                        disabledTaskId: new Set(), callbackTaskId: -1}
-                        : null
-                        setNodes(prevState => {
-                            return [...prevState,newNode];
-                        })
-                        setNumNodes(numNodes+1);
-
-                        setTaskNodes(prevState => prevState.filter(state=>state.id!==node.id));
-                        stageRef.current.container().style.cursor = "default"
-                    }}
-                    onDelete={()=>{
-                        setTaskNodes(prevState => prevState.filter(state=>state.id!==node.id));
-                        stageRef.current.container().style.cursor = "default"
-                    }}
-                    onTextSizeChange={node.type === "keyword" ? (rect)=>{
-                        if (rect.width && rect.height &&
-                        (node.width !== rect.width || node.height !== rect.height)) {
-                            setTaskNodes(prevState=>{
-                                return prevState.map(state=>{
-                                    let tmp = state;
-                                    if (tmp.id === node.id) {
-                                        tmp.width = rect.width;
-                                        tmp.height = rect.height;
-                                    }
-                                    return tmp;
-                                });
-                            })
-                        }
-                    }: null}
-                    onTextHeightOverflow={(textHeight)=>{
-                        setTaskNodes(prevState=>prevState.map(state=>{
-                            let tmp = state;
-                            if (tmp.id === state.id) {
-                                if (tmp.type === "concept" && textHeight >= tmp.radiusY) {
-                                    tmp.radiusY = textHeight;
-                                } else if (tmp.type === "sticky_note" && textHeight >= tmp.height) {
-                                    tmp.height = textHeight;
-                                }
-                                return tmp;
-                            }
-                        }))
-                    }}
-                    handleRegenerate={(suggestion)=>{
-                        regenerate(node.prompt, node.text, suggestion,
-                            (result)=>{
-                                setTaskNodes(prevState=>prevState.map(state=>{
-                                    let tmp = state;
-                                    if (tmp.id === node.id) {
-                                        tmp.text = result;
-                                    }
-                                    return tmp;
-                                }))
-                            })
-                    }}
-                    listening={!isDrawingArrow && !isDrawingDoubleArrow
-                        && !isSectioning && ! isAddingKeyword}/>
-                    {node.attached_to_type!=="section" ?
-                    <Group>
-                    {node.attached_from_id===-1 ? null
-                    : <MyLine
-                    points={[
-                        // ...anchorPosition,
-                        ...anchor_utils.calcAnchorPosition(
-                            to_anchor, node, canvasScale),
-                        ...anchor_utils.findPathBetweenNodes(to_anchor, from_anchor,
-                            node, getNodeById(node.attached_from_id), canvasScale),
-                        // ...calcAnchorOffset(arrow.from_anchor, nodes[arrow.from_id]),
-                        // ...calcAnchorOffset(arrow.to_anchor, nodes[arrow.to_id]),
-                        ...anchor_utils.calcAnchorPosition(from_anchor,
-                            getNodeById(node.attached_from_id), canvasScale)
-                    ]}
-                    tension={0}
-                    // stroke={"gray"}
-                    opacity={0.5}
-                    stroke={colorPalette[node.task_id%colorPalette.length]}
-                    strokeWidth={2/canvasScale}
-                    />}
-                    <MyLine
-                    points={[
-                        ...anchorPosition,
-                        // ...anchor_utils.calcAnchorPosition(
-                        //     from_anchor, node, canvasScale),
-                        ...anchor_utils.findPathBetweenNodes(from_anchor, to_anchor,
-                            node, getNodeById(node.attached_to_id), canvasScale),
-                        // ...calcAnchorOffset(arrow.from_anchor, nodes[arrow.from_id]),
-                        // ...calcAnchorOffset(arrow.to_anchor, nodes[arrow.to_id]),
-                        ...finalAnchor
-                    ]}
-                    tension={0}
-                    // stroke={"gray"}
-                    opacity={0.5}
-                    stroke={colorPalette[node.task_id%colorPalette.length]}
-                    strokeWidth={2/canvasScale}
-                    />
-                    </Group> : <MyLine
-                    points={[
-                        ...anchor_utils.calcAnchorPosition(
-                            from_anchor, node, canvasScale),
-                        // ...anchor_utils.findPathBetweenNodeAndPosition(
-                        //     [section.x+section.width*section.scaleX/2,
-                        //         section.y-60/canvasScale],
-                        //     node, 1, canvasScale
-                        // ),
-                        ...anchor_utils.findPathBetweenVectors(
-                            {x: anchorPosition[0], y: anchorPosition[1],
-                            dx: -1, dy: 0},
-                            {x: getTextWidth(section.text, 18, "bold", 5)/canvasScale+section.x+20/canvasScale,
-                            y: section.y-25/canvasScale, dx: 1, dy: 0}
-                        ),
-                        getTextWidth(section.text, 18, "bold", 5)/canvasScale+section.x+20/canvasScale,
-                        section.y-25/canvasScale
-                        // section.x+section.width*section.scaleX/2,
-                        // section.y-25/canvasScale,
-                        // getTextWidth(section.text, 18, "bold", 5)/canvasScale+section.x+20/canvasScale,
-                        // section.y-25/canvasScale
-                        // ...anchor_utils.findPathBetweenVectors(
-                        //     {x: section.x + section.width*section.scaleX/2,
-                        //     y: section.y - 40/canvasScale,
-                        //     dx: 1, dy:0},
-                        //     {x: }
-                        // ),
-                        // ...anchor_utils.calcAnchorPosition(
-                        //     from_anchor, node, canvasScale),
-                        // ...anchor_utils.findPathBetweenNodes(from_anchor, to_anchor,
-                        //     node,getNodeById(node.attached_to_id), canvasScale),
-                        // ...calcAnchorOffset(arrow.from_anchor, nodes[arrow.from_id]),
-                        // ...calcAnchorOffset(arrow.to_anchor, nodes[arrow.to_id]),
-                        // ...finalAnchor
-                    ]}
-                    tension={0}
-                    // stroke={"gray"}
-                    opacity={0.5}
-                    stroke={colorPalette[node.task_id%colorPalette.length]}
-                    strokeWidth={2/canvasScale}
-                    />}
-                </Group>
-                : null
-            })}
             {sections.map(section=>{
                 return (<Section
                 key={section.id}
@@ -1238,8 +1036,16 @@ export function Canvas({dimensions})
                     ...finalAnchor
                 ]}
                 tension={0}
-                stroke={"gray"}
-                strokeWidth={2/canvasScale}
+                stroke={arrow.selected?"#A9A9A9":"silver"}
+                strokeWidth={arrow.selected?4/canvasScale:2/canvasScale}
+                isSelected={arrow.selected}
+                onClick={()=>setArrows(prevState=>prevState.map(state=>{
+                    let tmp = state;
+                    if (tmp.id === arrow.id) {
+                        tmp.selected = !tmp.selected;
+                    }
+                    return tmp;
+                }))}
                 />
                 {/* <Line
                 points={[...finalAnchor,
@@ -1255,16 +1061,16 @@ export function Canvas({dimensions})
                     ...finalAnchor]}
                     // finalAnchor[0]+arrow_dx*10, finalAnchor[1]+arrow_dy*10]}
                 tension={0}
-                stroke={"gray"}
-                strokeWidth={2/canvasScale}/>
+                stroke={arrow.selected?"#A9A9A9":"silver"}
+                strokeWidth={arrow.selected?3/canvasScale:2/canvasScale}/>
                 <Line
                 points={[finalAnchor[0]-arrow_dx*arrow_size-arrow_dy*arrow_size,
                     finalAnchor[1]-arrow_dy*arrow_size-arrow_dx*arrow_size,
                     ...finalAnchor]}
                     // finalAnchor[0]+arrow_dx*10, finalAnchor[1]+arrow_dy*10]}
                 tension={0}
-                stroke={"gray"}
-                strokeWidth={2/canvasScale}/>
+                stroke={arrow.selected?"#A9A9A9":"silver"}
+                strokeWidth={arrow.selected?3/canvasScale:2/canvasScale}/>
                 </Group>: null}
                 </Group>
                 )
@@ -1277,7 +1083,7 @@ export function Canvas({dimensions})
                     ...anchor_utils.calcAnchorPosition(arrowFrom.anchor,getNodeById(arrowFrom.id), canvasScale),
                     ...findPathBetweenNodeAndPointer(arrowFrom.anchor,getNodeById(arrowFrom.id)),
                     ]}
-                stroke={"gray"}
+                stroke={"silver"}
                 listening={false}
                 strokeWidth={2/canvasScale}
                 /> :
@@ -1288,12 +1094,247 @@ export function Canvas({dimensions})
                         getNodeById(arrowFrom.id), getNodeById(arrowTo.id), canvasScale),
                     ...anchor_utils.calcAnchorPosition(arrowTo.anchor,getNodeById(arrowTo.id),canvasScale)
                     ]}
-                stroke={"gray"}
+                stroke={"silver"}
                 listening={false}
                 strokeWidth={2/canvasScale}
                 />)
                 : null
             }
+            {taskNodes.map(node=>{
+                const from_anchor = 1;
+                const to_anchor = 3;
+                // console.log(node.width)
+                // const from_anchor = Math.floor(Math.random()*4);
+                // const to_anchor = Math.floor(Math.random()*4);
+                // const arrow_size = 10 / canvasScale;
+                const arrow_dy = to_anchor===0 ? 1 : to_anchor===2 ? -1 : 0;
+                const arrow_dx = to_anchor===1 ? 1 : to_anchor===3 ? -1 : 0;
+                const finalAnchor = node.attached_to_type!=="section" ?
+                    anchor_utils.calcAnchorPosition(to_anchor,
+                        getNodeById(node.attached_to_id), canvasScale) : null;
+                const section = node.attached_to_type==="section" ? 
+                getSectionById(node.attached_to_id) : null;
+                const anchorPosition = anchor_utils.calcAnchorPosition(
+                    from_anchor, node, canvasScale);
+                return node.display ||
+                microTasks.filter(task=>task.id===node.task_id)[0].display ?
+                
+                <Group
+                key={node.id}>
+                    {node.attached_to_type!=="section" ?
+                    <Group>
+                    {node.attached_from_id===-1 ? null
+                    : getNodeById(node.attached_to_id).x < getNodeById(node.attached_from_id).x ?
+                    <MyLine
+                    points={[
+                        // ...anchorPosition,
+                        ...anchor_utils.calcAnchorPosition(
+                            to_anchor, node, canvasScale),
+                        ...anchor_utils.findPathBetweenNodes(to_anchor, from_anchor,
+                            node, getNodeById(node.attached_from_id), canvasScale),
+                        // ...calcAnchorOffset(arrow.from_anchor, nodes[arrow.from_id]),
+                        // ...calcAnchorOffset(arrow.to_anchor, nodes[arrow.to_id]),
+                        ...anchor_utils.calcAnchorPosition(from_anchor,
+                            getNodeById(node.attached_from_id), canvasScale)
+                    ]}
+                    tension={0}
+                    // stroke={"gray"}
+                    opacity={0.5}
+                    stroke={colorPalette[node.task_id%colorPalette.length]}
+                    strokeWidth={1.5/canvasScale}
+                    listening={false}
+                    /> : <MyLine
+                    points={[
+                        // ...anchorPosition,
+                        ...anchor_utils.calcAnchorPosition(
+                            2, node, canvasScale),
+                        ...anchor_utils.findPathBetweenNodes(2, from_anchor,
+                            node, getNodeById(node.attached_from_id), canvasScale),
+                        // ...calcAnchorOffset(arrow.from_anchor, nodes[arrow.from_id]),
+                        // ...calcAnchorOffset(arrow.to_anchor, nodes[arrow.to_id]),
+                        ...anchor_utils.calcAnchorPosition(from_anchor,
+                            getNodeById(node.attached_from_id), canvasScale)
+                    ]}
+                    tension={0}
+                    // stroke={"gray"}
+                    opacity={0.5}
+                    stroke={colorPalette[node.task_id%colorPalette.length]}
+                    strokeWidth={1.5/canvasScale}
+                    listening={false}
+                    />
+                    }
+                    <MyLine
+                    points={[
+                        ...anchorPosition,
+                        // ...anchor_utils.calcAnchorPosition(
+                        //     from_anchor, node, canvasScale),
+                        ...anchor_utils.findPathBetweenNodes(from_anchor, to_anchor,
+                            node, getNodeById(node.attached_to_id), canvasScale),
+                        // ...calcAnchorOffset(arrow.from_anchor, nodes[arrow.from_id]),
+                        // ...calcAnchorOffset(arrow.to_anchor, nodes[arrow.to_id]),
+                        ...finalAnchor
+                    ]}
+                    tension={0}
+                    // stroke={"gray"}
+                    opacity={0.5}
+                    stroke={colorPalette[node.task_id%colorPalette.length]}
+                    strokeWidth={1.5/canvasScale}
+                    listening={false}
+                    />
+                    </Group> : <MyLine
+                    points={[
+                        ...anchor_utils.calcAnchorPosition(
+                            from_anchor, node, canvasScale),
+                        // ...anchor_utils.findPathBetweenNodeAndPosition(
+                        //     [section.x+section.width*section.scaleX/2,
+                        //         section.y-60/canvasScale],
+                        //     node, 1, canvasScale
+                        // ),
+                        ...anchor_utils.findPathBetweenVectors(
+                            {x: anchorPosition[0], y: anchorPosition[1],
+                            dx: -1, dy: 0},
+                            {x: getTextWidth(section.text, 18, "bold", 5)/canvasScale+section.x+20/canvasScale,
+                            y: section.y-25/canvasScale, dx: 1, dy: 0}
+                        ),
+                        getTextWidth(section.text, 18, "bold", 5)/canvasScale+section.x+20/canvasScale,
+                        section.y-25/canvasScale
+                        // section.x+section.width*section.scaleX/2,
+                        // section.y-25/canvasScale,
+                        // getTextWidth(section.text, 18, "bold", 5)/canvasScale+section.x+20/canvasScale,
+                        // section.y-25/canvasScale
+                        // ...anchor_utils.findPathBetweenVectors(
+                        //     {x: section.x + section.width*section.scaleX/2,
+                        //     y: section.y - 40/canvasScale,
+                        //     dx: 1, dy:0},
+                        //     {x: }
+                        // ),
+                        // ...anchor_utils.calcAnchorPosition(
+                        //     from_anchor, node, canvasScale),
+                        // ...anchor_utils.findPathBetweenNodes(from_anchor, to_anchor,
+                        //     node,getNodeById(node.attached_to_id), canvasScale),
+                        // ...calcAnchorOffset(arrow.from_anchor, nodes[arrow.from_id]),
+                        // ...calcAnchorOffset(arrow.to_anchor, nodes[arrow.to_id]),
+                        // ...finalAnchor
+                    ]}
+                    tension={0}
+                    // stroke={"gray"}
+                    opacity={0.5}
+                    stroke={colorPalette[node.task_id%colorPalette.length]}
+                    strokeWidth={1.5/canvasScale}
+                    listening={false}
+                    />}
+                    <TaskNode
+                    key={node.id}
+                    type={node.type}
+                    x={node.x}
+                    y={node.y}
+                    width={node.width}
+                    height={node.height}
+                    radiusX={node.radiusX}
+                    radiusY={node.radiusY}
+                    text={node.text}
+                    prompt={node.prompt}
+                    fontSize={node.fontSize}
+                    color={colorPalette[node.task_id]}
+                    onDragMove={(e)=>{
+                        setTaskNodes(prevState => {
+                            return prevState.map((state) => {
+                                let tmp = state;
+                                if (tmp.id === node.id) {
+                                    tmp.x = e.target.x();
+                                    tmp.y = e.target.y();
+                                }
+                                return tmp;
+                            });
+                        });
+                    }}
+                    onDragEnd={(e)=>{
+                        setTaskNodes(prevState => {
+                            return prevState.map((state) => {
+                                let tmp = state;
+                                if (tmp.id === node.id) {
+                                    tmp.x = e.target.x();
+                                    tmp.y = e.target.y();
+                                }
+                                return tmp;
+                            });
+                        });
+                    }}
+                    onConfirm={()=>{
+                        const newNode = node.type === "sticky_note" ?
+                        {id: nodes.length, type: node.type, scaleX: 1, scaleY: 1,
+                        x: node.x, y: node.y, display: true, text: node.text,
+                        width: node.width, height: node.height, fontSize: 18,
+                        selected: false, disabledTaskId: new Set(),
+                        callbackTaskId: -1}
+                        : node.type === "concept" ? {id: nodes.length, type: node.type,
+                        scaleX: 1, scaleY: 1, x: node.x, y: node.y,
+                        radiusX: node.radiusX, radiusY: node.radiusY,
+                        selected: false, text: node.text, fontSize: 20, display: true,
+                        disabledTaskId: new Set(), callbackTaskId: -1}
+                        : node.type === "keyword" ? {id: nodes.length, type: node.type,
+                        scaleX: 1, scaleY: 1, x: node.x, y: node.y,
+                        width: node.width, height: node.height, fontSize: 20,
+                        selected: false, text: node.text, display: true,
+                        disabledTaskId: new Set(), callbackTaskId: -1}
+                        : null
+                        setNodes(prevState => {
+                            return [...prevState,newNode];
+                        })
+                        setNumNodes(numNodes+1);
+
+                        setTaskNodes(prevState => prevState.filter(state=>state.id!==node.id));
+                        stageRef.current.container().style.cursor = "default"
+                    }}
+                    onDelete={()=>{
+                        setTaskNodes(prevState => prevState.filter(state=>state.id!==node.id));
+                        stageRef.current.container().style.cursor = "default"
+                    }}
+                    onTextSizeChange={node.type === "keyword" ? (rect)=>{
+                        if (rect.width && rect.height &&
+                        (node.width !== rect.width || node.height !== rect.height)) {
+                            setTaskNodes(prevState=>{
+                                return prevState.map(state=>{
+                                    let tmp = state;
+                                    if (tmp.id === node.id) {
+                                        tmp.width = rect.width;
+                                        tmp.height = rect.height;
+                                    }
+                                    return tmp;
+                                });
+                            })
+                        }
+                    }: null}
+                    onTextHeightOverflow={(textHeight)=>{
+                        setTaskNodes(prevState=>prevState.map(state=>{
+                            let tmp = state;
+                            if (tmp.id === state.id) {
+                                if (tmp.type === "concept" && textHeight >= tmp.radiusY) {
+                                    tmp.radiusY = textHeight;
+                                } else if (tmp.type === "sticky_note" && textHeight >= tmp.height) {
+                                    tmp.height = textHeight;
+                                }
+                                return tmp;
+                            }
+                        }))
+                    }}
+                    handleRegenerate={(suggestion)=>{
+                        regenerate(node.prompt, node.text, suggestion,
+                            (result)=>{
+                                setTaskNodes(prevState=>prevState.map(state=>{
+                                    let tmp = state;
+                                    if (tmp.id === node.id) {
+                                        tmp.text = result;
+                                    }
+                                    return tmp;
+                                }))
+                            })
+                    }}
+                    listening={!isDrawingArrow && !isDrawingDoubleArrow
+                        && !isSectioning && ! isAddingKeyword}/>
+                </Group>
+                : null
+                })}
             </CanvasContext.Provider>
             </Group>
         </Layer>

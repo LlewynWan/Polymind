@@ -36,7 +36,13 @@ export async function promptGPT(prompt, num_results, max_words_per_result, handl
   };
   fetch('https://api.openai.com/v1/chat/completions', requestOptions)
       .then(response => response.json())
-      .then(data => data.choices[0].message.content.split('\n'))
+      .then(data => {
+        if (num_results > 1) {
+          return data.choices[0].message.content.split('\n')
+        } else {
+          return [data.choices[0].message.content];
+        }
+      })
       .then(results => results.map(result =>
         result.trim().replace(/^[0-9]+\. /, "").replace(/[^a-zA-Z ]/g, "")))
       .then(results => handleResponse(results))

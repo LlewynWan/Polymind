@@ -5,8 +5,9 @@ export function MyLine ({
     stroke,
     strokeWidth,
     listening,
+    onClick,
     opacity=1,
-    radius=10,
+    radius=10
 }) {
   return (
     <Shape
@@ -71,6 +72,7 @@ export function MyLine ({
       stroke={stroke}
       strokeWidth={strokeWidth}
       listening={listening}
+      onClick={onClick}
     />
   );
 };
