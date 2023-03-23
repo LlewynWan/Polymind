@@ -1311,10 +1311,10 @@ export function Canvas({dimensions})
                         setTaskNodes(prevState=>prevState.map(state=>{
                             let tmp = state;
                             if (tmp.id === state.id) {
-                                if (tmp.type === "concept" && textHeight >= tmp.radiusY) {
-                                    tmp.radiusY = textHeight;
-                                } else if (tmp.type === "sticky_note" && textHeight >= tmp.height) {
-                                    tmp.height = textHeight;
+                                if (tmp.type === "concept") {
+                                    tmp.radiusY = Math.max(sizeMap["concept"].radiusY,textHeight);
+                                } else if (tmp.type === "sticky_note") {
+                                    tmp.height = Math.max(sizeMap["sticky_note"].height,textHeight);
                                 }
                                 return tmp;
                             }
