@@ -92,6 +92,7 @@ export function TaskCard({
         shadowOffsetX={0}
         shadowBlur={2.5}
         shadowOpacity={0.32}
+        perfectDrawEnabled={false}
         // strokeWidth={0.25}
         // stroke={"grey"}
         // shadowColor={"black"}
@@ -128,13 +129,15 @@ export function TaskCard({
             y={-2.5}
             width={35}
             height={7.5}
-            fill={"transparent"}/>
+            fill={"transparent"}
+            perfectDrawEnabled={false}/>
             <Rect
             x={-15}
             y={0}
             width={30}
             height={10}
-            fill={"transparent"}/>
+            fill={"transparent"}
+            perfectDrawEnabled={false}/>
         </Group>
 
         <Icon
@@ -156,6 +159,7 @@ export function TaskCard({
             <Tag
             fill={color}
             cornerRadius={5}
+            perfectDrawEnabled={false}
             />
             <Text
             text={goal}
@@ -163,7 +167,8 @@ export function TaskCard({
             fontStyle={"bold"}
             fontFamily={"sans-serif"}
             fill={"white"}
-            padding={5}/>
+            padding={5}
+            perfectDrawEnabled={false}/>
         </Label>
 
         <Group
@@ -205,6 +210,7 @@ export function TaskCard({
             pointerWidth={5}
             pointerHeight={5}
             lineJoin={'round'}
+            perfectDrawEnabled={false}
             />
             <Text
             text={"Input Type"}
@@ -212,7 +218,8 @@ export function TaskCard({
             fontStyle={"bold"}
             fontFamily={"sans-serif"}
             fill={"white"}
-            padding={5}/>
+            padding={5}
+            perfectDrawEnabled={false}/>
         </Label>
         <Label
         x={width/2+10}
@@ -228,6 +235,7 @@ export function TaskCard({
             // pointerWidth={5}
             // pointerHeight={5}
             lineJoin={'round'}
+            perfectDrawEnabled={false}
             />
             <Text
             width={width/2-45}
@@ -237,7 +245,8 @@ export function TaskCard({
             fontStyle={"bold"}
             fontFamily={"sans-serif"}
             fill={"white"}
-            padding={5}/>
+            padding={5}
+            perfectDrawEnabled={false}/>
         </Label>
         
         <Label
@@ -254,6 +263,7 @@ export function TaskCard({
             pointerWidth={5}
             pointerHeight={5}
             lineJoin={'round'}
+            perfectDrawEnabled={false}
             />
             <Text
             text={"Output Type"}
@@ -261,7 +271,8 @@ export function TaskCard({
             fontStyle={"bold"}
             fontFamily={"sans-serif"}
             fill={"white"}
-            padding={5}/>
+            padding={5}
+            perfectDrawEnabled={false}/>
         </Label>
         <Label
         x={width/2+10}
@@ -277,6 +288,7 @@ export function TaskCard({
             // pointerWidth={5}
             // pointerHeight={5}
             lineJoin={'round'}
+            perfectDrawEnabled={false}
             />
             <Text
             width={width/2-45}
@@ -286,7 +298,8 @@ export function TaskCard({
             fontStyle={"bold"}
             fontFamily={"sans-serif"}
             fill={"white"}
-            padding={5}/>
+            padding={5}
+            perfectDrawEnabled={false}/>
         </Label>
         </Group>
 
@@ -307,6 +320,7 @@ export function TaskCard({
             pointerWidth={5}
             pointerHeight={5}
             lineJoin={'round'}
+            perfectDrawEnabled={false}
             />
             <Text
             text={"Prompt"}
@@ -314,7 +328,8 @@ export function TaskCard({
             fontStyle={"bold"}
             fontFamily={"sans-serif"}
             fill={"white"}
-            padding={5}/>
+            padding={5}
+            perfectDrawEnabled={false}/>
         </Label>
         <Group
         x={width/2-47.5}
@@ -328,6 +343,7 @@ export function TaskCard({
             fill={"#222233"}
             opacity={0.85}
             cornerRadius={5}
+            perfectDrawEnabled={false}
             // pointerDirection={"left"}
             // lineJoin={'round'}
             />
@@ -364,6 +380,7 @@ export function TaskCard({
                 e.cancelBubble = true;
                 setIsEditingPrompt(!isEditingPrompt);
             }}
+            perfectDrawEnabled={false}
             />}
         </Label>
         {suggestions.length>0 ?
@@ -395,7 +412,8 @@ export function TaskCard({
             <Tag
             fill={"silver"}
             opacity={0.85}
-            cornerRadius={2.5}/>
+            cornerRadius={2.5}
+            perfectDrawEnabled={false}/>
             <Text
             height={17}
             width={width/2-25}
@@ -406,7 +424,8 @@ export function TaskCard({
             padding={2.5}
             align={"center"}
             verticalAlign={"middle"}
-            ellipsis={true}/>
+            ellipsis={true}
+            perfectDrawEnabled={false}/>
             </Label>
         </Group>
         // <Group

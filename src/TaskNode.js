@@ -133,7 +133,8 @@ export function TaskNode({
         y={-15}
         width={45}
         height={30}
-        fill={"transparent"}/>
+        fill={"transparent"}
+        perfectDrawEnabled={false}/>
         <Group
         x={0}
         y={-15}
@@ -149,12 +150,14 @@ export function TaskNode({
                 stroke={color}
                 strokeWidth={1.5}
                 cornerRadius={5}
-                pointerDirection={"down"}/>
+                pointerDirection={"down"}
+                perfectDrawEnabled={false}/>
                 <Text
                 text={explanation}
                 fontSize={13}
                 fontStyle={"bold"}
-                padding={5}/>
+                padding={5}
+                perfectDrawEnabled={false}/>
             </Label> :
             <SuggestionPanel
             x={0}
@@ -230,7 +233,8 @@ export function TaskNode({
         y={-15}
         width={100}
         height={35}
-        fill={"transparent"}/>
+        fill={"transparent"}
+        perfectDrawEnabled={false}/>
         {type === "sticky_note" ? <Group
         x={70}
         y={0}
@@ -246,12 +250,14 @@ export function TaskNode({
                 stroke={color}
                 strokeWidth={1.5}
                 cornerRadius={5}
-                pointerDirection={"down"}/>
+                pointerDirection={"down"}
+                perfectDrawEnabled={false}/>
                 <Text
                 text={explanation}
                 fontSize={13}
                 fontStyle={"bold"}
-                padding={5}/>
+                padding={5}
+                perfectDrawEnabled={false}/>
             </Label>
             // <Group>
             //     <Rect
@@ -319,12 +325,14 @@ export function TaskNode({
                 stroke={color}
                 strokeWidth={1.5}
                 cornerRadius={5}
-                pointerDirection={"down"}/>
+                pointerDirection={"down"}
+                perfectDrawEnabled={false}/>
                 <Text
                 text={explanation}
                 fontSize={13}
                 fontStyle={"bold"}
-                padding={5}/>
+                padding={5}
+                perfectDrawEnabled={false}/>
             </Label> :
             <SuggestionPanel
             x={0}
@@ -395,12 +403,14 @@ export function TaskNode({
             fill={"white"}
             stroke={color}
             strokeWidth={2.5}
-            cornerRadius={5}/>
+            cornerRadius={5}
+            perfectDrawEnabled={false}/>
             <Text
             text={text}
             fontSize={fontSize}
             fontStyle={"bold"}
-            padding={10}/>
+            padding={10}
+            perfectDrawEnabled={false}/>
         </Label>
         : type === "sticky_note" ?
         <Group
@@ -418,13 +428,15 @@ export function TaskNode({
             shadowOffsetX={0}
             shadowOffsetY={5}
             shadowBlur={12}
-            shadowOpacity={0.2}/>
+            shadowOpacity={0.2}
+            perfectDrawEnabled={false}/>
             <Text
             x={20}
             y={30}
             width={width}
             text={text}
-            fontSize={fontSize}/>
+            fontSize={fontSize}
+            perfectDrawEnabled={false}/>
         </Group>
         // <Label>
         //     <Tag
@@ -452,6 +464,7 @@ export function TaskNode({
         // stroke={"#010203"}
         // strokeWidth={0.2}
         opacity={0.85}
+        perfectDrawEnabled={false}
         />
         <Text
         x={-radiusX}
@@ -462,6 +475,7 @@ export function TaskNode({
         align={"center"}
         fontSize={fontSize}
         verticalAlign={"middle"}
+        perfectDrawEnabled={false}
         />
         </Group>}
     </Group>

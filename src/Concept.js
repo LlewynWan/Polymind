@@ -197,6 +197,7 @@ export function Concept({
         stroke={"#010203"}
         strokeWidth={0.2}
         opacity={0.85}
+        perfectDrawEnabled={false}
         />
         <Text
         x={-radiusX}
@@ -276,6 +277,7 @@ export function Concept({
         strokeWidth={1}
         fill={(isHover && anchorIndex===index) ? "#0096FF" : "white"}
         opacity={isDragging?0.12:0.75}
+        perfectDrawEnabled={false}
         />
         <Circle
         key={index}
@@ -337,6 +339,7 @@ export function Concept({
           e.cancelBubble = true;
           setIsResizing(false);
         }}
+        perfectDrawEnabled={false}
         />
         </Group>)
       })}
@@ -380,6 +383,7 @@ export function Concept({
         onConnectingHover(e,minIndex);
       }
     }}
+    perfectDrawEnabled={false}
     />
     </Group>
     {transformer}

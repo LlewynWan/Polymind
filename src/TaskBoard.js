@@ -84,6 +84,7 @@ export function TaskBoard({
             opacity={0.6}
             strokeWidth={0.32}
             stroke={"#010203"}
+            perfectDrawEnabled={false}
             // shadowColor={"black"}
             // shadowOffsetY={2.5}
             // shadowOffsetX={0}
@@ -98,6 +99,7 @@ export function TaskBoard({
             fontStyle={"bold"}
             fontFamily={"sans-serif"}
             fill={"black"}
+            perfectDrawEnabled={false}
             />
             <Icon
             x={155}
@@ -200,6 +202,7 @@ export function TaskBoard({
             opacity={0.75}
             fill={"#D3D3D3"}
             ref={panelRef}
+            perfectDrawEnabled={false}
             />
             <Group
             x={0}

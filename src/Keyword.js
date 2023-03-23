@@ -222,6 +222,7 @@ export function Keyword({
         strokeWidth={0.75}
         opacity={isHover?0.3:0.15}
         visible={!isEditing}
+        perfectDrawEnabled={false}
         />
         {isEditing ?
         <TextInput
@@ -248,7 +249,8 @@ export function Keyword({
           if (isSelected) {
             setIsEditing(true);
           }
-        }}/>}
+        }}
+        perfectDrawEnabled={false}/>}
       </Label>
     </Group>
     <Group x={0} y={0}
@@ -268,6 +270,7 @@ export function Keyword({
         strokeWidth={1}
         fill={(isHoverBoundingBox && anchorIndex===index) ? "#0096FF" : "white"}
         opacity={isDragging?0.12:0.75}
+        perfectDrawEnabled={false}
         />
         <Circle
         key={index}
@@ -276,6 +279,7 @@ export function Keyword({
         strokeWidth={0}
         fill={"transparent"}
         opacity={isDragging?0.12:0.75}
+        perfectDrawEnabled={false}
         />
         </Group>)
       })}
@@ -324,6 +328,7 @@ export function Keyword({
         onConnectingHover(e,minIndex);
       }
     }}
+    perfectDrawEnabled={false}
     />: null}
     </Group>
     {transformer}

@@ -1062,7 +1062,8 @@ export function Canvas({dimensions})
                     // finalAnchor[0]+arrow_dx*10, finalAnchor[1]+arrow_dy*10]}
                 tension={0}
                 stroke={arrow.selected?"#A9A9A9":"silver"}
-                strokeWidth={arrow.selected?3/canvasScale:2/canvasScale}/>
+                strokeWidth={arrow.selected?3/canvasScale:2/canvasScale}
+                perfectDrawEnabled={false}/>
                 <Line
                 points={[finalAnchor[0]-arrow_dx*arrow_size-arrow_dy*arrow_size,
                     finalAnchor[1]-arrow_dy*arrow_size-arrow_dx*arrow_size,
@@ -1070,7 +1071,8 @@ export function Canvas({dimensions})
                     // finalAnchor[0]+arrow_dx*10, finalAnchor[1]+arrow_dy*10]}
                 tension={0}
                 stroke={arrow.selected?"#A9A9A9":"silver"}
-                strokeWidth={arrow.selected?3/canvasScale:2/canvasScale}/>
+                strokeWidth={arrow.selected?3/canvasScale:2/canvasScale}
+                perfectDrawEnabled={false}/>
                 </Group>: null}
                 </Group>
                 )
@@ -1477,7 +1479,8 @@ export function Canvas({dimensions})
             x={Math.min(selectionRect.x1, selectionRect.x2)}
             y={Math.min(selectionRect.y1, selectionRect.y2)}
             width={Math.abs(selectionRect.x1 - selectionRect.x2)}
-            height={Math.abs(selectionRect.y1 - selectionRect.y2)}/>
+            height={Math.abs(selectionRect.y1 - selectionRect.y2)}
+            perfectDrawEnabled={false}/>
         </Layer>
     </Stage>
     </HotKeys>

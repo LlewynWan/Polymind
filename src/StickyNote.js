@@ -360,6 +360,7 @@ export function StickyNote({
         onConnectingHover(e,minIndex);
       }
     }}
+    perfectDrawEnabled={false}
     />
     </Group>
     {transformer}

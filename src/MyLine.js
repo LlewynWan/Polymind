@@ -73,6 +73,7 @@ export function MyLine ({
       strokeWidth={strokeWidth}
       listening={listening}
       onClick={onClick}
+      perfectDrawEnabled={false}
     />
   );
 };

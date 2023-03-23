@@ -52,6 +52,7 @@ export function TaskCardAdder({
         width={width-30}
         fill={"silver"}
         cornerRadius={5}
+        perfectDrawEnabled={false}
         />
                 
         <Label
@@ -63,6 +64,7 @@ export function TaskCardAdder({
             cornerRadius={5}
             visible={!isEditingTaskName}
             opacity={0.75}
+            perfectDrawEnabled={false}
             />
             {isEditingTaskName ?
             <TextInput
@@ -86,7 +88,8 @@ export function TaskCardAdder({
             padding={5}
             onMouseEnter={handleTextHover}
             onMouseLeave={handleTextUnhover}
-            onClick={()=>setIsEditingTaskName(true)}/>
+            onClick={()=>setIsEditingTaskName(true)}
+            perfectDrawEnabled={false}/>
             }
         </Label>
 
@@ -100,6 +103,7 @@ export function TaskCardAdder({
             // visible={!isEditingTaskName}
             opacity={0.75}
             pointerDirection={"up"}
+            perfectDrawEnabled={false}
             />
             <Text
             width={width-50}
@@ -112,7 +116,8 @@ export function TaskCardAdder({
             // align={"center"}
             padding={5}
             onMouseEnter={handleTextHover}
-            onMouseLeave={handleTextUnhover}/>
+            onMouseLeave={handleTextUnhover}
+            perfectDrawEnabled={false}/>
         </Label>
 
         <Icon

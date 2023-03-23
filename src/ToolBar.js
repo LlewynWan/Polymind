@@ -146,10 +146,12 @@ export function ToolBar({
             shadowOpacity={isArrowIconClicked?0.25:0}
             opacity={isArrowIconClicked?0.75:
                 isHoverArrowIcon?0.27:0.2}
+            perfectDrawEnabled={false}
             />
             <Line
             points={[5,25,45,25]}
             stroke={isArrowIconClicked?"white":"black"}
+            perfectDrawEnabled={false}
             // tension={0}
             // pointerLength={10}
             // pointerWidth={12}
@@ -157,6 +159,7 @@ export function ToolBar({
             <Line
             points={[38,18,45,25,38,32]}
             stroke={isArrowIconClicked?"white":"black"}
+            perfectDrawEnabled={false}
             // tension={0}
             // pointerLength={10}
             // pointerWidth={12}
@@ -184,10 +187,12 @@ export function ToolBar({
             shadowOpacity={isDoubleArrowIconClicked?0.25:0}
             opacity={isDoubleArrowIconClicked?0.75:
                 isHoverDoubleArrowIcon?0.27:0.2}
+            perfectDrawEnabled={false}
             />
             <Line
             points={[5,25,45,25]}
             stroke={isDoubleArrowIconClicked?"white":"black"}
+            perfectDrawEnabled={false}
             // tension={0}
             // pointerLength={10}
             // pointerWidth={12}
@@ -195,6 +200,7 @@ export function ToolBar({
             <Line
             points={[38,18,45,25,38,32]}
             stroke={isDoubleArrowIconClicked?"white":"black"}
+            perfectDrawEnabled={false}
             // tension={0}
             // pointerLength={10}
             // pointerWidth={12}
@@ -202,6 +208,7 @@ export function ToolBar({
             <Line
             points={[12,18,5,25,12,32]}
             stroke={isDoubleArrowIconClicked?"white":"black"}
+            perfectDrawEnabled={false}
             // tension={0}
             // pointerLength={10}
             // pointerWidth={12}
@@ -229,6 +236,7 @@ export function ToolBar({
             shadowOpacity={isSectionIconClicked?0.25:0}
             opacity={isSectionIconClicked?0.75:
                 isHoverSectionIcon?0.27:0.2}
+            perfectDrawEnabled={false}
             />
             <Path
             x={8}
@@ -238,6 +246,7 @@ export function ToolBar({
             fill={"transparent"}
             stroke={isSectionIconClicked?"white":"black"}
             strokeWidth={1.75}
+            perfectDrawEnabled={false}
             />
             {/* <Line
             points={[25,10,
@@ -266,7 +275,8 @@ export function ToolBar({
             cornerRadius={2.5}
             fill={"transparent"}
             stroke={isSectionIconClicked?"white":"black"}
-            strokeWidth={1.75}/>
+            strokeWidth={1.75}
+            perfectDrawEnabled={false}/>
             {/* <Line
             points={[25,10,40,10,40,40,10,40,10,15]}
             stroke={isSectionIconClicked?"white":"black"}/> */}
@@ -293,13 +303,16 @@ export function ToolBar({
             shadowOpacity={isTextIconClicked?0.25:0}
             opacity={isTextIconClicked?0.75:
                 isHoverDoubleArrowIcon?0.27:0.2}
+            perfectDrawEnabled={false}
             />
             <Line
             points={[10,10,40,10]}
-            stroke={isTextIconClicked?"white":"black"}/>
+            stroke={isTextIconClicked?"white":"black"}
+            perfectDrawEnabled={false}/>
             <Line
             points={[25,10,25,40]}
-            stroke={isTextIconClicked?"white":"black"}/>
+            stroke={isTextIconClicked?"white":"black"}
+            perfectDrawEnabled={false}/>
         </Group>
 
         <Group x={conceptOffset} y={0}
@@ -345,6 +358,7 @@ export function ToolBar({
             shadowOpacity={0.25}
             fill={"#FFB5B7"}
             opacity={0.85}
+            perfectDrawEnabled={false}
             // draggable={true}
             />
             <Ellipse
@@ -385,6 +399,7 @@ export function ToolBar({
                 stage.container().style.cursor = "default";
                 handleEllipseDragEnd(e);
             }}
+            perfectDrawEnabled={false}
             />
         </Group>
 
@@ -449,6 +464,7 @@ export function ToolBar({
             shadowBlur={5}
             shadowOpacity={0.5}
             fill={"#748B97"}
+            perfectDrawEnabled={false}
             />
             <Rect
             x={12}
@@ -462,6 +478,7 @@ export function ToolBar({
             shadowBlur={5}
             shadowOpacity={0.5}
             fill={"#748B97"}
+            perfectDrawEnabled={false}
             />
             <Rect
             x={19}
@@ -490,7 +507,8 @@ export function ToolBar({
                 const stage = e.target.getStage();
                 stage.container().style.cursor = "default";
                 handleStickyNoteDragEnd(e);
-            }}/>
+            }}
+                perfectDrawEnabled={false}/>
         </Group>
         </Group>
     )

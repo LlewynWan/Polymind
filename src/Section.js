@@ -143,7 +143,8 @@ export function Section({
             fontStyle={"bold"}
             fontFamily={"sans-serif"}
             fill={"black"}
-            padding={5}/>}
+            padding={5}
+            perfectDrawEnabled={false}/>}
         </Label>
         <Rect
         x={0}
@@ -159,6 +160,7 @@ export function Section({
         stroke={color}
         strokeWidth={isHover?1.5:0.75}
         listening={false}
+        perfectDrawEnabled={false}
         onTransform={(e)=>{
             onScale(e.target.scaleX(),
             e.target.scaleY(),
@@ -187,6 +189,7 @@ export function Section({
         stroke={color}
         strokeWidth={1}
         listening={false}
+        perfectDrawEnabled={false}
         />
     </Group>
     {transformer}

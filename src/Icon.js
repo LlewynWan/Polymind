@@ -39,15 +39,18 @@ export function Icon({
         radius={10}
         fill={"transparent"}
         stroke={isHover?"black":"gray"}
-        strokeWidth={1.5}/>
+        strokeWidth={1.5}
+        perfectDrawEnabled={false}/>
         <Line
         points={[-5,0,5,0]}
         stroke={isHover?"black":"gray"}
-        strokeWidth={1.5}/>
+        strokeWidth={1.5}
+        perfectDrawEnabled={false}/>
         <Line
         points={[0,-5,0,5]}
         stroke={isHover?"black":"gray"}
-        strokeWidth={1.5}/>
+        strokeWidth={1.5}
+        perfectDrawEnabled={false}/>
     </Group>)
     : type === "delete" ?
     (<Group
@@ -69,15 +72,18 @@ export function Icon({
         radius={10}
         fill={"transparent"}
         stroke={"#8B0000"}
-        strokeWidth={1.75}/>
+        strokeWidth={1.75}
+        perfectDrawEnabled={false}/>
         <Line
         points={[-5,-5,5,5]}
         stroke={"#8B0000"}
-        strokeWidth={1.75}/>
+        strokeWidth={1.75}
+        perfectDrawEnabled={false}/>
         <Line
         points={[-5,5,5,-5]}
         stroke={"#8B0000"}
-        strokeWidth={1.75}/>
+        strokeWidth={1.75}
+        perfectDrawEnabled={false}/>
     </Group>)
     : type === "switch" ?
     <Group
@@ -127,6 +133,7 @@ export function Icon({
         // fill={"#212121"}
         cornerRadius={25}
         ref={switchPanelRef}
+        perfectDrawEnabled={false}
         // stroke={"silver"}
         // strokeWidth={1}
         />
@@ -144,6 +151,7 @@ export function Icon({
         radius={10}
         fill={"white"}
         ref={switchRef}
+        perfectDrawEnabled={false}
         />
     </Group>
     : type === "confirm" ?
@@ -167,11 +175,13 @@ export function Icon({
         y={-6}
         width={18}
         height={12}
-        fill={"transparent"}/>
+        fill={"transparent"}
+        perfectDrawEnabled={false}/>
         <Line
         points={[-6,0,0,6,12,-6]}
         stroke={"#4BB543"}
-        strokeWidth={2.5}/>
+        strokeWidth={2.5}
+        perfectDrawEnabled={false}/>
     </Group>
     : type === "cross" ?
     <Group
@@ -200,15 +210,18 @@ export function Icon({
         y={-7}
         width={14}
         height={14}
-        fill={"transparent"}/>
+        fill={"transparent"}
+        perfectDrawEnabled={false}/>
         <Line
         points={[-7,-7,7,7]}
         stroke={"#8B0000"}
-        strokeWidth={2.5}/>
+        strokeWidth={2.5}
+        perfectDrawEnabled={false}/>
         <Line
         points={[-7,7,7,-7]}
         stroke={"#8B0000"}
-        strokeWidth={2.5}/>
+        strokeWidth={2.5}
+        perfectDrawEnabled={false}/>
     </Group>
     : type === "visibility" ?
     <Group
@@ -233,14 +246,16 @@ export function Icon({
         outerRadius={15}
         fill={isHover?"#323232":"gray"}
         rotation={15}
-        angle={150}/>
+        angle={150}
+        perfectDrawEnabled={false}/>
         <Circle
         x={0}
         y={0}
         radius={5}
         fill={"transparent"}
         stroke={isHover?"#323232":"gray"}
-        strokeWidth={1.75}/>
+        strokeWidth={1.75}
+        perfectDrawEnabled={false}/>
         <Arc
         x={0}
         y={5}
@@ -248,20 +263,23 @@ export function Icon({
         outerRadius={15}
         fill={isHover?"#323232":"gray"}
         rotation={195}
-        angle={150}/>
+        angle={150}
+        perfectDrawEnabled={false}/>
         <Line
         x={0}
         y={0}
         visible={switchState===0}
         points={[-10,-10,10,10]}
         stroke={isHover?"#323232":"gray"}
-        strokeWidth={2.5}/>
+        strokeWidth={2.5}
+        perfectDrawEnabled={false}/>
         <Rect
         x={-15}
         y={-10}
         width={30}
         height={20}
-        fill={"transparent"}/>
+        fill={"transparent"}
+        perfectDrawEnabled={false}/>
     </Group>
     : type === "forward" ?
     <Group
@@ -281,18 +299,21 @@ export function Icon({
         y={0}
         points={[-7.5,-7.5,0,0,-7.5,7.5]}
         stroke={isHover?"#646464":"silver"}
-        strokeWidth={2.5}/>
+        strokeWidth={2.5}
+        perfectDrawEnabled={false}/>
         <Line
         x={0}
         y={0}
         points={[0,-7.5,7.5,0,0,7.5]}
         stroke={isHover?"#646464":"silver"}
-        strokeWidth={2.5}/>
+        strokeWidth={2.5}
+        perfectDrawEnabled={false}/>
         <Rect
         x={-7.5}
         y={-7.5}
         width={15}
-        height={15}/>
+        height={15}
+        perfectDrawEnabled={false}/>
     </Group>
     : type === "backward" ?
     <Group
@@ -312,18 +333,21 @@ export function Icon({
         y={0}
         points={[0,-7.5,-7.5,0,0,7.5]}
         stroke={isHover?"#646464":"silver"}
-        strokeWidth={2.5}/>
+        strokeWidth={2.5}
+        perfectDrawEnabled={false}/>
         <Line
         x={0}
         y={0}
         points={[7.5,-7.5,0,0,7.5,7.5]}
         stroke={isHover?"#646464":"silver"}
-        strokeWidth={2.5}/>
+        strokeWidth={2.5}
+        perfectDrawEnabled={false}/>
         <Rect
         x={-7.5}
         y={-7.5}
         width={15}
-        height={15}/>
+        height={15}
+        perfectDrawEnabled={false}/>
     </Group>
     : type.slice(-5) === "Arrow" ?
     <Group
@@ -343,7 +367,8 @@ export function Icon({
         y={-6}
         width={12}
         height={12}
-        fill={"transparent"}/>
+        fill={"transparent"}
+        perfectDrawEnabled={false}/>
         <Arrow
         x={0}
         y={0}
@@ -353,7 +378,8 @@ export function Icon({
         stroke={isHover?"#646464":"gray"}
         pointerLength={8}
         pointerWidth={12}
-        strokeWidth={1}/>
+        strokeWidth={1}
+        perfectDrawEnabled={false}/>
     </Group>
     : type === "question" ?
     <Group
@@ -375,6 +401,7 @@ export function Icon({
         fill={"transparent"}
         stroke={enabled?"#FFBF00":isHover?"black":"gray"}
         strokeWidth={1.5}
+        perfectDrawEnabled={false}
         />
         <Text
         x={0}
@@ -386,7 +413,8 @@ export function Icon({
         fontStyle={"bold"}
         fill={enabled?"#FFBF00":isHover?"black":"gray"}
         align={"center"}
-        verticalAlign={"middle"}/>
+        verticalAlign={"middle"}
+        perfectDrawEnabled={false}/>
     </Group>
     : null
     // return type === "add" ?

@@ -252,6 +252,7 @@ export function TaskHeader({
         shadowColor={"black"}
         // fill={"#646464"}
         fill={"white"}
+        perfectDrawEnabled={false}
         />
         {/* <Rect
         x={0}
@@ -363,7 +364,8 @@ export function TaskHeader({
                     fill={disabledSet.has(task.id)?
                         "#C0C2CE":colorPalette[task.id%colorPalette.length]}
                     opacity={disabledSet.has(task.id)?0.5:1}
-                    cornerRadius={2.5}/>
+                    cornerRadius={2.5}
+                    perfectDrawEnabled={false}/>
                     <Text
                     text={task.goal}
                     fontSize={fontSize}
@@ -375,6 +377,7 @@ export function TaskHeader({
                     verticalAlign={"middle"}
                     fill={"white"}
                     padding={2.5}
+                    perfectDrawEnabled={false}
                     />
                 </Label>
                 // <Circle
@@ -409,7 +412,8 @@ export function TaskHeader({
                 clearInterval(hoverLeftArrowInterval);
                 setHoverLeftArrowInterval(null);
             }
-        }}/>
+        }}
+        perfectDrawEnabled={false}/>
         <Arrow
         points={[width-12.5,fontHeight/2,width-10,fontHeight/2,width-7.5,fontHeight/2]}
         fill={"silver"}
@@ -431,7 +435,8 @@ export function TaskHeader({
                 clearInterval(hoverRightArrowInterval);
                 setHoverRightArrowInterval(null);
             }
-        }}/>
+        }}
+        perfectDrawEnabled={false}/>
     </Group>
 
     <Group
@@ -470,6 +475,7 @@ export function TaskHeader({
     cornerRadius={2.5}
     visible={isHoverHeader}
     ref={curtainRef}
+    perfectDrawEnabled={false}
     />
     {isCurtainDrawn && !isCurtainFixed ? <Icon
     x={width-15}
