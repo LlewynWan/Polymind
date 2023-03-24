@@ -1398,6 +1398,15 @@ export function Canvas({dimensions})
                     ]
                 });
             }}
+            toggleTaskActive={(task_id) => {
+                setMicroTasks(prevState=>prevState.map(state=>{
+                    let tmp = state;
+                    if (tmp.id === task_id) {
+                        tmp.active = !tmp.active;
+                    }
+                    return tmp;
+                }))
+            }}
             />
 
             <ToolBar

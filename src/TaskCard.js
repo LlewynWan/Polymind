@@ -14,6 +14,7 @@ export function TaskCard({
     x,y,
     width,
     height,
+    active,
     color,
     goal,
     suggestions,
@@ -23,6 +24,7 @@ export function TaskCard({
     examplePrompt,
     deleteTask,
     toggleDisplay,
+    onTaskLabelClick,
     handlePromptTextChange,
     setIOType
 })
@@ -57,10 +59,10 @@ export function TaskCard({
     useEffect(()=>{
         if (pageNum===0) {
             page1Ref.current.setAttrs({opacity: 0});
-            page1Ref.current.to({opacity: 1});
+            page1Ref.current.to({opacity: active?1:0.75});
         } else {
             page2Ref.current.setAttrs({opacity: 0});
-            page2Ref.current.to({opacity: 1});
+            page2Ref.current.to({opacity: active?1:0.75});
         }
     }, [pageNum])
 
@@ -155,9 +157,17 @@ export function TaskCard({
         <Label
         x={10}
         y={10}
+        onClick={onTaskLabelClick}
+        onMouseEnter={(e)=>{
+            e.target.getStage().container().style.cursor = "pointer";
+        }}
+        onMouseLeave={(e)=>{
+            e.target.getStage().container().style.cursor = "default";
+        }}
         >
             <Tag
-            fill={color}
+            fill={active?color:"#C0C2CE"}
+            opacity={active?1:0.75}
             cornerRadius={5}
             perfectDrawEnabled={false}
             />
@@ -173,7 +183,8 @@ export function TaskCard({
 
         <Group
         ref={page1Ref}
-        visible={!pageNum}>
+        visible={!pageNum}
+        opacity={active?1:0.75}>
 
         <Icon
         x={width/2-5}
@@ -305,7 +316,8 @@ export function TaskCard({
 
         <Group
         ref={page2Ref}
-        visible={pageNum===1}>
+        visible={pageNum===1}
+        opacity={active?1:0.75}>
         <Label
         x={width/2-57.5}
         y={95}

@@ -3,7 +3,7 @@ import React, { useState, useEffect, useRef } from "react";
 import Konva from "konva";
 
 import { colorPalette } from "./utils/color_utils";
-import { Group, Label, Tag, Text, Rect, Arrow } from "react-konva";
+import { Group, Label, Tag, Text, Rect, Arrow, Circle } from "react-konva";
 
 import { Icon } from "./Icon";
 
@@ -214,6 +214,35 @@ export function TaskHeader({
         setIsHover(false);
         setCurrentHoverId(-1);
         clearTimeout(hoverTimeout);
+        setIsCurtainDrawn(false);
+        
+        if (!isCurtainFixed) {
+            // setCurrentHoverId(-1);
+            setCurtainId(-1);
+            // clearTimeout(hoverTimeout);
+            setIsCurtainDrawn(false);
+            curtainRef.current.to({
+                width: 0,
+                duration: 0.25,
+                easing: Konva.Easings.EaseOut,
+                onFinish: ()=> {
+                    setCurtainId(-1);
+                    setIsCurtainDrawn(false);
+                    setIsHoverHeader(false);
+                    // setIsCurtainDrawn(false);
+                    // promptRectRef.current.to({
+                    //     fill: "silver",
+                    //     opacity: 1,
+                    //     duration: 0.25
+                    // });
+                    // promptCircleRef.current.to({
+                    //     fill: "silver",
+                    //     opacity: 1,
+                    //     duration: 0.25
+                    // });
+                }
+            });
+        }
         // setIsHoverHeader(false);
     }}
     listening={listening}>
@@ -306,8 +335,10 @@ export function TaskHeader({
         clipHeight={window.innerHeight*2}>
         {tasks.slice().reverse().map((task,index)=>{
             return (
+                <Group
+                key={task.id}>
                 <Label
-                key={task.id}
+                // key={task.id}
                 // x={task.id*25+offsetX}
                 x={headerPositions[tasks.length-index-1]+offsetX}
                 y={0}
@@ -343,8 +374,8 @@ export function TaskHeader({
                         }, 1000));
                     }
                     e.target.getStage().container().style.cursor = "pointer"
-                    e.target.parent.to({y: -1, duration: 0.15})
-                    e.target.to({fontSize: fontSize+2, duration: 0.15})
+                    e.target.parent.to({y: -1, duration: 0.15});
+                    e.target.to({fontSize: fontSize+2, duration: 0.15});
                     
                 }}
                 onMouseLeave={(e)=>{
@@ -358,14 +389,19 @@ export function TaskHeader({
                 onClick={(e)=>{
                     e.cancelBubble = true;
                     onTaskClick(task.id)
-                }}
-                >
+                }}>
                     <Tag
-                    fill={disabledSet.has(task.id)?
+                    fill={disabledSet.has(task.id)||!task.active?
                         "#C0C2CE":colorPalette[task.id%colorPalette.length]}
-                    opacity={disabledSet.has(task.id)?0.5:1}
+                    opacity={disabledSet.has(task.id)||!task.active?0.64:1}
                     cornerRadius={2.5}
-                    perfectDrawEnabled={false}/>
+                    perfectDrawEnabled={false}
+                    // shadowOffsetX={0}
+                    // shadowOffsetY={0}
+                    // shadowBlur={5}
+                    // shadowOpacity={task.id===4?1:0}
+                    // shadowColor={"#E53C38"}
+                    />
                     <Text
                     text={task.goal}
                     fontSize={fontSize}
@@ -376,10 +412,41 @@ export function TaskHeader({
                     align={"center"}
                     verticalAlign={"middle"}
                     fill={"white"}
+                    // fill={disabledSet.has(task.id)?colorPalette[task.id%colorPalette.length]:"white"}
                     padding={2.5}
+                    // opacity={task.id===4?0.5:1}
                     perfectDrawEnabled={false}
                     />
                 </Label>
+                {/* <Rect
+                x={headerPositions[tasks.length-index-1]+offsetX}
+                y={-3}
+                width={24}
+                height={6}
+                fill={"#E53C38"}
+                stroke={"white"}
+                strokeWidth={1}
+                opacity={0.75}
+                cornerRadius={1.5}/> */}
+
+                {/* <Circle
+                x={headerPositions[tasks.length-index-1]+offsetX+2.5}
+                y={fontHeight/2-6}
+                radius={5}
+                fill={"#E53C38"}
+                opacity={0.75}
+                perfectDrawEnabled={false}/>
+                <Circle
+                x={headerPositions[tasks.length-index-1]+offsetX+2.5}
+                y={fontHeight/2-6}
+                radius={5}
+                stroke={"white"}
+                strokeWidth={1.25}
+                fill={"transparent"}
+                // opacity={0.85}
+                perfectDrawEnabled={false}/> */}
+
+                </Group>
                 // <Circle
                 // key={task.id}
                 // x={task.id*15}
@@ -440,33 +507,34 @@ export function TaskHeader({
     </Group>
 
     <Group
-    onMouseLeave={()=>{
-        if (!isCurtainFixed) {
-            setCurrentHoverId(-1);
-            setCurtainId(-1);
-            clearTimeout(hoverTimeout);
-            setIsCurtainDrawn(false);
-            curtainRef.current.to({
-                width: 0,
-                duration: 0.25,
-                easing: Konva.Easings.EaseOut,
-                onFinish: ()=> {
-                    setIsHoverHeader(false);
-                    // setIsCurtainDrawn(false);
-                    // promptRectRef.current.to({
-                    //     fill: "silver",
-                    //     opacity: 1,
-                    //     duration: 0.25
-                    // });
-                    // promptCircleRef.current.to({
-                    //     fill: "silver",
-                    //     opacity: 1,
-                    //     duration: 0.25
-                    // });
-                }
-            });
-        }
-    }}>
+    // onMouseLeave={()=>{
+        // if (!isCurtainFixed) {
+        //     setCurrentHoverId(-1);
+        //     setCurtainId(-1);
+        //     clearTimeout(hoverTimeout);
+        //     setIsCurtainDrawn(false);
+        //     curtainRef.current.to({
+        //         width: 0,
+        //         duration: 0.25,
+        //         easing: Konva.Easings.EaseOut,
+        //         onFinish: ()=> {
+        //             setIsHoverHeader(false);
+        //             // setIsCurtainDrawn(false);
+        //             // promptRectRef.current.to({
+        //             //     fill: "silver",
+        //             //     opacity: 1,
+        //             //     duration: 0.25
+        //             // });
+        //             // promptCircleRef.current.to({
+        //             //     fill: "silver",
+        //             //     opacity: 1,
+        //             //     duration: 0.25
+        //             // });
+        //         }
+        //     });
+        // }
+    // }}
+    >
     <Rect
     x={0}
     y={-4}

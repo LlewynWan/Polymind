@@ -18,6 +18,7 @@ export function TaskBoard({
     deleteTask,
     toggleTaskHeaderSwitch,
     toggleDisplay,
+    toggleTaskActive,
     handlePromptTextChange,
     setIOType,
     onAddTask
@@ -220,6 +221,7 @@ export function TaskBoard({
                     y={taskCardOffset+190*index}
                     width={width-30}
                     height={170}
+                    active={task.active}
                     color={colorPalette[task.id%colorPalette.length]}
                     goal={task.goal}
                     suggestions={task.suggestions}
@@ -229,6 +231,7 @@ export function TaskBoard({
                     examplePrompt={task.examplePrompt}
                     deleteTask={()=>deleteTask(task.id)}
                     toggleDisplay={()=>toggleDisplay(task.id)}
+                    onTaskLabelClick={()=>{toggleTaskActive(task.id)}}
                     handlePromptTextChange={(value)=>handlePromptTextChange(value,task.id)}
                     setIOType={(type, IOType) => setIOType(task.id, type, IOType)}
                     />
