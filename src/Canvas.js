@@ -1398,14 +1398,23 @@ export function Canvas({dimensions})
                     ]
                 });
             }}
-            toggleTaskActive={(task_id) => {
-                setMicroTasks(prevState=>prevState.map(state=>{
+            toggleTaskActive={(task_id,active) => {
+                setNodes(prevState=>prevState.map(state=>{
                     let tmp = state;
-                    if (tmp.id === task_id) {
-                        tmp.active = !tmp.active;
+                    if (active) {
+                        tmp.disabledTaskId.delete(task_id);
+                    } else {
+                        tmp.disabledTaskId.add(task_id);
                     }
                     return tmp;
                 }))
+                setMicroTasks(prevState=>prevState.map(state=>{
+                    let tmp = state;
+                    if (tmp.id === task_id) {
+                        tmp.active = active;
+                    }
+                    return tmp;
+                }));
             }}
             />
 

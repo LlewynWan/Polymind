@@ -41,6 +41,8 @@ export function TaskHeader({
     const [isCurtainDrawn, setIsCurtainDrawn] = useState(false);
     const [isCurtainFixed, setIsCurtainFixed] = useState(false);
 
+    const [isAnimating, setIsAnimating] =  useState(false);
+
     const curtainRef = useRef(null);
     // const promptRectRef = useRef(null);
     // const promptCircleRef = useRef(null);
@@ -245,7 +247,7 @@ export function TaskHeader({
         }
         // setIsHoverHeader(false);
     }}
-    listening={listening}>
+    listening={listening && !isAnimating}>
         {/* <Rect
         x={0}
         y={-8-fontHeight}
@@ -349,6 +351,7 @@ export function TaskHeader({
                         setCurrentHoverId(task.id);
                         setHoverTimeout(setTimeout(()=>{
                             setIsHoverHeader(true);
+                            setIsAnimating(true);
                             curtainRef.current.to({
                                 fill: colorPalette[task.id%colorPalette.length],
                                 width: width,
@@ -357,6 +360,7 @@ export function TaskHeader({
                                 onFinish: ()=>{
                                     setIsCurtainDrawn(true);
                                     setCurtainId(task.id);
+                                    setIsAnimating(false);
                                 }
                                 // onFinish: ()=>{
                                 //     promptRectRef.current.to({
@@ -388,12 +392,21 @@ export function TaskHeader({
                 }}
                 onClick={(e)=>{
                     e.cancelBubble = true;
-                    onTaskClick(task.id)
+                    // curtainRef.current.to({
+                    //     width: 0,
+                    //     duration: 0.25,
+                    //     onFinish: ()=>{
+                    //         clearTimeout(hoverTimeout);
+                    //         setIsCurtainDrawn(false);
+                    //         setCurtainId(-1);
+                    //     }
+                    // })
+                    onTaskClick(task.id);
                 }}>
                     <Tag
-                    fill={disabledSet.has(task.id)||!task.active?
+                    fill={disabledSet.has(task.id)?
                         "#C0C2CE":colorPalette[task.id%colorPalette.length]}
-                    opacity={disabledSet.has(task.id)||!task.active?0.64:1}
+                    opacity={disabledSet.has(task.id)?0.64:1}
                     cornerRadius={2.5}
                     perfectDrawEnabled={false}
                     // shadowOffsetX={0}

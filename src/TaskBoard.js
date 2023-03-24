@@ -231,7 +231,7 @@ export function TaskBoard({
                     examplePrompt={task.examplePrompt}
                     deleteTask={()=>deleteTask(task.id)}
                     toggleDisplay={()=>toggleDisplay(task.id)}
-                    onTaskLabelClick={()=>{toggleTaskActive(task.id)}}
+                    onTaskLabelClick={()=>{toggleTaskActive(task.id,!task.active)}}
                     handlePromptTextChange={(value)=>handlePromptTextChange(value,task.id)}
                     setIOType={(type, IOType) => setIOType(task.id, type, IOType)}
                     />
