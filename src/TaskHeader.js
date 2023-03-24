@@ -390,19 +390,7 @@ export function TaskHeader({
                     e.target.parent.to({y: 0, duration: 0.15})
                     e.target.to({fontSize: fontSize, duration: 0.15})
                 }}
-                onClick={(e)=>{
-                    e.cancelBubble = true;
-                    // curtainRef.current.to({
-                    //     width: 0,
-                    //     duration: 0.25,
-                    //     onFinish: ()=>{
-                    //         clearTimeout(hoverTimeout);
-                    //         setIsCurtainDrawn(false);
-                    //         setCurtainId(-1);
-                    //     }
-                    // })
-                    onTaskClick(task.id);
-                }}>
+                onClick={(e)=>{onTaskClick(e,task.id)}}>
                     <Tag
                     fill={disabledSet.has(task.id)?
                         "#C0C2CE":colorPalette[task.id%colorPalette.length]}

@@ -389,31 +389,36 @@ export function Canvas({dimensions})
         }
         // }, 5000);
     }
-    const handleHeaderTaskClick = (task_id, object_type, object_id) => {
-        if (object_type !== "section") {
-            setNodes(prevState => prevState.map(state => {
-                let tmp = state;
-                if (tmp.id === object_id) {
-                    if (tmp.disabledTaskId.has(task_id)) {
-                        tmp.disabledTaskId.delete(task_id);
-                    } else {
-                        tmp.disabledTaskId.add(task_id);
+    const handleHeaderTaskClick = (e, task_id, object_type, object_id) => {
+        e.cancelBubble = true;
+        if (e.evt.ctrlKey) {
+            if (object_type !== "section") {
+                setNodes(prevState => prevState.map(state => {
+                    let tmp = state;
+                    if (tmp.id === object_id) {
+                        if (tmp.disabledTaskId.has(task_id)) {
+                            tmp.disabledTaskId.delete(task_id);
+                        } else {
+                            tmp.disabledTaskId.add(task_id);
+                        }
                     }
-                }
-                return tmp;
-            }))
-        } else if (object_type === "section") {
-            setSections(prevState => prevState.map(state => {
-                let tmp = state;
-                if (tmp.id === object_id) {
-                    if (tmp.disabledTaskId.has(task_id)) {
-                        tmp.disabledTaskId.delete(task_id);
-                    } else {
-                        tmp.disabledTaskId.add(task_id);
+                    return tmp;
+                }))
+            } else if (object_type === "section") {
+                setSections(prevState => prevState.map(state => {
+                    let tmp = state;
+                    if (tmp.id === object_id) {
+                        if (tmp.disabledTaskId.has(task_id)) {
+                            tmp.disabledTaskId.delete(task_id);
+                        } else {
+                            tmp.disabledTaskId.add(task_id);
+                        }
                     }
-                }
-                return tmp;
-            }))
+                    return tmp;
+                }))
+            }
+        } else {
+            
         }
     }
 
@@ -816,7 +821,7 @@ export function Canvas({dimensions})
                         return tmp;
                     }))
                 }}
-                onHeaderTaskClick={(task_id)=>handleHeaderTaskClick(task_id,"section",section.id)}
+                onHeaderTaskClick={(e,task_id)=>handleHeaderTaskClick(e,task_id,"section",section.id)}
                 onHeaderCurtainClick={(task_id)=>handleHeaderCurtainClick(section.id, "section", task_id)}
                 resetHeaderCurtain={(task_id)=>resetHeaderCurtain(section.id, "section", task_id)}
                 callbackTaskId={section.callbackTaskId}
@@ -894,7 +899,7 @@ export function Canvas({dimensions})
                     })
                 }}
                 disabledSet={node.disabledTaskId}
-                onHeaderTaskClick={(task_id)=>handleHeaderTaskClick(task_id,"sticky_note",node.id)}
+                onHeaderTaskClick={(e,task_id)=>handleHeaderTaskClick(e,task_id,"sticky_note",node.id)}
                 onHeaderCurtainClick={(task_id)=>handleHeaderCurtainClick(node.id, "sticky_note", task_id)}
                 resetHeaderCurtain={(task_id)=>resetHeaderCurtain(node.id, "sticky_note", task_id)}
                 callbackTaskId={node.callbackTaskId}
@@ -946,7 +951,7 @@ export function Canvas({dimensions})
                 headerListening={!isDrawingArrow &&
                     !isDrawingDoubleArrow&&!isSectioning&&!isAddingKeyword}
                 disabledSet={node.disabledTaskId}
-                onHeaderTaskClick={(task_id)=>handleHeaderTaskClick(task_id,"keyword",node.id)}
+                onHeaderTaskClick={(e,task_id)=>handleHeaderTaskClick(e,task_id,"keyword",node.id)}
                 onHeaderCurtainClick={(task_id)=>handleHeaderCurtainClick(node.id, "keyword", task_id)}
                 resetHeaderCurtain={(task_id)=>resetHeaderCurtain(node.id, "keyword", task_id)}
                 callbackTaskId={node.callbackTaskId}
@@ -1008,7 +1013,7 @@ export function Canvas({dimensions})
                 headerListening={!isDrawingArrow &&
                     !isDrawingDoubleArrow&&!isSectioning&&!isAddingKeyword}
                 disabledSet={node.disabledTaskId}
-                onHeaderTaskClick={(task_id)=>handleHeaderTaskClick(task_id,"concept",node.id)}
+                onHeaderTaskClick={(e,task_id)=>handleHeaderTaskClick(e,task_id,"concept",node.id)}
                 onHeaderCurtainClick={(task_id)=>handleHeaderCurtainClick(node.id, "concept", task_id)}
                 resetHeaderCurtain={(task_id)=>resetHeaderCurtain(node.id, "concept", task_id)}
                 callbackTaskId={node.callbackTaskId}
