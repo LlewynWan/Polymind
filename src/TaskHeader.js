@@ -19,6 +19,7 @@ export function TaskHeader({
     onCurtainClick,
     resetCurtain,
     disabledSet,
+    displaySet,
     resetCallbackTaskId,
     callbackTaskId=-1
 }) {
@@ -46,6 +47,8 @@ export function TaskHeader({
     const curtainRef = useRef(null);
     // const promptRectRef = useRef(null);
     // const promptCircleRef = useRef(null);
+
+    const [notificationSet, setNotificationSet] = useState(new Set());
 
 
     const handleScroll = (offset) => {
@@ -81,7 +84,8 @@ export function TaskHeader({
 
     useEffect(()=>{
         if (callbackTaskId !== -1 && !isHover && !isCurtainFixed) {
-            clearTimeout(hoverTimeout);
+            // clearTimeout(hoverTimeout);
+            setIsAnimating(true);
             clearTimeout(callbackTimeout);
             curtainRef.current.to({
                 fill: colorPalette[callbackTaskId%colorPalette.length],
@@ -90,10 +94,15 @@ export function TaskHeader({
                 duration: 0.25,
                 easing: Konva.Easings.EaseOut,
                 onFinish: ()=>{
+                    setIsAnimating(false);
                     setIsCurtainDrawn(true);
                     setCurtainId(callbackTaskId);
                     setCallbackTimeout(setTimeout(()=>{
                         setIsCurtainDrawn(false);
+                        if (!displaySet.has(callbackTaskId)) {
+                            notificationSet.add(callbackTaskId);
+                        }
+                        setNotificationSet(notificationSet);
                         curtainRef.current.getStage().container().style.cursor = "default"
                         curtainRef.current.to({
                             width: 0,
@@ -210,41 +219,42 @@ export function TaskHeader({
     onClick={(e)=>{e.cancelBubble=true}}
     onWheel={handleTaskHeaderWheel}
     onMouseEnter={()=>{
+        // console.log(isCurtainFixed,isCurtainDrawn)
         setIsHover(true);
     }}
     onMouseLeave={()=>{
         setIsHover(false);
-        setCurrentHoverId(-1);
-        clearTimeout(hoverTimeout);
-        setIsCurtainDrawn(false);
+        // setCurrentHoverId(-1);
+        // clearTimeout(hoverTimeout);
+        // setIsCurtainDrawn(false);
         
-        if (!isCurtainFixed) {
-            // setCurrentHoverId(-1);
-            setCurtainId(-1);
-            // clearTimeout(hoverTimeout);
-            setIsCurtainDrawn(false);
-            curtainRef.current.to({
-                width: 0,
-                duration: 0.25,
-                easing: Konva.Easings.EaseOut,
-                onFinish: ()=> {
-                    setCurtainId(-1);
-                    setIsCurtainDrawn(false);
-                    setIsHoverHeader(false);
-                    // setIsCurtainDrawn(false);
-                    // promptRectRef.current.to({
-                    //     fill: "silver",
-                    //     opacity: 1,
-                    //     duration: 0.25
-                    // });
-                    // promptCircleRef.current.to({
-                    //     fill: "silver",
-                    //     opacity: 1,
-                    //     duration: 0.25
-                    // });
-                }
-            });
-        }
+        // if (!isCurtainFixed) {
+        //     // setCurrentHoverId(-1);
+        //     setCurtainId(-1);
+        //     // clearTimeout(hoverTimeout);
+        //     setIsCurtainDrawn(false);
+        //     curtainRef.current.to({
+        //         width: 0,
+        //         duration: 0.25,
+        //         easing: Konva.Easings.EaseOut,
+        //         onFinish: ()=> {
+        //             setCurtainId(-1);
+        //             setIsCurtainDrawn(false);
+        //             setIsHoverHeader(false);
+        //             // setIsCurtainDrawn(false);
+        //             // promptRectRef.current.to({
+        //             //     fill: "silver",
+        //             //     opacity: 1,
+        //             //     duration: 0.25
+        //             // });
+        //             // promptCircleRef.current.to({
+        //             //     fill: "silver",
+        //             //     opacity: 1,
+        //             //     duration: 0.25
+        //             // });
+        //         }
+        //     });
+        // }
         // setIsHoverHeader(false);
     }}
     listening={listening && !isAnimating}>
@@ -346,69 +356,76 @@ export function TaskHeader({
                 y={0}
                 // onWheel={(e)=>{clearTimeout(hoverTimeout)}}
                 onMouseEnter={(e)=>{
-                    if (task.id !== currentHoverId && !disabledSet.has(task.id)) {
-                        clearTimeout(hoverTimeout);
-                        setCurrentHoverId(task.id);
-                        setHoverTimeout(setTimeout(()=>{
-                            setIsHoverHeader(true);
-                            setIsAnimating(true);
-                            curtainRef.current.to({
-                                fill: colorPalette[task.id%colorPalette.length],
-                                width: width,
-                                duration: 0.25,
-                                easing: Konva.Easings.EaseOut,
-                                onFinish: ()=>{
-                                    setIsCurtainDrawn(true);
-                                    setCurtainId(task.id);
-                                    setIsAnimating(false);
-                                }
-                                // onFinish: ()=>{
-                                //     promptRectRef.current.to({
-                                //         fill: colorPalette[task.id%colorPalette.length],
-                                //         opacity: 0.75,
-                                //         duration: 0.25
-                                //     });
-                                //     promptCircleRef.current.to({
-                                //         fill: colorPalette[task.id%colorPalette.length],
-                                //         opacity: 0.75,
-                                //         duration: 0.25
-                                //     });
-                                // }
-                            })
-                        }, 1000));
-                    }
-                    e.target.getStage().container().style.cursor = "pointer"
+                    // if (task.id !== currentHoverId && !disabledSet.has(task.id)) {
+                    //     clearTimeout(hoverTimeout);
+                    //     setCurrentHoverId(task.id);
+                    //     setHoverTimeout(setTimeout(()=>{
+                    //         setIsHoverHeader(true);
+                    //         setIsAnimating(true);
+                    //         curtainRef.current.to({
+                    //             fill: colorPalette[task.id%colorPalette.length],
+                    //             width: width,
+                    //             duration: 0.25,
+                    //             easing: Konva.Easings.EaseOut,
+                    //             onFinish: ()=>{
+                    //                 setIsCurtainDrawn(true);
+                    //                 setCurtainId(task.id);
+                    //                 setIsAnimating(false);
+                    //             }
+                    //             // onFinish: ()=>{
+                    //             //     promptRectRef.current.to({
+                    //             //         fill: colorPalette[task.id%colorPalette.length],
+                    //             //         opacity: 0.75,
+                    //             //         duration: 0.25
+                    //             //     });
+                    //             //     promptCircleRef.current.to({
+                    //             //         fill: colorPalette[task.id%colorPalette.length],
+                    //             //         opacity: 0.75,
+                    //             //         duration: 0.25
+                    //             //     });
+                    //             // }
+                    //         })
+                    //     }, 1000));
+                    // }
+                    e.target.getStage().container().style.cursor = "pointer";
                     e.target.parent.to({y: -1, duration: 0.15});
                     e.target.to({fontSize: fontSize+2, duration: 0.15});
-                    
                 }}
                 onMouseLeave={(e)=>{
-                    if (currentHoverId === task.id) {
-                        clearTimeout(hoverTimeout);
-                    }
+                    // if (currentHoverId === task.id) {
+                    //     clearTimeout(hoverTimeout);
+                    // }
                     e.target.getStage().container().style.cursor = "default"
                     e.target.parent.to({y: 0, duration: 0.15})
                     e.target.to({fontSize: fontSize, duration: 0.15})
                 }}
-                onClick={(e)=>{onTaskClick(e,task.id)}}>
+                onClick={(e)=>{
+                    notificationSet.delete(task.id);
+                    setNotificationSet(notificationSet);
+                    onTaskClick(e,task.id);
+                }}>
                     <Tag
-                    fill={disabledSet.has(task.id)?
+                    fill={
+                        // notificationSet.has(task.id)?"#010203":
+                        disabledSet.has(task.id)?
                         "#C0C2CE":colorPalette[task.id%colorPalette.length]}
                     opacity={disabledSet.has(task.id)?0.64:1}
                     cornerRadius={2.5}
                     perfectDrawEnabled={false}
-                    // shadowOffsetX={0}
-                    // shadowOffsetY={0}
-                    // shadowBlur={5}
-                    // shadowOpacity={task.id===4?1:0}
-                    // shadowColor={"#E53C38"}
                     />
                     <Text
+                    // stroke={"#FFA8B5"}
+                    // strokeWidth={notificationSet.has(task.id)?0.5:0}
                     text={task.goal}
                     fontSize={fontSize}
+                    // shadowOffsetY={2.5}
+                    // shadowBlur={5}
+                    // shadowOpacity={notificationSet.has(task.id)?0.25:0}
+                    // shadowColor={"#FFA8B5"}
                     // width={20}
                     // height={20}
-                    fontStyle={"bold"}
+                    fontStyle={displaySet.has(task.id)?"italic bold":"bold"}
+                    textDecoration={displaySet.has(task.id)?"underline":""}
                     // Ellipsis={true}
                     align={"center"}
                     verticalAlign={"middle"}
@@ -430,22 +447,25 @@ export function TaskHeader({
                 opacity={0.75}
                 cornerRadius={1.5}/> */}
 
-                {/* <Circle
-                x={headerPositions[tasks.length-index-1]+offsetX+2.5}
-                y={fontHeight/2-6}
+                {notificationSet.has(task.id) ? <Group>
+                <Circle
+                x={headerPositions[tasks.length-index-1]+offsetX+5}
+                y={fontHeight/2-5}
                 radius={5}
                 fill={"#E53C38"}
-                opacity={0.75}
+                opacity={0.8}
                 perfectDrawEnabled={false}/>
                 <Circle
-                x={headerPositions[tasks.length-index-1]+offsetX+2.5}
-                y={fontHeight/2-6}
+                x={headerPositions[tasks.length-index-1]+offsetX+5}
+                y={fontHeight/2-5}
                 radius={5}
                 stroke={"white"}
+                // stroke={"#FFA8B5"}
                 strokeWidth={1.25}
                 fill={"transparent"}
                 // opacity={0.85}
-                perfectDrawEnabled={false}/> */}
+                perfectDrawEnabled={false}/>
+                </Group> : null}
 
                 </Group>
                 // <Circle
@@ -552,7 +572,9 @@ export function TaskHeader({
     type={"forward"}
     onClick={(e)=>{
         e.cancelBubble = true;
-        // clearTimeout(callbackTimeout);
+        notificationSet.delete(curtainId);
+        setNotificationSet(notificationSet);
+        clearTimeout(callbackTimeout);
         setIsCurtainFixed(true);
         onCurtainClick(curtainId);
     }}/> : null}
@@ -566,9 +588,9 @@ export function TaskHeader({
 
         resetCurtain(curtainId);
         setIsCurtainFixed(false);
-        setCurrentHoverId(-1);
+        // setCurrentHoverId(-1);
         setCurtainId(-1);
-        clearTimeout(hoverTimeout);
+        // clearTimeout(hoverTimeout);
         setIsCurtainDrawn(false);
         curtainRef.current.to({
             width: 0,

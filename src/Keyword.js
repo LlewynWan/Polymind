@@ -38,7 +38,9 @@ export function Keyword({
   onHeaderCurtainClick,
   resetHeaderCurtain,
   disabledSet,
+  displaySet,
   resetNodeCallbackTaskId,
+  listening,
   header=true,
   draggable=true,
   callbackTaskId=-1
@@ -138,7 +140,8 @@ export function Keyword({
       setIsDragging(false);
       if (onDragEnd)
         onDragEnd(e);
-    }}>
+    }}
+    listening={listening}>
     
     {header ? <TaskHeader
     x={0}
@@ -152,6 +155,7 @@ export function Keyword({
     onCurtainClick={onHeaderCurtainClick}
     resetCurtain={resetHeaderCurtain}
     disabledSet={disabledSet}
+    displaySet={displaySet}
     callbackTaskId={callbackTaskId}
     resetCallbackTaskId={resetNodeCallbackTaskId}/> : null}
 

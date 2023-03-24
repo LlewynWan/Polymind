@@ -38,8 +38,10 @@ export function Concept({
     onHeaderCurtainClick,
     resetHeaderCurtain,
     disabledSet,
+    displaySet,
     resetNodeCallbackTaskId,
     headerListening,
+    listening,
     header=true,
     draggable=true,
     callbackTaskId=-1
@@ -145,7 +147,8 @@ export function Concept({
        setIsDragging(false);
        if (onDragEnd)
          onDragEnd(e);
-     }}>
+     }}
+     listening={listening}>
 
     {header ? <TaskHeader
     x={-radiusX*scaleX}
@@ -161,6 +164,7 @@ export function Concept({
     onCurtainClick={onHeaderCurtainClick}
     resetCurtain={resetHeaderCurtain}
     disabledSet={disabledSet}
+    displaySet={displaySet}
     callbackTaskId={callbackTaskId}
     resetCallbackTaskId={resetNodeCallbackTaskId}/>: null}
 

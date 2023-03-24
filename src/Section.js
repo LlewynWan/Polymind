@@ -20,7 +20,9 @@ export function Section({
     fontSize,
     header,
     headerListening,
+    listening,
     disabledSet,
+    displaySet,
     onHeaderTaskClick,
     onHeaderCurtainClick,
     resetHeaderCurtain,
@@ -93,7 +95,8 @@ export function Section({
     onDragMove={handleDragMove}
     onDragEnd={handleDragEnd}
     draggable={true}
-    onClick={onClick}>
+    onClick={onClick}
+    listening={listening}>
     {header ? <TaskHeader
     x={0}
     y={-80/canvasScale}
@@ -103,6 +106,7 @@ export function Section({
     scale={1/canvasScale}
     listening={headerListening}
     disabledSet={disabledSet}
+    displaySet={displaySet}
     onTaskClick={onHeaderTaskClick}
     onCurtainClick={onHeaderCurtainClick}
     resetCurtain={resetHeaderCurtain}

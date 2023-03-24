@@ -38,8 +38,10 @@ export function StickyNote({
   onHeaderCurtainClick,
   resetHeaderCurtain,
   disabledSet,
+  displaySet,
   resetNodeCallbackTaskId,
   headerListening,
+  listening,
   header=true,
   draggable=true,
   callbackTaskId=-1
@@ -128,7 +130,8 @@ export function StickyNote({
        setIsDragging(false);
        if (onDragEnd)
          onDragEnd(e);
-     }}>
+     }}
+     listening={listening}>
     
     {header ? <TaskHeader
     x={0}
@@ -142,6 +145,7 @@ export function StickyNote({
     onCurtainClick={onHeaderCurtainClick}
     resetCurtain={resetHeaderCurtain}
     disabledSet={disabledSet}
+    displaySet={displaySet}
     callbackTaskId={callbackTaskId}
     resetCallbackTaskId={resetNodeCallbackTaskId}/> : null}
     

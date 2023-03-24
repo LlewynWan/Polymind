@@ -123,11 +123,11 @@ export function Canvas({dimensions})
                 if (object_type !== "" && inFocus[object_type] !== -1) {
                     if (object_type!=="section") {
                         const node = nodes.filter(node=>node.id===inFocus[object_type])[0];
-                        if (node.text!=="" && !node.disabledTaskId.has(task.id))
+                        if (node.text!=="" && !node.disabledSet.has(task.id))
                             handleMicroTask(task, object_type, node);
                     } else {
                         const section = sections.filter(section=>section.id===inFocus[object_type]);
-                        if (section.length && !section[0].disabledTaskId.has(task.id))
+                        if (section.length && !section[0].disabledSet.has(task.id))
                             handleMicroTask(task, object_type, section[0])   
                     }   
                 }
@@ -391,34 +391,34 @@ export function Canvas({dimensions})
     }
     const handleHeaderTaskClick = (e, task_id, object_type, object_id) => {
         e.cancelBubble = true;
-        if (e.evt.ctrlKey) {
-            if (object_type !== "section") {
-                setNodes(prevState => prevState.map(state => {
-                    let tmp = state;
-                    if (tmp.id === object_id) {
-                        if (tmp.disabledTaskId.has(task_id)) {
-                            tmp.disabledTaskId.delete(task_id);
-                        } else {
-                            tmp.disabledTaskId.add(task_id);
-                        }
-                    }
-                    return tmp;
-                }))
-            } else if (object_type === "section") {
-                setSections(prevState => prevState.map(state => {
-                    let tmp = state;
-                    if (tmp.id === object_id) {
-                        if (tmp.disabledTaskId.has(task_id)) {
-                            tmp.disabledTaskId.delete(task_id);
-                        } else {
-                            tmp.disabledTaskId.add(task_id);
-                        }
-                    }
-                    return tmp;
-                }))
+        const toggleSet = (task_id, set) => {
+            if (set.has(task_id)) {
+                set.delete(task_id);
+            } else {
+                set.add(task_id);
             }
-        } else {
-            
+            return set;
+        };
+        if (object_type !== "section") {
+            setNodes(prevState => prevState.map(state => {
+                let tmp = state;
+                if (e.evt.ctrlKey) {
+                    tmp.disabledSet = toggleSet(task_id, tmp.disabledSet)
+                } else {
+                    tmp.displaySet = toggleSet(task_id, tmp.displaySet);
+                }
+                return tmp;
+            }))
+        } else if (object_type === "section") {
+            setSections(prevState => prevState.map(state => {
+                let tmp = state;
+                if (e.evt.ctrlKey) {
+                    tmp.disabledSet = toggleSet(task_id, tmp.disabledSet)
+                } else {
+                    tmp.displaySet = toggleSet(task_id, tmp.displaySet);
+                }
+                return tmp;
+            }))
         }
     }
 
@@ -482,7 +482,8 @@ export function Canvas({dimensions})
                 width: 0, height: 0, fontSize: 20,
                 scaleX: 1/canvasScale, scaleY: 1/canvasScale,
                 selected: true, text: "", display: true,
-                disabledTaskId: new Set(),
+                disabledSet: new Set(),
+                displaySet: new Set(),
                 callbackTaskId: -1};
                 return [...prevState, tmp];
             });
@@ -534,7 +535,8 @@ export function Canvas({dimensions})
                 return [
                     ...prevState,
                     {id: prevState.length, selected: false,
-                    callbackTaskId: -1, disabledTaskId: new Set(),
+                    callbackTaskId: -1, disabledSet: new Set(),
+                    displaySet: new Set(),
                     scaleX: 1, scaleY: 1,
                     x: Math.min(position1[0], position2[0]),
                     y: Math.min(position1[1], position2[1]),
@@ -832,7 +834,9 @@ export function Canvas({dimensions})
                     }
                     return tmp;
                 }))}
-                disabledSet={section.disabledTaskId}
+                disabledSet={section.disabledSet}
+                displaySet={section.displaySet}
+                listening={!isAddingKeyword&&!isSectioning}
                 />)
             })}
             {nodes.map((node, index) => {
@@ -898,13 +902,15 @@ export function Canvas({dimensions})
                         });
                     })
                 }}
-                disabledSet={node.disabledTaskId}
+                disabledSet={node.disabledSet}
+                displaySet={node.displaySet}
                 onHeaderTaskClick={(e,task_id)=>handleHeaderTaskClick(e,task_id,"sticky_note",node.id)}
                 onHeaderCurtainClick={(task_id)=>handleHeaderCurtainClick(node.id, "sticky_note", task_id)}
                 resetHeaderCurtain={(task_id)=>resetHeaderCurtain(node.id, "sticky_note", task_id)}
                 callbackTaskId={node.callbackTaskId}
                 resetNodeCallbackTaskId={()=>resetNodeCallbackTaskId(node.id)}
-                header={isTaskHeaderVisible}/> :
+                header={isTaskHeaderVisible}
+                listening={!isAddingKeyword&&!isSectioning}/> :
                 node.type === "keyword" ?
                 <Keyword
                 key={node.id}
@@ -950,13 +956,15 @@ export function Canvas({dimensions})
                 onConnected={(e,anchor)=>onNodeConnected(e,node.id,anchor)}
                 headerListening={!isDrawingArrow &&
                     !isDrawingDoubleArrow&&!isSectioning&&!isAddingKeyword}
-                disabledSet={node.disabledTaskId}
+                disabledSet={node.disabledSet}
+                displaySet={node.displaySet}
                 onHeaderTaskClick={(e,task_id)=>handleHeaderTaskClick(e,task_id,"keyword",node.id)}
                 onHeaderCurtainClick={(task_id)=>handleHeaderCurtainClick(node.id, "keyword", task_id)}
                 resetHeaderCurtain={(task_id)=>resetHeaderCurtain(node.id, "keyword", task_id)}
                 callbackTaskId={node.callbackTaskId}
                 resetNodeCallbackTaskId={()=>resetNodeCallbackTaskId(node.id)}
-                header={isTaskHeaderVisible}/> :
+                header={isTaskHeaderVisible}
+                listening={!isAddingKeyword&&!isSectioning}/> :
                 node.type === "concept" ?
                 <Concept
                 key={node.id}
@@ -1012,13 +1020,15 @@ export function Canvas({dimensions})
                 onDragEnd={(e)=>{handleDragNodeEnd(e,node.id)}}
                 headerListening={!isDrawingArrow &&
                     !isDrawingDoubleArrow&&!isSectioning&&!isAddingKeyword}
-                disabledSet={node.disabledTaskId}
+                disabledSet={node.disabledSet}
+                displaySet={node.displaySet}
                 onHeaderTaskClick={(e,task_id)=>handleHeaderTaskClick(e,task_id,"concept",node.id)}
                 onHeaderCurtainClick={(task_id)=>handleHeaderCurtainClick(node.id, "concept", task_id)}
                 resetHeaderCurtain={(task_id)=>resetHeaderCurtain(node.id, "concept", task_id)}
                 callbackTaskId={node.callbackTaskId}
                 resetNodeCallbackTaskId={()=>resetNodeCallbackTaskId(node.id)}
                 header={isTaskHeaderVisible}
+                listening={!isAddingKeyword&&!isSectioning}
                 /> : null : null
             })}
             {arrows.map((arrow,index)=>{
@@ -1051,6 +1061,7 @@ export function Canvas({dimensions})
                     }
                     return tmp;
                 }))}
+                listening={!isAddingKeyword&&!isSectioning}
                 />
                 {/* <Line
                 points={[...finalAnchor,
@@ -1272,18 +1283,18 @@ export function Canvas({dimensions})
                         {id: nodes.length, type: node.type, scaleX: 1, scaleY: 1,
                         x: node.x, y: node.y, display: true, text: node.text,
                         width: node.width, height: node.height, fontSize: 18,
-                        selected: false, disabledTaskId: new Set(),
+                        selected: false, disabledSet: new Set(), displaySet: new Set(),
                         callbackTaskId: -1}
                         : node.type === "concept" ? {id: nodes.length, type: node.type,
                         scaleX: 1, scaleY: 1, x: node.x, y: node.y,
                         radiusX: node.radiusX, radiusY: node.radiusY,
                         selected: false, text: node.text, fontSize: 20, display: true,
-                        disabledTaskId: new Set(), callbackTaskId: -1}
+                        disabledSet: new Set(), displaySet: new Set(), callbackTaskId: -1}
                         : node.type === "keyword" ? {id: nodes.length, type: node.type,
                         scaleX: 1, scaleY: 1, x: node.x, y: node.y,
                         width: node.width, height: node.height, fontSize: 20,
                         selected: false, text: node.text, display: true,
-                        disabledTaskId: new Set(), callbackTaskId: -1}
+                        disabledSet: new Set(), displaySet: new Set(), callbackTaskId: -1}
                         : null
                         setNodes(prevState => {
                             return [...prevState,newNode];
@@ -1338,7 +1349,7 @@ export function Canvas({dimensions})
                             })
                     }}
                     listening={!isDrawingArrow && !isDrawingDoubleArrow
-                        && !isSectioning && ! isAddingKeyword}/>
+                        && !isSectioning && !isAddingKeyword}/>
                 </Group>
                 : null
                 })}
@@ -1407,9 +1418,9 @@ export function Canvas({dimensions})
                 setNodes(prevState=>prevState.map(state=>{
                     let tmp = state;
                     if (active) {
-                        tmp.disabledTaskId.delete(task_id);
+                        tmp.disabledSet.delete(task_id);
                     } else {
-                        tmp.disabledTaskId.add(task_id);
+                        tmp.disabledSet.add(task_id);
                     }
                     return tmp;
                 }))
@@ -1475,7 +1486,8 @@ export function Canvas({dimensions})
                         radiusX: radiusX, radiusY: radiusY,
                         scaleX: 1/canvasScale, scaleY: 1/canvasScale,
                         selected: false, text: "", fontSize: 20, display: true,
-                        disabledTaskId: new Set(),
+                        disabledSet: new Set(),
+                        displaySet: new Set(),
                         callbackTaskId: -1};
                         return [...prevState, tmp];
                     });
@@ -1488,7 +1500,8 @@ export function Canvas({dimensions})
                         width: width, height: height, fontSize: 16,
                         scaleX: 1/canvasScale, scaleY: 1/canvasScale,
                         selected: false, text: "", display: true,
-                        disabledTaskId: new Set(),
+                        disabledSet: new Set(),
+                        displaySet: new Set(),
                         callbackTaskId: -1};
                         return [...prevState, tmp];
                     });
