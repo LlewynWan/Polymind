@@ -94,7 +94,12 @@ export function Canvas({dimensions})
     }
 
     const sampleFittsLawIDMin = (objects, type="node") => {
-        const position = pointer2CanvasPosition(stageRef.current.getPointerPosition());
+        var position = stageRef.current.getPointerPosition();
+        if (!position) {
+            return -1;
+        }
+
+        position = pointer2CanvasPosition(stageRef.current.getPointerPosition());
         var ID_inv = type === "node" ?
         objects.map(object=>1/node_utils.calcFittsLawID(object,position))
         : objects.map(object=>1/section_utils.calcSectionsFittsLawID(object,position));
@@ -268,7 +273,7 @@ export function Canvas({dimensions})
         setArrows(newArrows);
     }
 
-    const handleMicroTask = (task, object_type, object) => {
+    const handleMicroTask = (task, object_type, object, callback=null) => {
         // setTimeout(()=>{
             // setTaskNodes(prevState=>{
             //     return [
@@ -283,7 +288,8 @@ export function Canvas({dimensions})
         //     &&node.attached_to_type===object_type&&node.attached_to_id===object.id).length)
         if (!objectsCurtainClicked.has(object.id.toString()+task.id.toString()+object_type)
         && !promptGPTThreads.has(object.id.toString()+task.id.toString()+object_type)
-        && (!task.display || !taskNodes.filter(node=>node.task_id===task.id
+        && ((!task.display && !object.displaySet.has(task.id)) ||
+            !taskNodes.filter(node=>node.task_id===task.id
             &&node.attached_to_type===object_type&&node.attached_to_id===object.id).length))
         {
             promptGPTThreads.add(object.id.toString()+task.id.toString()+object_type)
@@ -343,6 +349,9 @@ export function Canvas({dimensions})
                             }})]
                         });
                     }
+                    if (callback) {
+                        callback();
+                    }
                     promptGPTThreads.delete(object.id.toString()+task.id.toString()+object_type);
                 }
                 promptGPT(prompt, num_items, max_word_per_item, handleResponse);
@@ -382,6 +391,9 @@ export function Canvas({dimensions})
                             }]
                         });
                     }
+                    if (callback) {
+                        callback();
+                    }
                     promptGPTThreads.delete(object.id.toString()+task.id.toString()+object_type);
                 }
                 promptGPT(prompt, num_items, max_word_per_item, handleResponse);
@@ -389,7 +401,7 @@ export function Canvas({dimensions})
         }
         // }, 5000);
     }
-    const handleHeaderTaskClick = (e, task_id, object_type, object_id) => {
+    const handleHeaderTaskClick = (e, task_id, object_type, object_id, requesting=false, callback=null) => {
         e.cancelBubble = true;
         const toggleSet = (task_id, set) => {
             if (set.has(task_id)) {
@@ -399,11 +411,18 @@ export function Canvas({dimensions})
             }
             return set;
         };
+
+        const object = object_type === "section" ? getSectionById(object_id) : getNodeById(object_id);
+
         if (object_type !== "section") {
             setNodes(prevState => prevState.map(state => {
                 let tmp = state;
                 if (e.evt.ctrlKey) {
-                    tmp.disabledSet = toggleSet(task_id, tmp.disabledSet)
+                    // if (!tmp.disabledSet.has(task_id)) {
+                    //     tmp.displaySet.delete(task_id);
+                    // }
+                    tmp.displaySet.delete(task_id);
+                    tmp.disabledSet = toggleSet(task_id, tmp.disabledSet);
                 } else {
                     tmp.displaySet = toggleSet(task_id, tmp.displaySet);
                 }
@@ -413,12 +432,30 @@ export function Canvas({dimensions})
             setSections(prevState => prevState.map(state => {
                 let tmp = state;
                 if (e.evt.ctrlKey) {
+                    // if (!tmp.disabledSet.has(task_id)) {
+                    //     tmp.displaySet.delete(task_id);
+                    // }
+                    tmp.displaySet.delete(task_id);
                     tmp.disabledSet = toggleSet(task_id, tmp.disabledSet)
                 } else {
                     tmp.displaySet = toggleSet(task_id, tmp.displaySet);
                 }
                 return tmp;
             }))
+        }
+
+        if (requesting) {
+            handleMicroTask(microTasks.filter(task=>task.id===task_id)[0],object_type,object,callback);
+        }
+        if ((!e.evt.ctrlKey &&
+            object.disabledSet.has(task_id) && !object.displaySet.has(task_id))
+            || (e.evt.ctrlKey
+            && object.disabledSet.has(task_id))) {
+                console.log(object.displaySet.has(task_id))
+            setTaskNodes(prevState=>prevState.filter(state=>
+                state.task_id!==task_id || state.attached_to_type!==object_type
+                ||state.attached_to_id!==object_id
+            ));
         }
     }
 
@@ -823,7 +860,8 @@ export function Canvas({dimensions})
                         return tmp;
                     }))
                 }}
-                onHeaderTaskClick={(e,task_id)=>handleHeaderTaskClick(e,task_id,"section",section.id)}
+                onHeaderTaskClick={(e,task_id,requesting,callback)=>
+                    handleHeaderTaskClick(e,task_id,"section",section.id,requesting,callback)}
                 onHeaderCurtainClick={(task_id)=>handleHeaderCurtainClick(section.id, "section", task_id)}
                 resetHeaderCurtain={(task_id)=>resetHeaderCurtain(section.id, "section", task_id)}
                 callbackTaskId={section.callbackTaskId}
@@ -904,7 +942,8 @@ export function Canvas({dimensions})
                 }}
                 disabledSet={node.disabledSet}
                 displaySet={node.displaySet}
-                onHeaderTaskClick={(e,task_id)=>handleHeaderTaskClick(e,task_id,"sticky_note",node.id)}
+                onHeaderTaskClick={(e,task_id,requesting,callback)=>
+                    handleHeaderTaskClick(e,task_id,"sticky_note",node.id,requesting,callback)}
                 onHeaderCurtainClick={(task_id)=>handleHeaderCurtainClick(node.id, "sticky_note", task_id)}
                 resetHeaderCurtain={(task_id)=>resetHeaderCurtain(node.id, "sticky_note", task_id)}
                 callbackTaskId={node.callbackTaskId}
@@ -958,7 +997,8 @@ export function Canvas({dimensions})
                     !isDrawingDoubleArrow&&!isSectioning&&!isAddingKeyword}
                 disabledSet={node.disabledSet}
                 displaySet={node.displaySet}
-                onHeaderTaskClick={(e,task_id)=>handleHeaderTaskClick(e,task_id,"keyword",node.id)}
+                onHeaderTaskClick={(e,task_id,requesting,callback)=>
+                    handleHeaderTaskClick(e,task_id,"keyword",node.id,requesting,callback)}
                 onHeaderCurtainClick={(task_id)=>handleHeaderCurtainClick(node.id, "keyword", task_id)}
                 resetHeaderCurtain={(task_id)=>resetHeaderCurtain(node.id, "keyword", task_id)}
                 callbackTaskId={node.callbackTaskId}
@@ -1022,7 +1062,8 @@ export function Canvas({dimensions})
                     !isDrawingDoubleArrow&&!isSectioning&&!isAddingKeyword}
                 disabledSet={node.disabledSet}
                 displaySet={node.displaySet}
-                onHeaderTaskClick={(e,task_id)=>handleHeaderTaskClick(e,task_id,"concept",node.id)}
+                onHeaderTaskClick={(e,task_id,requesting,callback)=>
+                    handleHeaderTaskClick(e,task_id,"concept",node.id,requesting,callback)}
                 onHeaderCurtainClick={(task_id)=>handleHeaderCurtainClick(node.id, "concept", task_id)}
                 resetHeaderCurtain={(task_id)=>resetHeaderCurtain(node.id, "concept", task_id)}
                 callbackTaskId={node.callbackTaskId}
@@ -1134,7 +1175,10 @@ export function Canvas({dimensions})
                 getSectionById(node.attached_to_id) : null;
                 const anchorPosition = anchor_utils.calcAnchorPosition(
                     from_anchor, node, canvasScale);
+                
                 return node.display ||
+                (node.attached_to_type==="section" ? section.displaySet.has(node.task_id)
+                : getNodeById(node.attached_to_id).displaySet.has(node.task_id)) ||
                 microTasks.filter(task=>task.id===node.task_id)[0].display ?
                 
                 <Group
@@ -1420,7 +1464,9 @@ export function Canvas({dimensions})
                     if (active) {
                         tmp.disabledSet.delete(task_id);
                     } else {
-                        tmp.disabledSet.add(task_id);
+                        if (!tmp.displaySet.has(task_id)) {
+                            tmp.disabledSet.add(task_id);
+                        }
                     }
                     return tmp;
                 }))

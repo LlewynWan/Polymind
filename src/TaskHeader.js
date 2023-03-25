@@ -48,6 +48,7 @@ export function TaskHeader({
     // const promptRectRef = useRef(null);
     // const promptCircleRef = useRef(null);
 
+    const [requestingSet, setRequestingSet] = useState(new Set());
     const [notificationSet, setNotificationSet] = useState(new Set());
 
 
@@ -83,7 +84,8 @@ export function TaskHeader({
     }
 
     useEffect(()=>{
-        if (callbackTaskId !== -1 && !isHover && !isCurtainFixed) {
+        if (callbackTaskId !== -1 && !disabledSet.has(callbackTaskId)
+            && !isHover && !isCurtainFixed) {
             // clearTimeout(hoverTimeout);
             setIsAnimating(true);
             clearTimeout(callbackTimeout);
@@ -387,6 +389,13 @@ export function TaskHeader({
                     //         })
                     //     }, 1000));
                     // }
+                    if (!requestingSet.has(task.id) && disabledSet.has(task.id)
+                    && !displaySet.has(task.id)) {
+                        e.target.parent.children[0].to({
+                            opacity: 0.8,
+                            fill: colorPalette[task.id%colorPalette.length],
+                            duration: 0.15})
+                    }
                     e.target.getStage().container().style.cursor = "pointer";
                     e.target.parent.to({y: -1, duration: 0.15});
                     e.target.to({fontSize: fontSize+2, duration: 0.15});
@@ -395,20 +404,108 @@ export function TaskHeader({
                     // if (currentHoverId === task.id) {
                     //     clearTimeout(hoverTimeout);
                     // }
+                    if (!requestingSet.has(task.id) && disabledSet.has(task.id)
+                    && !displaySet.has(task.id)) {
+                        e.target.parent.children[0].to({
+                            fill: "#C0C2CE",
+                            duration: 0.15})
+                    }
                     e.target.getStage().container().style.cursor = "default"
                     e.target.parent.to({y: 0, duration: 0.15})
                     e.target.to({fontSize: fontSize, duration: 0.15})
                 }}
                 onClick={(e)=>{
+                    if (requestingSet.has(task.id))
+                        return;
+                    // if (!e.evt.ctrlKey && disabledSet.has(task.id)) {
+                        // setInterval(()=>{
+                        //     e.target.parent.children[0].to({
+                        //         fill: "#C0C2CE",
+                        //         duration: 1.25,
+                        //         onFinish: ()=>{
+                        //             e.target.parent.children[0].to({
+                        //                 fill: colorPalette[task.id%colorPalette.length],
+                        //                 duration: 1.25})
+                        //         }})
+                        // }, 4000)
+                    // }
                     notificationSet.delete(task.id);
                     setNotificationSet(notificationSet);
-                    onTaskClick(e,task.id);
+                    const requesting =  disabledSet.has(task.id) &&
+                        !displaySet.has(task.id) && !e.evt.ctrlKey;
+
+                    // const tween_tocolor = requesting ?
+                    // new Konva.Tween({
+                    //     node: e.target.parent.children[0],
+                    //     duration: 0.75,
+                    //     easings: Konva.Easings.EaseInOut,
+                    //     fill: colorPalette[task.id%colorPalette.length],
+                    //     opacity: 0.8,
+                    // }) : null;
+                    const tween_togray = requesting ?
+                    new Konva.Tween({
+                        node: e.target.parent.children[0],
+                        duration: 0.75,
+                        easings: Konva.Easings.EaseInOut,
+                        fill: "#C0C2CE",
+                        opacity: 0.64,
+                        onFinish: ()=>{tween_togray.reverse()}
+                    }) : null;
+
+                    const waitingSignal = requesting ? setInterval(()=>{
+                        tween_togray.play();
+                        // tween.reverse();
+                    }, [2000]) : null;
+                    // const waitingSignal = requesting ?
+                    //     setInterval(()=>{
+                    //         e.target.parent.children[0].to({
+                    //             fill: "#C0C2CE",
+                    //             opacity: 0.64,
+                    //             duration: 0.75,
+                    //             easings: Konva.Easings.EaseInOut,
+                    //             onFinish: ()=>{
+                    //                 e.target.parent.children[0].to({
+                    //                     fill: colorPalette[task.id%colorPalette.length],
+                    //                     opacity: 0.8,
+                    //                     easings: Konva.Easings.EaseInOut,
+                    //                     duration: 0.75})
+                    //             }})
+                    //     }, 2000) : null;
+                    if (requesting) {
+                        requestingSet.add(task.id);
+                        setRequestingSet(requestingSet);
+                    }
+                    // if (disabledSet.has(task.id) && !e.evt.ctrlKey) {
+
+                    // }
+                    // console.log(requesting)
+                    onTaskClick(e, task.id, requesting,
+                        ()=>{
+                            if (waitingSignal) {
+                                clearInterval(waitingSignal);
+                            }
+                            requestingSet.delete(task.id);
+                            setRequestingSet(requestingSet);
+                            // console.log(e.target.parent.children[0])
+                            // tween_tocolor.pause();
+                            tween_togray.pause();
+                            // tween_tocolor.destroy();
+                            tween_togray.destroy();
+                            e.target.parent.children[0].setAttrs({
+                                fill: "#010203",
+                                opacity: 0.64,
+                                // duration: 0.25
+                            })
+                            // e.target
+                        });
                 }}>
                     <Tag
                     fill={
                         // notificationSet.has(task.id)?"#010203":
                         disabledSet.has(task.id)?
-                        "#C0C2CE":colorPalette[task.id%colorPalette.length]}
+                        (displaySet.has(task.id)&&!requestingSet.has(task.id)
+                        ?"#010203":"#C0C2CE")
+                        :colorPalette[task.id%colorPalette.length]}
                     opacity={disabledSet.has(task.id)?0.64:1}
                     cornerRadius={2.5}
                     perfectDrawEnabled={false}
@@ -424,8 +521,10 @@ export function TaskHeader({
                     // shadowColor={"#FFA8B5"}
                     // width={20}
                     // height={20}
-                    fontStyle={displaySet.has(task.id)?"italic bold":"bold"}
-                    textDecoration={displaySet.has(task.id)?"underline":""}
+                    fontStyle={"bold"}
+                    // fontStyle={displaySet.has(task.id)?"italic bold":"bold"}
+                    textDecoration={displaySet.has(task.id)
+                        && (!disabledSet.has(task.id))?"underline":""}
                     // Ellipsis={true}
                     align={"center"}
                     verticalAlign={"middle"}

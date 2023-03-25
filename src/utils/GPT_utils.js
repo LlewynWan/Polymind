@@ -4,6 +4,14 @@ const openai = new OpenAIApi(
   new Configuration({ apiKey: process.env.REACT_APP_OPENAI_API_KEY })
 )
 
+const fetchTimeout = (url, ms, callback, { signal, ...options } = {}) => {
+  const controller = new AbortController();
+  const promise = fetch(url, { signal: controller.signal, ...options });
+  if (signal) signal.addEventListener("abort", () => controller.abort());
+  const timeout = setTimeout(() => controller.abort(), ms);
+  return promise.finally(() => clearTimeout(timeout));
+};
+
 export async function promptGPT(prompt, num_results, max_words_per_result, handleResponse) {
   const GPT35TurboMessage = [ 
     { role: "system", content: `You are a writing expert and you are assisting users in prewriting process. You should strictly follow the output specification given by the user.` },
@@ -34,7 +42,8 @@ export async function promptGPT(prompt, num_results, max_words_per_result, handl
     //   'stop': ["\"\"\""],
     })
   };
-  fetch('https://api.openai.com/v1/chat/completions', requestOptions)
+  // console.log(requestOptions)
+  fetchTimeout('https://api.openai.com/v1/chat/completions', 7500, handleResponse, requestOptions)
       .then(response => response.json())
       .then(data => {
         if (num_results > 1) {
@@ -47,7 +56,9 @@ export async function promptGPT(prompt, num_results, max_words_per_result, handl
         result.trim().replace(/^[0-9]+\. /, "").replace(/[^a-zA-Z ]/g, "")))
       .then(results => handleResponse(results))
     .catch(err => {
-      console.log("Ran out of tokens for today! Try tomorrow!");
+      handleResponse([]);
+      console.log("Request Timeout");
+      // console.log("Ran out of tokens for today! Try tomorrow!");
     });
 }
 
