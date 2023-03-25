@@ -452,10 +452,10 @@ export function TaskHeader({
                         onFinish: ()=>{tween_togray.reverse()}
                     }) : null;
 
-                    const waitingSignal = requesting ? setInterval(()=>{
+                    const waitingSignal = requesting ? setInterval(function (){
                         tween_togray.play();
                         // tween.reverse();
-                    }, [2000]) : null;
+                    }(), [2000]) : null;
                     // const waitingSignal = requesting ?
                     //     setInterval(()=>{
                     //         e.target.parent.children[0].to({
@@ -492,7 +492,7 @@ export function TaskHeader({
                             // tween_tocolor.destroy();
                             tween_togray.destroy();
                             e.target.parent.children[0].setAttrs({
-                                fill: "#010203",
+                                fill: "#423F40",
                                 opacity: 0.64,
                                 // duration: 0.25
                             })
@@ -504,9 +504,10 @@ export function TaskHeader({
                         // notificationSet.has(task.id)?"#010203":
                         disabledSet.has(task.id)?
                         (displaySet.has(task.id)&&!requestingSet.has(task.id)
-                        ?"#010203":"#C0C2CE")
+                        ?"#423F40":"#C0C2CE")
                         :colorPalette[task.id%colorPalette.length]}
-                    opacity={disabledSet.has(task.id)?0.64:1}
+                    opacity={disabledSet.has(task.id)?
+                        (displaySet.has(task.id)&&!requestingSet.has(task.id)?0.8:0.64):1}
                     cornerRadius={2.5}
                     perfectDrawEnabled={false}
                     />
@@ -529,6 +530,9 @@ export function TaskHeader({
                     align={"center"}
                     verticalAlign={"middle"}
                     fill={"white"}
+                    // fill={disabledSet.has(task.id)&&displaySet.has(task.id)
+                    //     &&!requestingSet.has(task.id)
+                    //     ?colorPalette[task.id%colorPalette.length]:"white"}
                     // fill={disabledSet.has(task.id)?colorPalette[task.id%colorPalette.length]:"white"}
                     padding={2.5}
                     // opacity={task.id===4?0.5:1}

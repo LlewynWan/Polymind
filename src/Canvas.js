@@ -417,28 +417,32 @@ export function Canvas({dimensions})
         if (object_type !== "section") {
             setNodes(prevState => prevState.map(state => {
                 let tmp = state;
-                if (e.evt.ctrlKey) {
-                    // if (!tmp.disabledSet.has(task_id)) {
-                    //     tmp.displaySet.delete(task_id);
-                    // }
-                    tmp.displaySet.delete(task_id);
-                    tmp.disabledSet = toggleSet(task_id, tmp.disabledSet);
-                } else {
-                    tmp.displaySet = toggleSet(task_id, tmp.displaySet);
+                if (tmp.id === object_id) {
+                    if (e.evt.ctrlKey) {
+                        // if (!tmp.disabledSet.has(task_id)) {
+                        //     tmp.displaySet.delete(task_id);
+                        // }
+                        tmp.displaySet.delete(task_id);
+                        tmp.disabledSet = toggleSet(task_id, tmp.disabledSet);
+                    } else {
+                        tmp.displaySet = toggleSet(task_id, tmp.displaySet);
+                    }
                 }
                 return tmp;
             }))
         } else if (object_type === "section") {
             setSections(prevState => prevState.map(state => {
                 let tmp = state;
-                if (e.evt.ctrlKey) {
-                    // if (!tmp.disabledSet.has(task_id)) {
-                    //     tmp.displaySet.delete(task_id);
-                    // }
-                    tmp.displaySet.delete(task_id);
-                    tmp.disabledSet = toggleSet(task_id, tmp.disabledSet)
-                } else {
-                    tmp.displaySet = toggleSet(task_id, tmp.displaySet);
+                if (tmp.id === object_id) {
+                    if (e.evt.ctrlKey) {
+                        // if (!tmp.disabledSet.has(task_id)) {
+                        //     tmp.displaySet.delete(task_id);
+                        // }
+                        tmp.displaySet.delete(task_id);
+                        tmp.disabledSet = toggleSet(task_id, tmp.disabledSet)
+                    } else {
+                        tmp.displaySet = toggleSet(task_id, tmp.displaySet);
+                    }
                 }
                 return tmp;
             }))
@@ -451,12 +455,12 @@ export function Canvas({dimensions})
             object.disabledSet.has(task_id) && !object.displaySet.has(task_id))
             || (e.evt.ctrlKey
             && object.disabledSet.has(task_id))) {
-                console.log(object.displaySet.has(task_id))
-            setTaskNodes(prevState=>prevState.filter(state=>
-                state.task_id!==task_id || state.attached_to_type!==object_type
-                ||state.attached_to_id!==object_id
+            setTaskNodes(prevState=>prevState.filter(state=> {
+                return state.task_id!==task_id
+                || state.attached_to_id!==object_id}
             ));
         }
+        // console.log(nodes[0].disabledSet, nodes[1].disabledSet)
     }
 
     const [promptCardIndex, setPromptCardIndex] = React.useState(1);
