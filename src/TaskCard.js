@@ -159,9 +159,11 @@ export function TaskCard({
         y={10}
         onClick={onTaskLabelClick}
         onMouseEnter={(e)=>{
+            e.target.to({fontSize: 20, duration: 0.25})
             e.target.getStage().container().style.cursor = "pointer";
         }}
         onMouseLeave={(e)=>{
+            e.target.to({fontSize: 18, duration: 0.25})
             e.target.getStage().container().style.cursor = "default";
         }}
         >
@@ -184,7 +186,8 @@ export function TaskCard({
         <Group
         ref={page1Ref}
         visible={!pageNum}
-        opacity={active?1:0.75}>
+        // opacity={active?1:0.75}
+        >
 
         <Icon
         x={width/2-5}
@@ -317,7 +320,8 @@ export function TaskCard({
         <Group
         ref={page2Ref}
         visible={pageNum===1}
-        opacity={active?1:0.75}>
+        // opacity={active?1:0.75}
+        >
         <Label
         x={width/2-57.5}
         y={95}

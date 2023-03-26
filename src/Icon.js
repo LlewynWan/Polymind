@@ -361,7 +361,8 @@ export function Icon({
         setIsHover(false);
         e.target.getStage().container().style.cursor = "default"
     }}
-    onClick={onClick}>
+    onClick={onClick}
+    opacity={isHover?1:0.75}>
         <Rect
         x={-6}
         y={-6}

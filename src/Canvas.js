@@ -533,7 +533,9 @@ export function Canvas({dimensions})
                 width: 0, height: 0, fontSize: 20,
                 scaleX: 1/canvasScale, scaleY: 1/canvasScale,
                 selected: true, text: "", display: true,
-                disabledSet: new Set(),
+                disabledSet: new Set(
+                    microTasks.filter(task=>!task.active).map(task=>task.id)
+                ),
                 displaySet: new Set(),
                 notificationSet: new Set(),
                 callbackTaskId: -1};
@@ -597,7 +599,10 @@ export function Canvas({dimensions})
                 return [
                     ...prevState,
                     {id: prevState.length, selected: false,
-                    callbackTaskId: -1, disabledSet: new Set(),
+                    callbackTaskId: -1,
+                    disabledSet: new Set(
+                        microTasks.filter(task=>!task.active).map(task=>task.id)
+                    ),
                     displaySet: new Set(),
                     notificationSet: new Set(),
                     scaleX: 1, scaleY: 1,
@@ -1393,18 +1398,25 @@ export function Canvas({dimensions})
                         {id: nodes.length, type: node.type, scaleX: 1, scaleY: 1,
                         x: node.x, y: node.y, display: true, text: node.text,
                         width: node.width, height: node.height, fontSize: 18,
-                        selected: false, disabledSet: new Set(), displaySet: new Set(),
+                        selected: false, disabledSet: new Set(
+                            microTasks.filter(task=>!task.active).map(task=>task.id)
+                        ), displaySet: new Set(),
+                        notificationSet: new Set(),
                         callbackTaskId: -1}
                         : node.type === "concept" ? {id: nodes.length, type: node.type,
                         scaleX: 1, scaleY: 1, x: node.x, y: node.y,
                         radiusX: node.radiusX, radiusY: node.radiusY,
                         selected: false, text: node.text, fontSize: 20, display: true,
-                        disabledSet: new Set(), displaySet: new Set(), callbackTaskId: -1}
+                        disabledSet: new Set(
+                            microTasks.filter(task=>!task.active).map(task=>task.id)
+                        ), displaySet: new Set(), notificationSet: new Set(), callbackTaskId: -1}
                         : node.type === "keyword" ? {id: nodes.length, type: node.type,
                         scaleX: 1, scaleY: 1, x: node.x, y: node.y,
                         width: node.width, height: node.height, fontSize: 20,
                         selected: false, text: node.text, display: true,
-                        disabledSet: new Set(), displaySet: new Set(), callbackTaskId: -1}
+                        disabledSet: new Set(
+                            microTasks.filter(task=>!task.active).map(task=>task.id)
+                        ), displaySet: new Set(), notificationSet: new Set(), callbackTaskId: -1}
                         : null
                         setNodes(prevState => {
                             return [...prevState,newNode];
@@ -1530,12 +1542,23 @@ export function Canvas({dimensions})
                     if (active) {
                         tmp.disabledSet.delete(task_id);
                     } else {
-                        if (!tmp.displaySet.has(task_id)) {
+                        if (!tmp.displaySet.has(task_id) && !tmp.notificationSet.has(task_id)) {
                             tmp.disabledSet.add(task_id);
                         }
                     }
                     return tmp;
-                }))
+                }));
+                setSections(prevState=>prevState.map(state=>{
+                    let tmp = state;
+                    if (active) {
+                        tmp.disabledSet.delete(task_id);
+                    } else {
+                        if (!tmp.displaySet.has(task_id) && !tmp.notificationSet.has(task_id)) {
+                            tmp.disabledSet.add(task_id);
+                        }
+                    }
+                    return tmp;
+                }));
                 setMicroTasks(prevState=>prevState.map(state=>{
                     let tmp = state;
                     if (tmp.id === task_id) {
@@ -1628,7 +1651,9 @@ export function Canvas({dimensions})
                         radiusX: radiusX, radiusY: radiusY,
                         scaleX: 1/canvasScale, scaleY: 1/canvasScale,
                         selected: false, text: "", fontSize: 20, display: true,
-                        disabledSet: new Set(),
+                        disabledSet: new Set(
+                            microTasks.filter(task=>!task.active).map(task=>task.id)
+                        ),
                         displaySet: new Set(),
                         notificationSet: new Set(),
                         callbackTaskId: -1};
@@ -1643,7 +1668,9 @@ export function Canvas({dimensions})
                         width: width, height: height, fontSize: 16,
                         scaleX: 1/canvasScale, scaleY: 1/canvasScale,
                         selected: false, text: "", display: true,
-                        disabledSet: new Set(),
+                        disabledSet: new Set(
+                            microTasks.filter(task=>!task.active).map(task=>task.id)
+                        ),
                         displaySet: new Set(),
                         notificationSet: new Set(),
                         callbackTaskId: -1};
