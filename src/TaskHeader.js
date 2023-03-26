@@ -492,7 +492,8 @@ export function TaskHeader({
                             // tween_tocolor.destroy();
                             tween_togray.destroy();
                             e.target.parent.children[0].setAttrs({
-                                fill: "#423F40",
+                                // fill: "#423F40",
+                                fill: "#353233",
                                 opacity: 0.64,
                                 // duration: 0.25
                             })
@@ -504,7 +505,7 @@ export function TaskHeader({
                         // notificationSet.has(task.id)?"#010203":
                         disabledSet.has(task.id)?
                         (displaySet.has(task.id)&&!requestingSet.has(task.id)
-                        ?"#423F40":"#C0C2CE")
+                        ?"#353233":"#C0C2CE")
                         :colorPalette[task.id%colorPalette.length]}
                     opacity={disabledSet.has(task.id)?
                         (displaySet.has(task.id)&&!requestingSet.has(task.id)?0.8:0.64):1}

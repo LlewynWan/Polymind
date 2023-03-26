@@ -1,7 +1,6 @@
 import React, { createRef, useContext, useEffect, useState } from "react";
 import { HotKeys } from "react-hotkeys";
 
-import Konva from "konva";
 import { MyLine } from "./MyLine";
 import { Stage, Layer, Group, Line, Rect } from "react-konva";
 
@@ -11,19 +10,14 @@ import { Concept } from "./Concept";
 import { Section } from "./Section";
 import { TaskNode } from "./TaskNode";
 import { StickyNote } from "./StickyNote";
-
 import { TaskBoard } from "./TaskBoard";
-
-import { Prompter } from "./Prompter";
-import { TaskPrompt } from "./TaskPrompt";
-import { PromptPanel } from "./PromptPanel";
 import { promptGPT, regenerate } from "./utils/GPT_utils";
 
 import { colorPalette } from "./utils/color_utils";
 import { toLowerCase, outputMap } from "./utils/task_utils";
 import { getTextWidth, sizeMap } from "./utils/size_utils";
 import { anchor_utils, node_utils, section_utils } from "./utils/canvas_utils";
-import { GlobalContext, CanvasContext, PrompterContext } from "./state";
+import { GlobalContext, CanvasContext } from "./state";
 
 
 
@@ -413,7 +407,8 @@ export function Canvas({dimensions})
         };
 
         const object = object_type === "section" ? getSectionById(object_id) : getNodeById(object_id);
-
+        const microTask = microTasks.filter(task=>task.id===task_id)[0];
+        
         if (object_type !== "section") {
             setNodes(prevState => prevState.map(state => {
                 let tmp = state;
@@ -449,7 +444,7 @@ export function Canvas({dimensions})
         }
 
         if (requesting) {
-            handleMicroTask(microTasks.filter(task=>task.id===task_id)[0],object_type,object,callback);
+            handleMicroTask(microTask, toLowerCase(microTask.inputType),object,callback);
         }
         if ((!e.evt.ctrlKey &&
             object.disabledSet.has(task_id) && !object.displaySet.has(task_id))
