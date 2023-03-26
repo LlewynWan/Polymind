@@ -183,7 +183,7 @@ export function Canvas({dimensions})
 
         setGlobalTextbox(prevState=>{
             let tmp = prevState;
-            tmp.text = section_utils.calcSectionOutline(nodes, arrows);
+            tmp.text = section_utils.calcSectionOutline(nodes.filter(node=>node.display), arrows);
             return tmp;
         })
 
