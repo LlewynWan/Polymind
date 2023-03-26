@@ -333,14 +333,15 @@ export function ToolBar({
             })
         }}
         onMouseLeave={(e)=>{
+            setEllipseDraggable(false);
             e.target.to({
                 y: height / 2 + 20,
                 radiusX: 40,
                 radiusY: 40,
                 duration: 0.32,
-                onFinish: ()=>{
-                    setEllipseDraggable(false);
-                }
+                // onFinish: ()=>{
+                //     setEllipseDraggable(false);
+                // }
             })
         }}>
             <Ellipse
@@ -427,15 +428,16 @@ export function ToolBar({
             // }
         }}
         onMouseLeave={()=>{
+            setStickyNoteDraggable(false);
             stickyNoteRef.current.to({
                 x: 19,
                 y: 19,
                 width: 60,
                 height: 60,
                 duration: 0.2,
-                onFinish: ()=>{
-                    setStickyNoteDraggable(false);
-                }
+                // onFinish: ()=>{
+                //     setStickyNoteDraggable(false);
+                // }
             });
             // if (isHoverStickyNotes) {
             //     setIsHoverStickyNotes(false);

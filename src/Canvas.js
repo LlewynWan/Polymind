@@ -25,8 +25,8 @@ export function Canvas({dimensions})
 {
     const {nodes, numNodes, arrows, sections,
         setNodes, setNumNodes, setArrows, setSections,
-        promptCards, mainPrompter, taskPrompts, microTasks,
-        setPromptCards, setMainPrompter, setTaskPrompts, setMicroTasks,
+        promptCards, globalTextbox, taskPrompts, microTasks,
+        setPromptCards, setGlobalTextbox, setTaskPrompts, setMicroTasks,
         taskNodes, setTaskNodes} = useContext(GlobalContext);
 
     const [canvasX, setCanvasX] = React.useState(0);
@@ -737,8 +737,8 @@ export function Canvas({dimensions})
         node.to({
             scaleX: 1.2,
             scaleY: 1.2,
-            x: mainPrompter.x - mainPrompter.width*0.1,
-            y: mainPrompter.y - mainPrompter.height - 40,
+            x: globalTextbox.x - globalTextbox.width*0.1,
+            y: globalTextbox.y - globalTextbox.height - 40,
             shadowBlur: 0,
             shadowOpacity: 0
         })
@@ -749,8 +749,8 @@ export function Canvas({dimensions})
         node.to({
             scaleX: 1,
             scaleY: 1,
-            x: mainPrompter.x,
-            y: mainPrompter.y,
+            x: globalTextbox.x,
+            y: globalTextbox.y,
             shadowBlur: 5,
             shadowOpacity: 0.25
         })
@@ -1530,8 +1530,8 @@ export function Canvas({dimensions})
             />
 
             <ToolBar
-                x={mainPrompter.x+mainPrompter.width/2-285}
-                y={mainPrompter.y-50}
+                x={globalTextbox.x+globalTextbox.width/2-285}
+                y={globalTextbox.y-50}
                 width={615}
                 height={60}
                 color={"white"}

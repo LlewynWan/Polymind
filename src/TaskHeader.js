@@ -396,7 +396,7 @@ export function TaskHeader({
                     if (!requestingSet.has(task.id) && disabledSet.has(task.id)
                     && !displaySet.has(task.id)) {
                         e.target.parent.children[0].to({
-                            opacity: 0.8,
+                            opacity: 0.85,
                             fill: colorPalette[task.id%colorPalette.length],
                             duration: 0.15})
                     }
@@ -513,7 +513,7 @@ export function TaskHeader({
                         ?"#353233":"#C0C2CE")
                         :colorPalette[task.id%colorPalette.length]}
                     opacity={disabledSet.has(task.id)?
-                        (displaySet.has(task.id)&&!requestingSet.has(task.id)?0.8:0.64):1}
+                        (displaySet.has(task.id)&&!requestingSet.has(task.id)?0.85:0.64):1}
                     cornerRadius={2.5}
                     perfectDrawEnabled={false}
                     />

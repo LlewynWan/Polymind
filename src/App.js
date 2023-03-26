@@ -51,7 +51,7 @@ function App() {
         {x: dimensions.width*0.75, y: dimensions.height*0.05+525, scale: 1, width: 400, height: 120, text: "prompt suggestion 4", display: true},
         {x: dimensions.width*0.75, y: dimensions.height*0.05+700, scale: 1, width: 400, height: 120, text: "prompt suggestion 5", display: true}
     ],
-    main_prompter: {x: dimensions.width*0.3, y: dimensions.height*0.95, scale: 1, width: 640, height: 180, prompt: "Main Prompter",}
+    global_textbox: {x: dimensions.width*0.3, y: dimensions.height*0.95, scale: 1, width: 640, height: 180, prompt: "Main Prompter",}
   }
 
   const [nodes, setNodes] = React.useState(initialState.nodes);
@@ -59,7 +59,7 @@ function App() {
   const [arrows, setArrows] = React.useState(initialState.arrows);
   const [sections, setSections] = React.useState(initialState.sections)
   const [promptCards, setPromptCards] = React.useState(initialState.prompt_cards);
-  const [mainPrompter, setMainPrompter] = React.useState(initialState.main_prompter);
+  const [globalTextbox, setGlobalTextbox] = React.useState(initialState.global_textbox);
   const [taskPrompts, setTaskPrompts] = React.useState(initialState.task_prompts);
   const [microTasks, setMicroTasks] = React.useState(initialState.microtasks);
   const [taskNodes, setTaskNodes] = React.useState(initialState.task_nodes);
@@ -71,7 +71,7 @@ function App() {
         height: window.innerHeight,
         width: window.innerWidth
       });
-      setMainPrompter(prevState=>{
+      setGlobalTextbox(prevState=>{
         let tmp = prevState;
         tmp.x = window.innerWidth*0.3;
         tmp.y = window.innerHeight*0.95;
@@ -92,10 +92,10 @@ function App() {
   return (
     <div className="container fullscreen" id="fullsccreen">
       <GlobalContext.Provider value={{
-        nodes, numNodes, arrows, sections, promptCards, mainPrompter,
+        nodes, numNodes, arrows, sections, promptCards, globalTextbox,
         taskPrompts, microTasks, taskNodes,
         setNodes, setNumNodes, setArrows, setSections, setTaskPrompts,
-        setPromptCards, setMainPrompter, setMicroTasks, setTaskNodes
+        setPromptCards, setGlobalTextbox, setMicroTasks, setTaskNodes
       }}>
         <Canvas dimensions={dimensions}/>
       </GlobalContext.Provider>
