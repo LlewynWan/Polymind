@@ -137,7 +137,8 @@ export function ToolBar({
             width={50}
             height={50}
             stroke={"#010203"}
-            strokeWidth={1.5}
+            // strokeWidth={1.5}
+            strokeWidth={1.25}
             fill={isArrowIconClicked?"#010203":
             isHoverArrowIcon?"#D5D5D5":"#D9CBA6"}
             shadowOffsetY={0}
@@ -180,7 +181,8 @@ export function ToolBar({
             fill={isDoubleArrowIconClicked?"#010203":
             isHoverDoubleArrowIcon?"#D5D5D5":"#D9CBA6"}
             stroke={"#010203"}
-            strokeWidth={1.5}
+            // strokeWidth={1.5}
+            strokeWidth={1.25}
             shadowOffsetY={0}
             shadowOffsetX={0}
             shadowBlur={isDoubleArrowIconClicked?5:0}
@@ -229,7 +231,8 @@ export function ToolBar({
             fill={isSectionIconClicked?"#010203":
             isHoverSectionIcon?"#D5D5D5":"#D9CBA6"}
             stroke={"#010203"}
-            strokeWidth={1.5}
+            // strokeWidth={1.5}
+            strokeWidth={1.25}
             shadowOffsetY={0}
             shadowOffsetX={0}
             shadowBlur={isSectionIconClicked?5:0}

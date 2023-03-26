@@ -2,7 +2,7 @@ import React, { createRef, useContext, useEffect, useState } from "react";
 import { HotKeys } from "react-hotkeys";
 
 import { MyLine } from "./MyLine";
-import { Stage, Layer, Group, Line, Rect } from "react-konva";
+import { Stage, Layer, Group, Line, Rect, Text } from "react-konva";
 
 import { ToolBar } from "./ToolBar";
 import { Keyword } from "./Keyword"
@@ -11,6 +11,7 @@ import { Section } from "./Section";
 import { TaskNode } from "./TaskNode";
 import { StickyNote } from "./StickyNote";
 import { TaskBoard } from "./TaskBoard";
+import { Textbox } from "./Textbox"
 import { promptGPT, regenerate } from "./utils/GPT_utils";
 
 import { colorPalette } from "./utils/color_utils";
@@ -179,6 +180,12 @@ export function Canvas({dimensions})
             // setInFocus({node: ID_inv.indexOf(Math.min(...ID_inv))});
             // console.log(ID.indexOf(Math.min(...ID)));
         }, 5000);
+
+        setGlobalTextbox(prevState=>{
+            let tmp = prevState;
+            tmp.text = section_utils.calcSectionOutline(nodes, arrows);
+            return tmp;
+        })
 
         return () => {
             clearInterval(pointerTracker);
@@ -569,6 +576,16 @@ export function Canvas({dimensions})
         }
     }
     const handleStageMouseUp = e => {
+        if (selectionRect.x1 === selectionRect.x2
+            || selectionRect.y1 === selectionRect.y2) {
+                setSeletionRect({
+                    visible: false,
+                    x1: 0, y1: 0,
+                    x2: 0, y2: 0
+                })
+                setIsSectioning(false);
+                return;
+            }
         if (isSectioning) {
             setSections(prevState=>{
                 const position1 = pointer2CanvasPosition({
@@ -732,19 +749,19 @@ export function Canvas({dimensions})
         }
     }
 
-    const onMainPrompterHover = node => {
+    const onMainTextboxHover = node => {
         setToolBarVisibility(false);
         node.to({
             scaleX: 1.2,
             scaleY: 1.2,
             x: globalTextbox.x - globalTextbox.width*0.1,
-            y: globalTextbox.y - globalTextbox.height - 40,
+            y: globalTextbox.y - globalTextbox.height - 66,
             shadowBlur: 0,
             shadowOpacity: 0
         })
     }
 
-    const onMainPrompterUnhover = node => {
+    const onMainTextboxUnhover = node => {
         setToolBarVisibility(true);
         node.to({
             scaleX: 1,
@@ -1529,9 +1546,39 @@ export function Canvas({dimensions})
             }}
             />
 
+            <Textbox
+            // id={0}
+            x={globalTextbox.x}
+            y={globalTextbox.y}
+            width={globalTextbox.width}
+            height={globalTextbox.height}
+            fontSize={14}
+            text={globalTextbox.text}
+            onHover={onMainTextboxHover}
+            onUnhover={onMainTextboxUnhover}
+            // onTextChange={(value)=>{setGlobalState("prompt",value);}}
+            draggable={false}
+            />
+            <Text
+            x={globalTextbox.x}
+            y={globalTextbox.y+5}
+            width={globalTextbox.width+20}
+            text={"see outline"}
+            fill={"gray"}
+            fontStyle={"bold"}
+            fontSize={14}
+            visible={toolBarVisibility}
+            align={"center"}
+            perfectDrawEnabled={false}
+            listening={false}
+            />
+
             <ToolBar
-                x={globalTextbox.x+globalTextbox.width/2-285}
-                y={globalTextbox.y-50}
+                x={dimensions.width/2-307.5-64}
+                // y={dimensions.height*0.95-50}
+                y={dimensions.height*0.95-50}
+                // x={globalTextbox.x+(globalTextbox.width+20)/2-307.5}
+                // y={globalTextbox.y-80}
                 width={615}
                 height={60}
                 color={"white"}

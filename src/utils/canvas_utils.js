@@ -16,7 +16,7 @@ const calcSectionsFittsLawID = (section, pointerPosition) => {
 const DFS = (root, nodes, arrows, visited, prefix="") => {
     visited.add(root.id);
     var outline = prefix + root.type + ": " + root.text + "\n";
-    const children = nodes.filter(node=> !visited.has(node.id) &&
+    const children = nodes.filter(node=>!visited.has(node.id) &&
         arrows.filter(arrow=>(arrow.directed&&arrow.from_id===root.id&&arrow.to_id===node.id)
         || (!arrow.directed&&arrow.from_id===root.id&&arrow.to_id===node.id)
         || (!arrow.directed&&arrow.from_id===node.id&&arrow.to_id===root.id)).length);
@@ -27,8 +27,19 @@ const DFS = (root, nodes, arrows, visited, prefix="") => {
 }
 
 const calcSectionOutline = (nodes, arrows, prefix="") => {
-    const roots = nodes.filter(node => 
-        !arrows.filter(arrow=>arrow.directed&&arrow.to_id===node.id).length);
+    const cmp = (a,b) => {
+        const types = ["keyword", "concept", "sticky_note"];
+        const idx_a = types.indexOf(a.type);
+        const idx_b = types.indexOf(b.type);
+        if (idx_a < idx_b) {
+            return -1;
+        } else {
+            return 1;
+        }
+    }
+    const roots = [...nodes.filter(node => 
+        !arrows.filter(arrow=>arrow.directed&&arrow.to_id===node.id).length)]
+        .sort(cmp);
     var outline = "";
     var visited = new Set();
     roots.forEach(root => {

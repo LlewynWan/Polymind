@@ -51,7 +51,7 @@ function App() {
         {x: dimensions.width*0.75, y: dimensions.height*0.05+525, scale: 1, width: 400, height: 120, text: "prompt suggestion 4", display: true},
         {x: dimensions.width*0.75, y: dimensions.height*0.05+700, scale: 1, width: 400, height: 120, text: "prompt suggestion 5", display: true}
     ],
-    global_textbox: {x: dimensions.width*0.3, y: dimensions.height*0.95, scale: 1, width: 640, height: 180, prompt: "Main Prompter",}
+    global_textbox: {x: dimensions.width/2-330-64, y: dimensions.height*0.98, scale: 1, width: 640, height: 180, text: ""}
   }
 
   const [nodes, setNodes] = React.useState(initialState.nodes);
@@ -73,18 +73,18 @@ function App() {
       });
       setGlobalTextbox(prevState=>{
         let tmp = prevState;
-        tmp.x = window.innerWidth*0.3;
-        tmp.y = window.innerHeight*0.95;
+        tmp.x = window.innerWidth/2-330-64;
+        tmp.y = window.innerHeight*0.98;
         return tmp;
       })
-      setPromptCards(prevState=>{
-        return prevState.map((state,index)=>{
-          let tmp = state;
-          tmp.x = window.innerWidth*0.75;
-          tmp.y = window.innerHeight*0.05+175*(index);
-          return tmp;
-        });
-      });
+      // setPromptCards(prevState=>{
+      //   return prevState.map((state,index)=>{
+      //     let tmp = state;
+      //     tmp.x = window.innerWidth*0.75;
+      //     tmp.y = window.innerHeight*0.05+175*(index);
+      //     return tmp;
+      //   });
+      // });
     }
     window.addEventListener('resize', handleResize);
   }, [dimensions])
