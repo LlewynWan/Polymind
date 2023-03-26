@@ -42,7 +42,6 @@ export async function promptGPT(prompt, num_results, max_words_per_result, handl
     //   'stop': ["\"\"\""],
     })
   };
-  // console.log(requestOptions)
   fetchTimeout('https://api.openai.com/v1/chat/completions', 7500, handleResponse, requestOptions)
       .then(response => response.json())
       .then(data => {

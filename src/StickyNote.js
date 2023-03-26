@@ -39,6 +39,8 @@ export function StickyNote({
   resetHeaderCurtain,
   disabledSet,
   displaySet,
+  notificationSet,
+  setNotificationSet,
   resetNodeCallbackTaskId,
   headerListening,
   listening,
@@ -146,6 +148,8 @@ export function StickyNote({
     resetCurtain={resetHeaderCurtain}
     disabledSet={disabledSet}
     displaySet={displaySet}
+    notificationSet={notificationSet}
+    setNotificationSet={setNotificationSet}
     callbackTaskId={callbackTaskId}
     resetCallbackTaskId={resetNodeCallbackTaskId}/> : null}
     

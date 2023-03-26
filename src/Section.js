@@ -23,6 +23,8 @@ export function Section({
     listening,
     disabledSet,
     displaySet,
+    notificationSet,
+    setNotificationSet,
     onHeaderTaskClick,
     onHeaderCurtainClick,
     resetHeaderCurtain,
@@ -107,6 +109,8 @@ export function Section({
     listening={headerListening}
     disabledSet={disabledSet}
     displaySet={displaySet}
+    notificationSet={notificationSet}
+    setNotificationSet={setNotificationSet}
     onTaskClick={onHeaderTaskClick}
     onCurtainClick={onHeaderCurtainClick}
     resetCurtain={resetHeaderCurtain}

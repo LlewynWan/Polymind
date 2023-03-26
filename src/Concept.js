@@ -39,6 +39,8 @@ export function Concept({
     resetHeaderCurtain,
     disabledSet,
     displaySet,
+    notificationSet,
+    setNotificationSet,
     resetNodeCallbackTaskId,
     headerListening,
     listening,
@@ -165,6 +167,8 @@ export function Concept({
     resetCurtain={resetHeaderCurtain}
     disabledSet={disabledSet}
     displaySet={displaySet}
+    notificationSet={notificationSet}
+    setNotificationSet={setNotificationSet}
     callbackTaskId={callbackTaskId}
     resetCallbackTaskId={resetNodeCallbackTaskId}/>: null}
 

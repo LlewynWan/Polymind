@@ -20,6 +20,8 @@ export function TaskHeader({
     resetCurtain,
     disabledSet,
     displaySet,
+    notificationSet,
+    setNotificationSet,
     resetCallbackTaskId,
     callbackTaskId=-1
 }) {
@@ -49,7 +51,7 @@ export function TaskHeader({
     // const promptCircleRef = useRef(null);
 
     const [requestingSet, setRequestingSet] = useState(new Set());
-    const [notificationSet, setNotificationSet] = useState(new Set());
+    // const [notificationSet, setNotificationSet] = useState(new Set());
 
 
     const handleScroll = (offset) => {
@@ -84,7 +86,9 @@ export function TaskHeader({
     }
 
     useEffect(()=>{
-        if (callbackTaskId !== -1 && !disabledSet.has(callbackTaskId)
+        if (callbackTaskId !== -1 &&
+            !disabledSet.has(callbackTaskId)
+            // && !notificationSet.has(callbackTaskId)
             && !isHover && !isCurtainFixed) {
             // clearTimeout(hoverTimeout);
             setIsAnimating(true);
@@ -429,8 +433,6 @@ export function TaskHeader({
                         //         }})
                         // }, 4000)
                     // }
-                    notificationSet.delete(task.id);
-                    setNotificationSet(notificationSet);
                     const requesting =  disabledSet.has(task.id) &&
                         !displaySet.has(task.id) && !e.evt.ctrlKey;
 
@@ -452,10 +454,11 @@ export function TaskHeader({
                         onFinish: ()=>{tween_togray.reverse()}
                     }) : null;
 
-                    const waitingSignal = requesting ? setInterval(function (){
+                    const waitingSignal = requesting ? setInterval(function waitingAnimation(){
                         tween_togray.play();
+                        return waitingAnimation;
                         // tween.reverse();
-                    }(), [2000]) : null;
+                    }(), [1800]) : null;
                     // const waitingSignal = requesting ?
                     //     setInterval(()=>{
                     //         e.target.parent.children[0].to({
@@ -484,8 +487,6 @@ export function TaskHeader({
                             if (waitingSignal) {
                                 clearInterval(waitingSignal);
                             }
-                            requestingSet.delete(task.id);
-                            setRequestingSet(requestingSet);
                             // console.log(e.target.parent.children[0])
                             // tween_tocolor.pause();
                             tween_togray.pause();
@@ -496,9 +497,13 @@ export function TaskHeader({
                                 fill: "#353233",
                                 opacity: 0.64,
                                 // duration: 0.25
-                            })
+                            });
+                            requestingSet.delete(task.id);
+                            setRequestingSet(requestingSet);
                             // e.target
                         });
+                    notificationSet.delete(task.id);
+                    setNotificationSet(notificationSet);
                 }}>
                     <Tag
                     fill={

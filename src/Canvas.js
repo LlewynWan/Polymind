@@ -175,6 +175,7 @@ export function Canvas({dimensions})
                 "concept": sampleFittsLawIDMin(nodes.filter(node=>node.display && node.type==="concept")),
                 "section": sampleFittsLawIDMin(sections, "section")
             });
+            // return trackFittsLaw;
             // setInFocus({node: ID_inv.indexOf(Math.min(...ID_inv))});
             // console.log(ID.indexOf(Math.min(...ID)));
         }, 5000);
@@ -281,6 +282,7 @@ export function Canvas({dimensions})
         // console.log(taskNodes.filter(node=>node.task_id===task.id
         //     &&node.attached_to_type===object_type&&node.attached_to_id===object.id).length)
         if (!objectsCurtainClicked.has(object.id.toString()+task.id.toString()+object_type)
+        && !object.notificationSet.has(task.id)
         && !promptGPTThreads.has(object.id.toString()+task.id.toString()+object_type)
         && ((!task.display && !object.displaySet.has(task.id)) ||
             !taskNodes.filter(node=>node.task_id===task.id
@@ -292,6 +294,12 @@ export function Canvas({dimensions})
                 var prompt = task.examplePrompt.replace("[placeholder]",object.text);
                 if (object_type==="node") {
                     const unshuffled = nodes.filter(node=>node.display&&node.id!==object.id&&node.text!=="").map(node=>node.id);
+                    if (!unshuffled.length) {
+                        if (callback) {
+                            callback();
+                        }
+                        return;
+                    }
                     const shuffled = unshuffled.map(value => ({ value, sort: Math.random() }))
                     .sort((a, b) => a.sort - b.sort)
                     .map(({ value }) => value);
@@ -520,6 +528,7 @@ export function Canvas({dimensions})
                 selected: true, text: "", display: true,
                 disabledSet: new Set(),
                 displaySet: new Set(),
+                notificationSet: new Set(),
                 callbackTaskId: -1};
                 return [...prevState, tmp];
             });
@@ -573,6 +582,7 @@ export function Canvas({dimensions})
                     {id: prevState.length, selected: false,
                     callbackTaskId: -1, disabledSet: new Set(),
                     displaySet: new Set(),
+                    notificationSet: new Set(),
                     scaleX: 1, scaleY: 1,
                     x: Math.min(position1[0], position2[0]),
                     y: Math.min(position1[1], position2[1]),
@@ -873,6 +883,16 @@ export function Canvas({dimensions})
                 }))}
                 disabledSet={section.disabledSet}
                 displaySet={section.displaySet}
+                notificationSet={section.notificationSet}
+                setNotificationSet={(newSet)=>{
+                    setSections(prevState=>prevState.map(state=>{
+                        let tmp = state;
+                        if (tmp.id === section.id) {
+                            tmp.notificationSet = newSet;
+                        }
+                        return tmp;
+                    }))
+                }}
                 listening={!isAddingKeyword&&!isSectioning}
                 />)
             })}
@@ -941,6 +961,16 @@ export function Canvas({dimensions})
                 }}
                 disabledSet={node.disabledSet}
                 displaySet={node.displaySet}
+                notificationSet={node.notificationSet}
+                setNotificationSet={(newSet)=>{
+                    setNodes(prevState=>prevState.map(state=>{
+                        let tmp = state;
+                        if (tmp.id === node.id) {
+                            tmp.notificationSet = newSet;
+                        }
+                        return tmp;
+                    }))
+                }}
                 onHeaderTaskClick={(e,task_id,requesting,callback)=>
                     handleHeaderTaskClick(e,task_id,"sticky_note",node.id,requesting,callback)}
                 onHeaderCurtainClick={(task_id)=>handleHeaderCurtainClick(node.id, "sticky_note", task_id)}
@@ -996,6 +1026,16 @@ export function Canvas({dimensions})
                     !isDrawingDoubleArrow&&!isSectioning&&!isAddingKeyword}
                 disabledSet={node.disabledSet}
                 displaySet={node.displaySet}
+                notificationSet={node.notificationSet}
+                setNotificationSet={(newSet)=>{
+                    setNodes(prevState=>prevState.map(state=>{
+                        let tmp = state;
+                        if (tmp.id === node.id) {
+                            tmp.notificationSet = newSet;
+                        }
+                        return tmp;
+                    }))
+                }}
                 onHeaderTaskClick={(e,task_id,requesting,callback)=>
                     handleHeaderTaskClick(e,task_id,"keyword",node.id,requesting,callback)}
                 onHeaderCurtainClick={(task_id)=>handleHeaderCurtainClick(node.id, "keyword", task_id)}
@@ -1061,6 +1101,16 @@ export function Canvas({dimensions})
                     !isDrawingDoubleArrow&&!isSectioning&&!isAddingKeyword}
                 disabledSet={node.disabledSet}
                 displaySet={node.displaySet}
+                notificationSet={node.notificationSet}
+                setNotificationSet={(newSet)=>{
+                    setNodes(prevState=>prevState.map(state=>{
+                        let tmp = state;
+                        if (tmp.id === node.id) {
+                            tmp.notificationSet = newSet;
+                        }
+                        return tmp;
+                    }))
+                }}
                 onHeaderTaskClick={(e,task_id,requesting,callback)=>
                     handleHeaderTaskClick(e,task_id,"concept",node.id,requesting,callback)}
                 onHeaderCurtainClick={(task_id)=>handleHeaderCurtainClick(node.id, "concept", task_id)}
@@ -1533,6 +1583,7 @@ export function Canvas({dimensions})
                         selected: false, text: "", fontSize: 20, display: true,
                         disabledSet: new Set(),
                         displaySet: new Set(),
+                        notificationSet: new Set(),
                         callbackTaskId: -1};
                         return [...prevState, tmp];
                     });
@@ -1547,6 +1598,7 @@ export function Canvas({dimensions})
                         selected: false, text: "", display: true,
                         disabledSet: new Set(),
                         displaySet: new Set(),
+                        notificationSet: new Set(),
                         callbackTaskId: -1};
                         return [...prevState, tmp];
                     });

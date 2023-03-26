@@ -39,6 +39,8 @@ export function Keyword({
   resetHeaderCurtain,
   disabledSet,
   displaySet,
+  notificationSet,
+  setNotificationSet,
   resetNodeCallbackTaskId,
   listening,
   header=true,
@@ -156,6 +158,8 @@ export function Keyword({
     resetCurtain={resetHeaderCurtain}
     disabledSet={disabledSet}
     displaySet={displaySet}
+    notificationSet={notificationSet}
+    setNotificationSet={setNotificationSet}
     callbackTaskId={callbackTaskId}
     resetCallbackTaskId={resetNodeCallbackTaskId}/> : null}
 
