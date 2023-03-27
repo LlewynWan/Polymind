@@ -6,6 +6,7 @@ import { colorPalette } from "./utils/color_utils";
 import { Group, Label, Tag, Text, Rect, Arrow, Circle } from "react-konva";
 
 import { Icon } from "./Icon";
+import { PreviewPanel } from "./PreviewPanel";
 
 
 export function TaskHeader({
@@ -93,6 +94,13 @@ export function TaskHeader({
             // clearTimeout(hoverTimeout);
             setIsAnimating(true);
             clearTimeout(callbackTimeout);
+            setNotificationSet(prevSet=>{
+                let tmp = prevSet;
+                if (!displaySet.has(callbackTaskId)) {
+                    tmp.add(callbackTaskId);
+                }
+                return tmp;
+            });
             curtainRef.current.to({
                 fill: colorPalette[callbackTaskId%colorPalette.length],
                 width: width,
@@ -105,10 +113,6 @@ export function TaskHeader({
                     setCurtainId(callbackTaskId);
                     setCallbackTimeout(setTimeout(()=>{
                         setIsCurtainDrawn(false);
-                        if (!displaySet.has(callbackTaskId)) {
-                            notificationSet.add(callbackTaskId);
-                        }
-                        setNotificationSet(notificationSet);
                         curtainRef.current.getStage().container().style.cursor = "default"
                         curtainRef.current.to({
                             width: 0,
@@ -266,6 +270,13 @@ export function TaskHeader({
         // setIsHoverHeader(false);
     }}
     listening={listening && !isAnimating}>
+        {/* <PreviewPanel
+        x={0}
+        y={-4}
+        width={width}
+        height={width*0.5}
+        visible={notificationSet.size!==0}
+        tasks={tasks.filter(task=>notificationSet.has(task.id))}/> */}
         {/* <Rect
         x={0}
         y={-8-fontHeight}
@@ -504,8 +515,12 @@ export function TaskHeader({
                             setRequestingSet(requestingSet);
                             // e.target
                         });
-                    notificationSet.delete(task.id);
-                    setNotificationSet(notificationSet);
+                    
+                    setNotificationSet(prevSet=>{
+                        let tmp = prevSet;
+                        tmp.delete(task.id);
+                        return tmp;
+                    });
                 }}>
                     <Tag
                     fill={
@@ -683,8 +698,13 @@ export function TaskHeader({
     type={"forward"}
     onClick={(e)=>{
         e.cancelBubble = true;
-        notificationSet.delete(curtainId);
-        setNotificationSet(notificationSet);
+                            
+        setNotificationSet(prevSet=>{
+            let tmp = prevSet;
+            tmp.delete(curtainId);
+            return tmp;
+        });
+
         clearTimeout(callbackTimeout);
         setIsCurtainFixed(true);
         onCurtainClick(curtainId);

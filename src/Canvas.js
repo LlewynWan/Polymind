@@ -825,7 +825,7 @@ export function Canvas({dimensions})
         opacity={promptPanelVisibility ? 0.5 : 1}
         >
             <Group>
-            <CanvasContext.Provider value={{canvasX, canvasY, canvasScale, microTasks}}>
+            <CanvasContext.Provider value={{canvasX, canvasY, canvasScale, microTasks, taskNodes}}>
             {sections.map(section=>{
                 return (<Section
                 key={section.id}
@@ -910,11 +910,11 @@ export function Canvas({dimensions})
                 disabledSet={section.disabledSet}
                 displaySet={section.displaySet}
                 notificationSet={section.notificationSet}
-                setNotificationSet={(newSet)=>{
+                setNotificationSet={(toggleSet)=>{
                     setSections(prevState=>prevState.map(state=>{
                         let tmp = state;
                         if (tmp.id === section.id) {
-                            tmp.notificationSet = newSet;
+                            tmp.notificationSet = toggleSet(tmp.notificationSet);
                         }
                         return tmp;
                     }))
@@ -988,11 +988,11 @@ export function Canvas({dimensions})
                 disabledSet={node.disabledSet}
                 displaySet={node.displaySet}
                 notificationSet={node.notificationSet}
-                setNotificationSet={(newSet)=>{
+                setNotificationSet={(toggleSet)=>{
                     setNodes(prevState=>prevState.map(state=>{
                         let tmp = state;
                         if (tmp.id === node.id) {
-                            tmp.notificationSet = newSet;
+                            tmp.notificationSet = toggleSet(tmp.notificationSet);
                         }
                         return tmp;
                     }))
@@ -1053,11 +1053,11 @@ export function Canvas({dimensions})
                 disabledSet={node.disabledSet}
                 displaySet={node.displaySet}
                 notificationSet={node.notificationSet}
-                setNotificationSet={(newSet)=>{
+                setNotificationSet={(toggleSet)=>{
                     setNodes(prevState=>prevState.map(state=>{
                         let tmp = state;
                         if (tmp.id === node.id) {
-                            tmp.notificationSet = newSet;
+                            tmp.notificationSet = toggleSet(tmp.notificationSet);
                         }
                         return tmp;
                     }))
@@ -1128,11 +1128,11 @@ export function Canvas({dimensions})
                 disabledSet={node.disabledSet}
                 displaySet={node.displaySet}
                 notificationSet={node.notificationSet}
-                setNotificationSet={(newSet)=>{
+                setNotificationSet={(toggleSet)=>{
                     setNodes(prevState=>prevState.map(state=>{
                         let tmp = state;
                         if (tmp.id === node.id) {
-                            tmp.notificationSet = newSet;
+                            tmp.notificationSet = toggleSet(tmp.notificationSet);
                         }
                         return tmp;
                     }))

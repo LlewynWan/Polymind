@@ -7,14 +7,10 @@ import { CanvasContext } from "./state";
 import { sizeMap } from "./utils/size_utils";
 
 import { Icon } from "./Icon";
-import { TextInput } from "./TextInput"
 import { SuggestionPanel } from "./SuggestionPanel";
 
 import { explain } from "./utils/GPT_utils";
 
-
-const RETURN_KEY = 13;
-const ESCAPE_KEY = 27;
 
 export function TaskNode({
     x,

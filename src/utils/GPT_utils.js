@@ -152,6 +152,52 @@ export async function explain(prevPrompt, prevOutput, handleResponse) {
     });
 }
 
+export async function summarize(prevPrompt, prevOutput, handleResponse) {
+  const GPT35TurboMessage = [
+    { role: "system", content: `You are a writing expert and you are assisting users in prewriting process. You should strictly follow the output specification given by the user.` },
+    {   
+      role: "user",
+      content: prevPrompt,
+    },
+    {
+      role: "assistant",
+      content: prevOutput,
+    },
+    {
+      role: "user",
+      content: "Provide a summary of your answer within 15 words."
+    }
+  ];
+
+  // console.log(GPT35TurboMessage)
+
+  const requestOptions = {
+    // mode: 'no-cors',
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer ' + String(process.env.REACT_APP_OPENAI_API_KEY)
+    },
+    body: JSON.stringify({
+      "model": "gpt-3.5-turbo",
+      'messages': GPT35TurboMessage,
+      'temperature': 0.7,
+      // 'max_tokens': maxTokens,
+      // 'top_p': 1,
+    //   'frequency_penalty': 0,
+    //   'presence_penalty': 0.5,
+    //   'stop': ["\"\"\""],
+    })
+  };
+  fetch('https://api.openai.com/v1/chat/completions', requestOptions)
+      .then(response => response.json())
+      .then(data => data.choices[0].message.content)
+      .then(result => handleResponse(result))
+    .catch(err => {
+      console.log("Ran out of tokens for today! Try tomorrow!");
+    });
+}
+
 export async function requestTaskPrompt(taskName, handleResponse) {
   // var template = {example1: "{Task Name: Brainstorm, Example Prompt: ['Brainstorm keywords related to [placeholder].','Find synonyms for [placeholder].']}",
   // example2: "{Task Name: Summarise, Example Prompt: ['Provide a TLDR version of the following:\n[placeholder]','Summarise Top 3 keywords of the following:\n[placeholder]','Write an abstract of the following:\n[placeholder]']}",
