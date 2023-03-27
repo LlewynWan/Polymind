@@ -1517,6 +1517,19 @@ export function Canvas({dimensions})
             toggleTaskHeaderSwitch={()=>{
                 if (isTaskHeaderVisible) {
                     setObjectsCurtainClicked(new Set());
+                    setTaskNodes([]);
+                    setNodes(prevState=>prevState.map(state=>{
+                        let tmp = state;
+                        tmp.displaySet = new Set();
+                        tmp.notificationSet = new Set();
+                        return tmp;
+                    }));
+                    setSections(prevState=>prevState.map(state=>{
+                        let tmp = state;
+                        tmp.displaySet = new Set();
+                        tmp.notificationSet = new Set();
+                        return tmp;
+                    }));
                 }
                 setIsTaskHeaderVisible(!isTaskHeaderVisible);
             }}

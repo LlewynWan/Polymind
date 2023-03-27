@@ -71,6 +71,7 @@ const calcFittsLawID = (node, pointerPosition) => {
     const D = Math.sqrt((pointerPosition[0]-nodeCenter[0])**2+
     (pointerPosition[1]-nodeCenter[1])**2);
 
+    font.destroy();
     return D*2/W;
 }
 

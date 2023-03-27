@@ -69,6 +69,7 @@ export function Concept({
 
     const [textInputY, setTextInputY] = useState(-tmp.height()/2-0.5);
     const [textInputHeight, setTextInputHeight] = useState(tmp.height()*1.2);
+    tmp.destroy();
 
     const pointer2CanvasPosition = (pointerPosition) => {
         const posX = (pointerPosition.x - canvasX) / canvasScale;
@@ -132,6 +133,7 @@ export function Concept({
         setTextInputY(-tmp.height()/2-0.5);
         setTextInputHeight(tmp.height()*1.2)
         onTextChange(e.currentTarget.value);
+        tmp.destroy();
     }
 
     return (

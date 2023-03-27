@@ -136,6 +136,7 @@ export function TaskHeader({
         });
         setHeaderPositions(positions);
         setFontHeight(test.height());
+        test.destroy();
     }, [tasks, fontSize, offsetX])
 
     useEffect(()=>{
