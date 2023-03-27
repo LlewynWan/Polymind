@@ -4,7 +4,7 @@ const openai = new OpenAIApi(
   new Configuration({ apiKey: process.env.REACT_APP_OPENAI_API_KEY })
 )
 
-const fetchTimeout = (url, ms, callback, { signal, ...options } = {}) => {
+const fetchTimeout = (url, ms, { signal, ...options } = {}) => {
   const controller = new AbortController();
   const promise = fetch(url, { signal: controller.signal, ...options });
   if (signal) signal.addEventListener("abort", () => controller.abort());
@@ -42,7 +42,7 @@ export async function promptGPT(prompt, num_results, max_words_per_result, handl
     //   'stop': ["\"\"\""],
     })
   };
-  fetchTimeout('https://api.openai.com/v1/chat/completions', 7500, handleResponse, requestOptions)
+  fetchTimeout('https://api.openai.com/v1/chat/completions', 7500, requestOptions)
       .then(response => response.json())
       .then(data => {
         if (num_results > 1) {
@@ -165,7 +165,7 @@ export async function summarize(prevPrompt, prevOutput, handleResponse) {
     },
     {
       role: "user",
-      content: "Provide summarise the answer within 10 words."
+      content: "Summarise the answer in 10 words."
     }
   ];
 
@@ -189,12 +189,13 @@ export async function summarize(prevPrompt, prevOutput, handleResponse) {
     //   'stop': ["\"\"\""],
     })
   };
-  fetch('https://api.openai.com/v1/chat/completions', requestOptions)
+  fetchTimeout('https://api.openai.com/v1/chat/completions', 2000, requestOptions)
       .then(response => response.json())
       .then(data => data.choices[0].message.content)
       .then(result => handleResponse(result))
     .catch(err => {
-      console.log("Ran out of tokens for today! Try tomorrow!");
+      handleResponse("")
+      console.log("Request Timeout");
     });
 }
 
@@ -208,14 +209,15 @@ export async function requestTaskPrompt(taskName, handleResponse) {
   const GPT35TurboMessage = [
     { role: "system", content: `The user is microtasking while prewriting. Given a task name he would like to see a prompt example to communicate with ChatGPT.` },
     {role: "user",
-    content: "Given a task name, write an example prompt to communicate with you. Below are some examples:\n\
-    Task Name: Brainstorm Prompt: Brainstorm keywords related to [placeholder].\n\
-    Task Name: Summarise Prompt: Provide a TLDR version of the following:\\n[placeholder].\n\
-    Task Name: Elaborate Prompt: Provide a simple explanation of [placeholder].\n\
-    Task Name: Draft Prompt: [placeholder].\\n\nWrite an abstract of the above outline.\n\
+    content: `Given a task name, write an example prompt to communicate with you. Below are some examples:\n\
+    Task Name: Brainstorm\nPrompt: Brainstorm keywords related to [placeholder].\n\n\
+    Task Name: Summarise\nPrompt: Provide a TLDR version of the following:\\n[placeholder].\n\n\
+    Task Name: Elaborate\nPrompt: Provide a simple explanation of [placeholder].\n\n\
+    Task Name: Draft\nPrompt: [placeholder].\\n\nWrite an abstract of the above outline.\n\n\
+    Task Name: Freewrite\nPrompt: [placeholder].\\n Continue to write.\n\n\
     Now I'm going to give a task name, you should return a prompt. The output should be within 20 words.\n\
-    Task Name: Extend\n\
-    Prompt: "}
+    Task Name: ${taskName}\n\
+    Prompt: `}
   ];
 
   // console.log(GPT35TurboMessage)

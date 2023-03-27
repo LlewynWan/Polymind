@@ -3,10 +3,13 @@ import React, { useState, useEffect, useRef } from "react";
 import Konva from "konva";
 
 import { colorPalette } from "./utils/color_utils";
+import { summarize } from "./utils/GPT_utils";
 import { Group, Label, Tag, Text, Rect, Arrow, Circle } from "react-konva";
 
 import { Icon } from "./Icon";
 import { PreviewPanel } from "./PreviewPanel";
+
+import { CanvasContext } from "./state";
 
 
 export function TaskHeader({
@@ -52,6 +55,7 @@ export function TaskHeader({
     // const promptCircleRef = useRef(null);
 
     const [requestingSet, setRequestingSet] = useState(new Set());
+    const [summary, setSummary] = useState("summary");
     // const [notificationSet, setNotificationSet] = useState(new Set());
 
 
@@ -101,6 +105,7 @@ export function TaskHeader({
                 }
                 return tmp;
             });
+            // const summaryThread = summarize()
             curtainRef.current.to({
                 fill: colorPalette[callbackTaskId%colorPalette.length],
                 width: width,
@@ -692,6 +697,20 @@ export function TaskHeader({
     ref={curtainRef}
     perfectDrawEnabled={false}
     />
+    <Text
+    x={0}
+    y={-4}
+    width={width-20}
+    height={fontHeight+8}
+    verticalAlign={"middle"}
+    fontSize={10}
+    ellipsis={true}
+    fill={"white"}
+    fontStyle={"bold"}
+    text={summary}
+    padding={2.5}
+    visible={isCurtainDrawn && !isCurtainFixed}
+    perfectDrawEnabled={false}/>
     {isCurtainDrawn && !isCurtainFixed ? <Icon
     x={width-15}
     y={fontHeight/2}

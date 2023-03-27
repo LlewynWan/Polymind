@@ -131,6 +131,7 @@ export function TaskBoard({
             width={width}
             visible={isAddingCard}
             taskName={newTaskName}
+            setTaskName={setNewTaskName}
             onConfirm={(examplePrompt)=>{
                 setIsAddingCard(false);
                 onAddTask(newTaskName, examplePrompt);

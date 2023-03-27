@@ -7,6 +7,14 @@ import { TextInput } from "./TextInput";
 import { requestTaskPrompt } from "./utils/GPT_utils";
 
 
+const taskNames = [
+    "Reflect", "Analyze", "Compare", "Contrast",
+    "Evaluate", "Critique", "Infer", "Synthesize",
+    "Generate", "Organize", "Prioritize", "Revise",
+    "Edit", "Proofread"
+];
+
+
 export function TaskCardAdder({
     x,
     y,
@@ -15,6 +23,7 @@ export function TaskCardAdder({
     onConfirm,
     onCancel,
     taskName,
+    setTaskName,
     handleTaskNameChange
 }) {
     const handleTextHover = (e) => {
@@ -35,10 +44,11 @@ export function TaskCardAdder({
     function handleEscapeKeys(e) {
         if ((e.keyCode === RETURN_KEY && !e.shiftKey) || e.keyCode === ESCAPE_KEY) {
             setIsEditingTaskName(false);
-            setExamplePrompt("Requesting task prompt example ...")
-            requestTaskPrompt(taskName, (result)=>{setExamplePrompt(result)})
+            setExamplePrompt("Requesting task prompt example ...");
+            requestTaskPrompt(taskName, (result)=>{setExamplePrompt(result)});
         }
     }
+
 
     return (
     <Group
@@ -68,14 +78,19 @@ export function TaskCardAdder({
             />
             {isEditingTaskName ?
             <TextInput
-            x={5}
-            y={4.5}
-            width={width-110}
+            // x={5}
+            // y={4.5}
+            x={0}
+            y={0}
+            width={width-140}
             height={20}
             value={taskName}
             fontSize={18}
             fontStyle={"bold"}
             fontColor={"white"}
+            background={"#646464"}
+            borderRadius={5}
+            padding={5}
             onKeyDown={handleEscapeKeys}
             onChange={(e)=>handleTaskNameChange(e.target.value)}
             /> :
@@ -88,7 +103,13 @@ export function TaskCardAdder({
             padding={5}
             onMouseEnter={handleTextHover}
             onMouseLeave={handleTextUnhover}
-            onClick={()=>setIsEditingTaskName(true)}
+            onClick={()=>{
+                if (taskName==="Task Name") {
+                    setTaskName(taskNames[Math.floor
+                        (Math.random()*taskNames.length)]+"?");
+                }
+                setIsEditingTaskName(true)
+            }}
             perfectDrawEnabled={false}/>
             }
         </Label>
@@ -126,6 +147,7 @@ export function TaskCardAdder({
         type={"confirm"}
         onClick={()=>{
             setIsEditingTaskName(false);
+            setExamplePrompt("example prompt");
             onConfirm(examplePrompt==="Requesting task prompt example ..."?"":examplePrompt);
         }}/>
         <Icon
@@ -134,6 +156,7 @@ export function TaskCardAdder({
         type={"cross"}
         onClick={()=>{
             setIsEditingTaskName(false);
+            setExamplePrompt("example prompt")
             onCancel();
         }}/>
 

@@ -1561,7 +1561,7 @@ export function Canvas({dimensions})
                         ...prevState,
                         {id: Math.max(...prevState.map(state=>state.id))+1,
                         goal: taskName, inputType: "Keyword", outputType: "Keyword",
-                        display: false, suggestions: [], examplePrompt: examplePrompt}
+                        active: true, display: false, suggestions: [], examplePrompt: examplePrompt}
                     ]
                 });
             }}
