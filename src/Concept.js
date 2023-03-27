@@ -11,6 +11,7 @@ const RETURN_KEY = 13;
 const ESCAPE_KEY = 27;
 
 export function Concept({
+    id,
     x,
     y,
     radiusX,
@@ -43,6 +44,7 @@ export function Concept({
     setNotificationSet,
     resetNodeCallbackTaskId,
     headerListening,
+    expandAll,
     listening,
     header=true,
     draggable=true,
@@ -155,6 +157,8 @@ export function Concept({
      listening={listening}>
 
     {header ? <TaskHeader
+    id={id}
+    type={"concept"}
     x={-radiusX*scaleX}
     y={-radiusY*scaleY-40/canvasScale}
     // x={-radiusX}
@@ -171,6 +175,7 @@ export function Concept({
     displaySet={displaySet}
     notificationSet={notificationSet}
     setNotificationSet={setNotificationSet}
+    expandAll={expandAll}
     callbackTaskId={callbackTaskId}
     resetCallbackTaskId={resetNodeCallbackTaskId}/>: null}
 

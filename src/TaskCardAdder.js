@@ -156,7 +156,7 @@ export function TaskCardAdder({
         type={"cross"}
         onClick={()=>{
             setIsEditingTaskName(false);
-            setExamplePrompt("example prompt")
+            setExamplePrompt("example prompt");
             onCancel();
         }}/>
 

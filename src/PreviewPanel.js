@@ -1,9 +1,11 @@
-import React, { useState, useRef, useContext, useEffect } from "react";
-import { Group, Rect, Label, Tag, Text, Ellipse } from "react-konva";
+import React from "react";
+import { Group, Rect } from "react-konva";
 
+import Konva from "konva";
+
+import { Icon } from "./Icon";
+import { NewsTicker } from "./NewsTicker";
 import { colorPalette } from "./utils/color_utils";
-import { summarize } from "./utils/GPT_utils";
-import { CanvasContext } from "./state";
 
 
 export function PreviewPanel ({
@@ -11,47 +13,25 @@ export function PreviewPanel ({
     y,
     width,
     height,
+    tasks,
     visible,
-    notificationSet
+    taskSummaryMap,
+    expandAll
 }) {
-    const {taskNodes} = useContext(CanvasContext);
-    // const [previewTaskId, setPreviewTaskId] = useState(-1);
-    const [summary, setSummary] = useState({});
-    const [mainView, setMainView] = useState([-1,""]);
-    const [minorView, setMinorView] = useState([-1,""]);
-    const [viewIndex, setViewIndex] = useState(0);
-
-    useEffect(()=>{
-        const keys = Object.keys(summary);
-        const viewThread = setInterval(()=>{
-            setMainView(summary[viewIndex]);
-            setMinorView(summary[(viewIndex+1)%keys.length])
-            setViewIndex(viewIndex=>(viewIndex+1)%keys.length);
-        },1500)
-        return () => {
-            clearInterval(viewThread);
-        };
-    },[summary])
-
-    useEffect(()=>{
-        taskNodes.filter(node=>notificationSet.has(node.task_id)).forEach(node => {
-            summarize(node.prompt, node.text, (result)=>{
-                setSummary(prevState=>{
-                    let tmp = prevState;
-                    tmp[node.id] = [node.task_id, result];
-                    return tmp
-                })
-            })
-        });
-    }, [notificationSet])
 
     return (
     <Group
     x={x-20}
-    y={y-height-5}
+    y={y}
     visible={visible}
-    listening={false}
+    // listening={false}
     opacity={0.75}>
+        <Rect
+        x={0}
+        y={-12}
+        width={width+40}
+        height={12}
+        fill={"transparent"}/>
         {/* <Rect
         x={0}
         y={0}
@@ -60,29 +40,27 @@ export function PreviewPanel ({
         cornerRadius={5}
         fill={"white"}
         perfectDrawEnabled={false}/> */}
-        {mainView[0]!==-1?<Label
-        x={2.5}
-        y={2.5+0*15}>
-            <Tag
-            fill={colorPalette[mainView[0]%colorPalette.length]}
-            cornerRadius={2.5}
-            // stroke={"#010203"}
-            // strokeWidth={0.12}
-            lineJoin={'round'}
-            perfectDrawEnabled={false}
-            />
-            <Text
-            width={width+35}
-            height={12}
-            text={mainView[1]?mainView[1]:""}
-            fontSize={10}
-            fontStyle={"bold"}
-            fontFamily={"sans-serif"}
-            fill={"white"}
-            padding={2.5}
-            perfectDrawEnabled={false}
-            Ellipse={true}/>
-        </Label>:null}
+        {tasks.map((task,index)=>{
+        return (
+            <NewsTicker
+            x={0}
+            y={-20-index*15}
+            width={width}
+            text={taskSummaryMap[task.id]?taskSummaryMap[task.id]:""}
+            color={colorPalette[task.id%colorPalette.length]}
+            fontSize={10}/>
+        )})}
+        {tasks.length!==0?<Rect
+        x={width+40}
+        y={-5-tasks.length*15}
+        width={10}
+        height={tasks.length*15+10}
+        fill={"transparent"}/>:null}
+        {tasks.length!==0?<Icon
+        x={width+45}
+        y={-tasks.length*15/2-5}
+        type={"forward"}
+        onClick={expandAll}/>:null}
     </Group>
     )
 }

@@ -12,6 +12,7 @@ const ESCAPE_KEY = 27;
 
 
 export function Keyword({
+  id,
   x,
   y,
   color,
@@ -42,6 +43,7 @@ export function Keyword({
   notificationSet,
   setNotificationSet,
   resetNodeCallbackTaskId,
+  expandAll,
   listening,
   header=true,
   draggable=true,
@@ -146,6 +148,8 @@ export function Keyword({
     listening={listening}>
     
     {header ? <TaskHeader
+    id={id}
+    type={"keyword"}
     x={0}
     y={-40/canvasScale}
     tasks={microTasks.filter(task=>task.inputType==="Keyword"||task.inputType==="Nodes")}
@@ -161,6 +165,7 @@ export function Keyword({
     notificationSet={notificationSet}
     setNotificationSet={setNotificationSet}
     callbackTaskId={callbackTaskId}
+    expandAll={expandAll}
     resetCallbackTaskId={resetNodeCallbackTaskId}/> : null}
 
     <Group x={0} y={0}

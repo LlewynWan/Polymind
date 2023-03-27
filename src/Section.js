@@ -9,6 +9,7 @@ const RETURN_KEY = 13;
 const ESCAPE_KEY = 27;
 
 export function Section({
+    id,
     x,
     y,
     scaleX,
@@ -28,6 +29,7 @@ export function Section({
     onHeaderTaskClick,
     onHeaderCurtainClick,
     resetHeaderCurtain,
+    expandAll,
     onClick,
     onScale,
     onTextChange,
@@ -100,6 +102,8 @@ export function Section({
     onClick={onClick}
     listening={listening}>
     {header ? <TaskHeader
+    id={id}
+    type={"section"}
     x={0}
     y={-80/canvasScale}
     tasks={microTasks.filter(task=>task.inputType==="Section")}
@@ -115,6 +119,7 @@ export function Section({
     onCurtainClick={onHeaderCurtainClick}
     resetCurtain={resetHeaderCurtain}
     callbackTaskId={callbackTaskId}
+    expandAll={expandAll}
     resetCallbackTaskId={resetCallbackTaskId}/> : null}
         <Label
         x={0}

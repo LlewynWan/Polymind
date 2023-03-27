@@ -43,6 +43,7 @@ export function StickyNote({
   setNotificationSet,
   resetNodeCallbackTaskId,
   headerListening,
+  expandAll,
   listening,
   header=true,
   draggable=true,
@@ -136,6 +137,8 @@ export function StickyNote({
      listening={listening}>
     
     {header ? <TaskHeader
+    id={id}
+    type={"sticky_note"}
     x={0}
     y={-45/canvasScale}
     tasks={microTasks.filter(task=>task.inputType==="Sticky Note"||task.inputType==="Nodes")}
@@ -151,6 +154,7 @@ export function StickyNote({
     notificationSet={notificationSet}
     setNotificationSet={setNotificationSet}
     callbackTaskId={callbackTaskId}
+    expandAll={expandAll}
     resetCallbackTaskId={resetNodeCallbackTaskId}/> : null}
     
     <Group

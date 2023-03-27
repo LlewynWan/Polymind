@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useContext, useEffect, useRef } from "react";
 
 import Konva from "konva";
 
@@ -13,6 +13,8 @@ import { CanvasContext } from "./state";
 
 
 export function TaskHeader({
+    id,
+    type,
     x,y,
     tasks,
     scale,
@@ -27,8 +29,10 @@ export function TaskHeader({
     notificationSet,
     setNotificationSet,
     resetCallbackTaskId,
+    expandAll,
     callbackTaskId=-1
 }) {
+    const {taskNodes} = useContext(CanvasContext);
     const [isHover, setIsHover] = useState(false);
 
     const [offsetX, setOffsetX] = useState(25);
@@ -55,7 +59,8 @@ export function TaskHeader({
     // const promptCircleRef = useRef(null);
 
     const [requestingSet, setRequestingSet] = useState(new Set());
-    const [summary, setSummary] = useState("summary");
+    const [summary, setSummary] = useState("");
+    const [taskSummaryMap, setTaskSummaryMap] = useState({});
     // const [notificationSet, setNotificationSet] = useState(new Set());
 
 
@@ -105,7 +110,18 @@ export function TaskHeader({
                 }
                 return tmp;
             });
-            // const summaryThread = summarize()
+            const newNodes = taskNodes.filter(node=>
+                node.task_id===callbackTaskId && node.attached_to_id===id &&
+                (node.attached_to_type===type || (node.attached_to_type==="node" && type!="section")));
+            const prevOutput = newNodes.reduce((prevText,node)=>prevText+node.text+"\n","")
+            const summaryThread = summarize(newNodes[0].prompt, prevOutput, (result)=>{
+                setTaskSummaryMap(prevState=>{
+                    let tmp = prevState;
+                    tmp[callbackTaskId] = result;
+                    return tmp;
+                })
+                setSummary(result);
+            });
             curtainRef.current.to({
                 fill: colorPalette[callbackTaskId%colorPalette.length],
                 width: width,
@@ -117,6 +133,7 @@ export function TaskHeader({
                     setIsCurtainDrawn(true);
                     setCurtainId(callbackTaskId);
                     setCallbackTimeout(setTimeout(()=>{
+                        setSummary("");
                         setIsCurtainDrawn(false);
                         curtainRef.current.getStage().container().style.cursor = "default"
                         curtainRef.current.to({
@@ -125,7 +142,7 @@ export function TaskHeader({
                             duration: 0.15,
                             onFinish: ()=>resetCallbackTaskId()
                         });
-                    }, 2000));
+                    }, 4000));
                 }
             })
         }
@@ -275,13 +292,15 @@ export function TaskHeader({
         // setIsHoverHeader(false);
     }}
     listening={listening && !isAnimating}>
-        {/* <PreviewPanel
+        <PreviewPanel
         x={0}
         y={-4}
         width={width}
         height={width*0.5}
-        visible={notificationSet.size!==0}
-        notificationSet={notificationSet}/> */}
+        visible={notificationSet.size!==0&&isHover}
+        tasks={tasks.filter(task=>notificationSet.has(task.id)&&taskSummaryMap[task.id])}
+        taskSummaryMap={taskSummaryMap}
+        expandAll={expandAll}/>
         {/* <Rect
         x={0}
         y={-8-fontHeight}
@@ -698,9 +717,9 @@ export function TaskHeader({
     perfectDrawEnabled={false}
     />
     <Text
-    x={0}
+    x={2.5}
     y={-4}
-    width={width-20}
+    width={width-25}
     height={fontHeight+8}
     verticalAlign={"middle"}
     fontSize={10}

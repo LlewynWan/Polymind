@@ -36,7 +36,8 @@ export function Canvas({dimensions})
     const stageRef = React.useRef(null);
     const layerRef = React.useRef(null);
 
-    const promptGPTThreads = new Set();
+    var promptGPTThreads = new Set();
+    // const [taskTracker, setTaskTracker] = useState({});
 
     const [selectionRect, setSeletionRect] = React.useState({
         visible: false,
@@ -309,14 +310,15 @@ export function Canvas({dimensions})
                         if (callback) {
                             callback();
                         }
+                        promptGPTThreads.delete(object.id.toString()+task.id.toString()+object_type);
                         return;
                     }
                     const shuffled = unshuffled.map(value => ({ value, sort: Math.random() }))
                     .sort((a, b) => a.sort - b.sort)
                     .map(({ value }) => value);
-                    if (!shuffled.length) {
-                        return;
-                    }
+                    // if (!shuffled.length) {
+                    //     return;
+                    // }
                     attached_from_id = shuffled[0];
                     prompt = prompt.replace("[placeholder]", nodes.filter(node=>node.id===shuffled[0])[0].text);
                 }
@@ -351,7 +353,7 @@ export function Canvas({dimensions})
                             scaleX: 1, scaleY: 1, attached_from_id: attached_from_id,
                             attached_to_type: object_type, task_id: task.id,
                             attached_to_id: object.id, type: toLowerCase(task.outputType),
-                            x: object.x+120*canvasScale+Math.random()*120+object.scaleX*
+                            x: object.x+150*canvasScale+Math.random()*120+object.scaleX*
                                 (object.type==="concept"?object.radiusX*2:object.width),
                             y: object.type==="concept"?
                                 object.y+object.scaleY*object.radiusY+(200*index-200)*canvasScale+
@@ -727,6 +729,35 @@ export function Canvas({dimensions})
             return tmp;
         }));
     }
+    const expandAll = (id, type) => {
+        if (type === "section") {
+            setSections(prevState=>prevState.map(state=>{
+                let tmp = state;
+                if (tmp.id === id) {
+                    microTasks.forEach(task=>{
+                        if (tmp.notificationSet.has(task.id)) {
+                            tmp.displaySet.add(task.id)
+                            tmp.notificationSet.delete(task.id);
+                        }
+                    })
+                }
+                return tmp;
+            }))
+        } else {
+            setNodes(prevState=>prevState.map(state=>{
+                let tmp = state;
+                if (tmp.id === id) {
+                    microTasks.forEach(task=>{
+                        if (tmp.notificationSet.has(task.id)) {
+                            tmp.displaySet.add(task.id)
+                            tmp.notificationSet.delete(task.id);
+                        }
+                    })
+                }
+                return tmp;
+            }))
+        }
+    }
 
     const onNodeConnected = (e, id, anchor)=>{
         e.cancelBubble = true;
@@ -829,6 +860,7 @@ export function Canvas({dimensions})
             {sections.map(section=>{
                 return (<Section
                 key={section.id}
+                id={section.id}
                 x={section.x}
                 y={section.y}
                 isSelected={section.selected}
@@ -895,6 +927,7 @@ export function Canvas({dimensions})
                         return tmp;
                     }))
                 }}
+                expandAll={()=>expandAll(section.id, "section")}
                 onHeaderTaskClick={(e,task_id,requesting,callback)=>
                     handleHeaderTaskClick(e,task_id,"section",section.id,requesting,callback)}
                 onHeaderCurtainClick={(task_id)=>handleHeaderCurtainClick(section.id, "section", task_id)}
@@ -997,6 +1030,7 @@ export function Canvas({dimensions})
                         return tmp;
                     }))
                 }}
+                expandAll={()=>expandAll(node.id, "sticky_note")}
                 onHeaderTaskClick={(e,task_id,requesting,callback)=>
                     handleHeaderTaskClick(e,task_id,"sticky_note",node.id,requesting,callback)}
                 onHeaderCurtainClick={(task_id)=>handleHeaderCurtainClick(node.id, "sticky_note", task_id)}
@@ -1008,6 +1042,7 @@ export function Canvas({dimensions})
                 node.type === "keyword" ?
                 <Keyword
                 key={node.id}
+                id={node.id}
                 x={node.x}
                 y={node.y}
                 scaleX={node.scaleX}
@@ -1062,6 +1097,7 @@ export function Canvas({dimensions})
                         return tmp;
                     }))
                 }}
+                expandAll={()=>expandAll(node.id, "Keyword")}
                 onHeaderTaskClick={(e,task_id,requesting,callback)=>
                     handleHeaderTaskClick(e,task_id,"keyword",node.id,requesting,callback)}
                 onHeaderCurtainClick={(task_id)=>handleHeaderCurtainClick(node.id, "keyword", task_id)}
@@ -1073,6 +1109,7 @@ export function Canvas({dimensions})
                 node.type === "concept" ?
                 <Concept
                 key={node.id}
+                id={node.id}
                 x={node.x}
                 y={node.y}
                 scaleX={node.scaleX}
@@ -1137,6 +1174,7 @@ export function Canvas({dimensions})
                         return tmp;
                     }))
                 }}
+                expandAll={()=>expandAll(node.id, "concept")}
                 onHeaderTaskClick={(e,task_id,requesting,callback)=>
                     handleHeaderTaskClick(e,task_id,"concept",node.id,requesting,callback)}
                 onHeaderCurtainClick={(task_id)=>handleHeaderCurtainClick(node.id, "concept", task_id)}
