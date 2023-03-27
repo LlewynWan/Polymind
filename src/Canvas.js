@@ -123,11 +123,13 @@ export function Canvas({dimensions})
                 if (object_type !== "" && inFocus[object_type] !== -1) {
                     if (object_type!=="section") {
                         const node = nodes.filter(node=>node.id===inFocus[object_type])[0];
-                        if (node.text!=="" && !node.disabledSet.has(task.id))
+                        if (node.text!=="" && !node.disabledSet.has(task.id)
+                        && !node.notificationSet.has(task.id))
                             handleMicroTask(task, object_type, node);
                     } else {
                         const section = sections.filter(section=>section.id===inFocus[object_type]);
-                        if (section.length && !section[0].disabledSet.has(task.id))
+                        if (section.length && !section[0].disabledSet.has(task.id)
+                        && !section[0].notificationSet.has(task.id))
                             handleMicroTask(task, object_type, section[0])   
                     }   
                 }
@@ -206,7 +208,9 @@ export function Canvas({dimensions})
             setArrowFrom({id: -1, anchor: -1});
             setArrowTo({id: -1, anchor: -1});
         }
-    }, [dimensions, nodes, sections, canvasScale, isHoverToolBar,
+    }, [dimensions,
+        // nodes, sections,
+        canvasScale, isHoverToolBar,
         isDrawingArrow, isDrawingDoubleArrow, isAddingKeyword]);
 
 
@@ -289,7 +293,7 @@ export function Canvas({dimensions})
         // console.log(taskNodes.filter(node=>node.task_id===task.id
         //     &&node.attached_to_type===object_type&&node.attached_to_id===object.id).length)
         if (!objectsCurtainClicked.has(object.id.toString()+task.id.toString()+object_type)
-        && !object.notificationSet.has(task.id)
+        // && !object.notificationSet.has(task.id)
         && !promptGPTThreads.has(object.id.toString()+task.id.toString()+object_type)
         && ((!task.display && !object.displaySet.has(task.id)) ||
             !taskNodes.filter(node=>node.task_id===task.id
@@ -1246,7 +1250,10 @@ export function Canvas({dimensions})
                 getSectionById(node.attached_to_id) : null;
                 const anchorPosition = anchor_utils.calcAnchorPosition(
                     from_anchor, node, canvasScale);
-                
+                const anchorOffsetPosition = anchor_utils.calcAnchorOffsetPositions(
+                    node, canvasScale)[from_anchor];
+                // console.log(anchorOffsetPosition)
+
                 return node.display ||
                 (node.attached_to_type==="section" ? section.displaySet.has(node.task_id)
                 : getNodeById(node.attached_to_id).displaySet.has(node.task_id)) ||
@@ -1316,20 +1323,26 @@ export function Canvas({dimensions})
                     />
                     </Group> : <MyLine
                     points={[
-                        ...anchor_utils.calcAnchorPosition(
-                            from_anchor, node, canvasScale),
+                        ...anchorPosition,
+                        ...anchorOffsetPosition,
+                        // ...anchor_utils.calcAnchorPosition(
+                        //     from_anchor, node, canvasScale),
                         // ...anchor_utils.findPathBetweenNodeAndPosition(
                         //     [section.x+section.width*section.scaleX/2,
                         //         section.y-60/canvasScale],
                         //     node, 1, canvasScale
                         // ),
+                        // ...anchorOffsetPosition,
+                        // ...anchor_utils.calcAnchorOffsetPositions(from_anchor,node,canvasScale),
                         ...anchor_utils.findPathBetweenVectors(
-                            {x: anchorPosition[0], y: anchorPosition[1],
+                            {x: anchorOffsetPosition[0], y: anchorOffsetPosition[1],
                             dx: -1, dy: 0},
-                            {x: getTextWidth(section.text, 18, "bold", 5)/canvasScale+section.x+20/canvasScale,
+                            {x: getTextWidth(section.text, 18, "bold", 5)/canvasScale+section.x+25/canvasScale,
                             y: section.y-25/canvasScale, dx: 1, dy: 0}
                         ),
-                        getTextWidth(section.text, 18, "bold", 5)/canvasScale+section.x+20/canvasScale,
+                        getTextWidth(section.text, 18, "bold", 5)/canvasScale+section.x+25/canvasScale,
+                        section.y-25/canvasScale,
+                        getTextWidth(section.text, 18, "bold", 5)/canvasScale+section.x+12/canvasScale,
                         section.y-25/canvasScale
                         // section.x+section.width*section.scaleX/2,
                         // section.y-25/canvasScale,
@@ -1397,7 +1410,7 @@ export function Canvas({dimensions})
                         const newNode = node.type === "sticky_note" ?
                         {id: nodes.length, type: node.type, scaleX: 1, scaleY: 1,
                         x: node.x, y: node.y, display: true, text: node.text,
-                        width: node.width, height: node.height, fontSize: 18,
+                        width: node.width, height: node.height, fontSize: 16,
                         selected: false, disabledSet: new Set(
                             microTasks.filter(task=>!task.active).map(task=>task.id)
                         ), displaySet: new Set(),
@@ -1448,14 +1461,17 @@ export function Canvas({dimensions})
                     onTextHeightOverflow={(textHeight)=>{
                         setTaskNodes(prevState=>prevState.map(state=>{
                             let tmp = state;
-                            if (tmp.id === state.id) {
+                            if (tmp.id === node.id) {
                                 if (tmp.type === "concept") {
                                     tmp.radiusY = Math.max(sizeMap["concept"].radiusY,textHeight);
                                 } else if (tmp.type === "sticky_note") {
+                                    // console.log(tmp.type, textHeight)
+                                    // console.log(Math.max(sizeMap["sticky_note"].height,textHeight))
                                     tmp.height = Math.max(sizeMap["sticky_note"].height,textHeight);
+                                    // console.log(tmp.height)
                                 }
-                                return tmp;
                             }
+                            return tmp;
                         }))
                     }}
                     handleRegenerate={(suggestion)=>{
@@ -1500,7 +1516,7 @@ export function Canvas({dimensions})
             }))}
             toggleTaskHeaderSwitch={()=>{
                 if (isTaskHeaderVisible) {
-                    objectsCurtainClicked(new Set());
+                    setObjectsCurtainClicked(new Set());
                 }
                 setIsTaskHeaderVisible(!isTaskHeaderVisible);
             }}
@@ -1594,12 +1610,14 @@ export function Canvas({dimensions})
             align={"center"}
             perfectDrawEnabled={false}
             listening={false}
+            // onMouseEnter={onMainTextboxHover}
+            // onMouseLeave={onMainTextboxUnhover}
             />
 
             <ToolBar
                 x={dimensions.width/2-307.5-64}
                 // y={dimensions.height*0.95-50}
-                y={dimensions.height*0.95-50}
+                y={dimensions.height*0.95-55}
                 // x={globalTextbox.x+(globalTextbox.width+20)/2-307.5}
                 // y={globalTextbox.y-80}
                 width={615}

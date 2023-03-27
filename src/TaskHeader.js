@@ -132,6 +132,7 @@ export function TaskHeader({
             align: "center", verticalAlign: "middle", padding: 2.5});
             const newPosition = positions.slice(-1)[0] + tmp.width()+1.5;
             positions.push(newPosition);
+            tmp.destroy();
         });
         setHeaderPositions(positions);
         setFontHeight(test.height());

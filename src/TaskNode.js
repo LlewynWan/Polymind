@@ -66,7 +66,6 @@ export function TaskNode({
         var pos = 0;
         var prev = 0;
         while (pos !== -1) {
-            console.log(pos)
             pos = text.indexOf(' ', pos+1);
             if (pos - prev > 30) {
                 text = text.substring(0,pos)+'\n'+text.substring(pos+1);
@@ -76,7 +75,7 @@ export function TaskNode({
         return text;
     }
 
-    useEffect(()=>{
+    useEffect(() => {
         if (onTextHeightOverflow) {
             onTextHeightOverflow(textHeight);
         }
@@ -96,7 +95,10 @@ export function TaskNode({
         const tmp = type === "concept" ?
         new Konva.Text({text: text, width: radiusX*2, fontSize: fontSize})
         : new Konva.Text({text: text, width: width, fontSize: fontSize});
+        // if (type==="sticky_note")
+        //     console.log(tmp.height());
         setTextHeight(tmp.height());
+        tmp.destroy();
     }, [text, fontSize, canvasScale]);
     
     return (

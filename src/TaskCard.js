@@ -122,9 +122,11 @@ export function TaskCard({
             {pageNum===0? <Line
             points={[-15,0,0,5,15,0]}
             stroke={"silver"}
+            perfectDrawEnabled={false}
             /> : <Line
             points={[-15,5,0,0,15,5]}
             stroke={"silver"}
+            perfectDrawEnabled={false}
             />}
             <Rect
             x={-17.5}
