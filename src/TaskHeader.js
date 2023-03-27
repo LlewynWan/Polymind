@@ -276,7 +276,7 @@ export function TaskHeader({
         width={width}
         height={width*0.5}
         visible={notificationSet.size!==0}
-        tasks={tasks.filter(task=>notificationSet.has(task.id))}/> */}
+        notificationSet={notificationSet}/> */}
         {/* <Rect
         x={0}
         y={-8-fontHeight}

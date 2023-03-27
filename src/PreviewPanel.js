@@ -12,68 +12,77 @@ export function PreviewPanel ({
     width,
     height,
     visible,
-    tasks
+    notificationSet
 }) {
     const {taskNodes} = useContext(CanvasContext);
     // const [previewTaskId, setPreviewTaskId] = useState(-1);
     const [summary, setSummary] = useState({});
+    const [mainView, setMainView] = useState([-1,""]);
+    const [minorView, setMinorView] = useState([-1,""]);
+    const [viewIndex, setViewIndex] = useState(0);
 
     useEffect(()=>{
-        taskNodes.forEach(node => {
+        const keys = Object.keys(summary);
+        const viewThread = setInterval(()=>{
+            setMainView(summary[viewIndex]);
+            setMinorView(summary[(viewIndex+1)%keys.length])
+            setViewIndex(viewIndex=>(viewIndex+1)%keys.length);
+        },1500)
+        return () => {
+            clearInterval(viewThread);
+        };
+    },[summary])
+
+    useEffect(()=>{
+        taskNodes.filter(node=>notificationSet.has(node.task_id)).forEach(node => {
             summarize(node.prompt, node.text, (result)=>{
                 setSummary(prevState=>{
                     let tmp = prevState;
-                    tmp[node.id] = result;
+                    tmp[node.id] = [node.task_id, result];
                     return tmp
                 })
             })
         });
-    }, [tasks])
+    }, [notificationSet])
 
     return (
     <Group
-    x={x}
+    x={x-20}
     y={y-height-5}
     visible={visible}
     listening={false}
     opacity={0.75}>
-        <Rect
+        {/* <Rect
         x={0}
         y={0}
-        width={width}
+        width={width+40}
         height={height}
         cornerRadius={5}
         fill={"white"}
-        perfectDrawEnabled={false}/>
-        {taskNodes.map((node,index)=>{
-            return (
-                <Label
-                x={5}
-                y={5+index*17.5}
-                key={node.id}>
-                    <Tag
-                    fill={colorPalette[node.task_id%colorPalette.length]}
-                    cornerRadius={2.5}
-                    // stroke={"#010203"}
-                    // strokeWidth={0.12}
-                    lineJoin={'round'}
-                    perfectDrawEnabled={false}
-                    />
-                    <Text
-                    width={width-5}
-                    text={summary[node.id]?summary[node.id]:""}
-                    fontSize={10}
-                    fontStyle={"bold"}
-                    fontFamily={"sans-serif"}
-                    fill={"white"}
-                    padding={2.5}
-                    perfectDrawEnabled={false}/>
-                </Label>
-            )
-            // summarize(node.prompt,node.text,(err,summary)=>{
-            //     console.log(summary)
-            // })
-        })}
+        perfectDrawEnabled={false}/> */}
+        {mainView[0]!==-1?<Label
+        x={2.5}
+        y={2.5+0*15}>
+            <Tag
+            fill={colorPalette[mainView[0]%colorPalette.length]}
+            cornerRadius={2.5}
+            // stroke={"#010203"}
+            // strokeWidth={0.12}
+            lineJoin={'round'}
+            perfectDrawEnabled={false}
+            />
+            <Text
+            width={width+35}
+            height={12}
+            text={mainView[1]?mainView[1]:""}
+            fontSize={10}
+            fontStyle={"bold"}
+            fontFamily={"sans-serif"}
+            fill={"white"}
+            padding={2.5}
+            perfectDrawEnabled={false}
+            Ellipse={true}/>
+        </Label>:null}
     </Group>
     )
 }

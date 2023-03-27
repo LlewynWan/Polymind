@@ -165,7 +165,7 @@ export async function summarize(prevPrompt, prevOutput, handleResponse) {
     },
     {
       role: "user",
-      content: "Provide a summary of your answer within 15 words."
+      content: "Provide summarise the answer within 10 words."
     }
   ];
 
