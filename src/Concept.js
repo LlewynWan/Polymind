@@ -45,6 +45,7 @@ export function Concept({
     resetNodeCallbackTaskId,
     headerListening,
     expandAll,
+    closeAll,
     listening,
     header=true,
     draggable=true,
@@ -176,6 +177,7 @@ export function Concept({
     notificationSet={notificationSet}
     setNotificationSet={setNotificationSet}
     expandAll={expandAll}
+    closeAll={closeAll}
     callbackTaskId={callbackTaskId}
     resetCallbackTaskId={resetNodeCallbackTaskId}/>: null}
 

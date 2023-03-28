@@ -44,6 +44,7 @@ export function Keyword({
   setNotificationSet,
   resetNodeCallbackTaskId,
   expandAll,
+  closeAll,
   listening,
   header=true,
   draggable=true,
@@ -166,6 +167,7 @@ export function Keyword({
     setNotificationSet={setNotificationSet}
     callbackTaskId={callbackTaskId}
     expandAll={expandAll}
+    closeAll={closeAll}
     resetCallbackTaskId={resetNodeCallbackTaskId}/> : null}
 
     <Group x={0} y={0}

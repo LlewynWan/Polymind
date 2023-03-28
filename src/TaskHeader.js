@@ -30,6 +30,7 @@ export function TaskHeader({
     setNotificationSet,
     resetCallbackTaskId,
     expandAll,
+    closeAll,
     callbackTaskId=-1
 }) {
     const {taskNodes} = useContext(CanvasContext);
@@ -344,7 +345,7 @@ export function TaskHeader({
         shadowOffsetX={0}
         shadowOffsetY={1.5}
         shadowOpacity={0.15}
-        shadowColor={"black"}
+        shadowColor={"#111111"}
         // fill={"#646464"}
         fill={"white"}
         perfectDrawEnabled={false}
@@ -727,6 +728,12 @@ export function TaskHeader({
     ref={curtainRef}
     perfectDrawEnabled={false}
     />
+    {[...displaySet].filter(task_id=>!disabledSet.has(task_id)).length > 0 ? <Icon
+    // x={width+15}
+    x={-12}
+    y={fontHeight/2}
+    type={"closeAll"}
+    onClick={closeAll}/>: null}
     <Text
     x={2.5}
     y={-4}

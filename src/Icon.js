@@ -1,5 +1,5 @@
 import React, { useRef, useState } from "react";
-import { Group, Line, Circle, Rect, Arc, Arrow, Text } from "react-konva";
+import { Group, Line, Circle, Rect, Arc, Arrow, Text, Label, Tag } from "react-konva";
 
 
 export function Icon({
@@ -416,6 +416,66 @@ export function Icon({
         align={"center"}
         verticalAlign={"middle"}
         perfectDrawEnabled={false}/>
+    </Group>
+    : type === "closeAll" ?
+    <Group
+    x={x}
+    y={y}
+    onMouseEnter={(e)=>{
+        setIsHover(true);
+        e.target.getStage().container().style.cursor = "pointer"
+    }}
+    onMouseLeave={(e)=>{
+        setIsHover(false);
+        e.target.getStage().container().style.cursor = "default"
+    }}
+    onClick={onClick}
+    opacity={isHover?0.5:1}>
+         <Line
+        x={0}
+        y={0}
+        points={[0,-7.5,-7.5,0,0,7.5]}
+        stroke={isHover?"#E53C38":"silver"}
+        // stroke={"#E53C38"}
+        strokeWidth={2.5}
+        perfectDrawEnabled={false}/>
+        <Line
+        x={0}
+        y={0}
+        points={[7.5,-7.5,0,0,7.5,7.5]}
+        // stroke={"#E53C38"}
+        stroke={isHover?"#E53C38":"silver"}
+        strokeWidth={2.5}
+        perfectDrawEnabled={false}/>
+        <Rect
+        x={-7.5}
+        y={-7.5}
+        width={15}
+        height={15}
+        perfectDrawEnabled={false}/>
+        {/* <Circle
+        x={7.5}
+        y={15}
+        radius={5}
+        fill={"#E53C38"}
+        opacity={0.8}/> */}
+        {/* <Label
+        x={0}
+        y={0}>
+            <Tag
+            fill={"red"}
+            // fill={"#2A2A35"}
+            cornerRadius={2.5}
+            lineJoin={'round'}
+            perfectDrawEnabled={false}/>
+            <Text
+            fontSize={10}
+            fontStyle={"bold"}
+            fill={"white"}
+            text={"close all"}
+            padding={2.5}
+            />
+        </Label> */}
     </Group>
     : null
     // return type === "add" ?

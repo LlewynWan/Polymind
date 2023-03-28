@@ -44,6 +44,7 @@ export function StickyNote({
   resetNodeCallbackTaskId,
   headerListening,
   expandAll,
+  closeAll,
   listening,
   header=true,
   draggable=true,
@@ -155,6 +156,7 @@ export function StickyNote({
     setNotificationSet={setNotificationSet}
     callbackTaskId={callbackTaskId}
     expandAll={expandAll}
+    closeAll={closeAll}
     resetCallbackTaskId={resetNodeCallbackTaskId}/> : null}
     
     <Group

@@ -758,6 +758,33 @@ export function Canvas({dimensions})
             }))
         }
     }
+    const closeAll = (id, type) => {
+        if (type === "section") {
+            setSections(prevState=>prevState.map(state=>{
+                let tmp = state;
+                if (tmp.id === id) {
+                    microTasks.forEach(task=>{
+                        if (!tmp.disabledSet.has(task.id)) {
+                            tmp.displaySet.delete(task.id)
+                        }
+                    })
+                }
+                return tmp;
+            }))
+        } else {
+            setNodes(prevState=>prevState.map(state=>{
+                let tmp = state;
+                if (tmp.id === id) {
+                    microTasks.forEach(task=>{
+                        if (!tmp.disabledSet.has(task.id)) {
+                            tmp.displaySet.delete(task.id)
+                        }
+                    })
+                }
+                return tmp;
+            }))
+        }
+    }
 
     const onNodeConnected = (e, id, anchor)=>{
         e.cancelBubble = true;
@@ -928,6 +955,7 @@ export function Canvas({dimensions})
                     }))
                 }}
                 expandAll={()=>expandAll(section.id, "section")}
+                closeAll={()=>closeAll(section.id, "section")}
                 onHeaderTaskClick={(e,task_id,requesting,callback)=>
                     handleHeaderTaskClick(e,task_id,"section",section.id,requesting,callback)}
                 onHeaderCurtainClick={(task_id)=>handleHeaderCurtainClick(section.id, "section", task_id)}
@@ -1031,6 +1059,7 @@ export function Canvas({dimensions})
                     }))
                 }}
                 expandAll={()=>expandAll(node.id, "sticky_note")}
+                closeAll={()=>closeAll(node.id, "sticky_note")}
                 onHeaderTaskClick={(e,task_id,requesting,callback)=>
                     handleHeaderTaskClick(e,task_id,"sticky_note",node.id,requesting,callback)}
                 onHeaderCurtainClick={(task_id)=>handleHeaderCurtainClick(node.id, "sticky_note", task_id)}
@@ -1097,7 +1126,8 @@ export function Canvas({dimensions})
                         return tmp;
                     }))
                 }}
-                expandAll={()=>expandAll(node.id, "Keyword")}
+                expandAll={()=>expandAll(node.id, "keyword")}
+                closeAll={()=>closeAll(node.id, "keyword")}
                 onHeaderTaskClick={(e,task_id,requesting,callback)=>
                     handleHeaderTaskClick(e,task_id,"keyword",node.id,requesting,callback)}
                 onHeaderCurtainClick={(task_id)=>handleHeaderCurtainClick(node.id, "keyword", task_id)}
@@ -1175,6 +1205,7 @@ export function Canvas({dimensions})
                     }))
                 }}
                 expandAll={()=>expandAll(node.id, "concept")}
+                closeAll={()=>closeAll(node.id, "concept")}
                 onHeaderTaskClick={(e,task_id,requesting,callback)=>
                     handleHeaderTaskClick(e,task_id,"concept",node.id,requesting,callback)}
                 onHeaderCurtainClick={(task_id)=>handleHeaderCurtainClick(node.id, "concept", task_id)}

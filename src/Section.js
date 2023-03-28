@@ -30,6 +30,7 @@ export function Section({
     onHeaderCurtainClick,
     resetHeaderCurtain,
     expandAll,
+    closeAll,
     onClick,
     onScale,
     onTextChange,
@@ -120,6 +121,7 @@ export function Section({
     resetCurtain={resetHeaderCurtain}
     callbackTaskId={callbackTaskId}
     expandAll={expandAll}
+    closeAll={closeAll}
     resetCallbackTaskId={resetCallbackTaskId}/> : null}
         <Label
         x={0}
