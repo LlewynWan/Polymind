@@ -253,9 +253,11 @@ export function Canvas({dimensions})
         && !nodes.filter(node=>node.id===arrow.from_id)[0].selected
         && !nodes.filter(node=>node.id===arrow.to_id)[0].selected);
         const newTaskNodes = taskNodes.filter(taskNode=>
+            taskNode.attached_to_type !== "section" ?
             !nodes.filter(node=>node.id===taskNode.attached_to_id)[0].selected
             && (!nodes.filter(node=>node.id===taskNode.attached_from_id).length
-            || !nodes.filter(node=>node.id===taskNode.attached_from_id)[0].selected));
+            || !nodes.filter(node=>node.id===taskNode.attached_from_id)[0].selected)
+            : !sections.filter(section=>section.id===taskNode.attached_to_id)[0].selected);
         
         // setArrows(prevState=>prevState.filter(arrow=>{
         //     return !nodes.filter(node=>node.id===arrow.from_id)[0].selected

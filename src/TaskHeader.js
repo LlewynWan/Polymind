@@ -145,13 +145,15 @@ export function TaskHeader({
                     setCallbackTimeout(setTimeout(()=>{
                         setSummary("");
                         setIsCurtainDrawn(false);
-                        curtainRef.current.getStage().container().style.cursor = "default"
-                        curtainRef.current.to({
-                            width: 0,
-                            visible: false,
-                            duration: 0.15,
-                            onFinish: ()=>resetCallbackTaskId()
-                        });
+                        if (curtainRef.current) {
+                            curtainRef.current.getStage().container().style.cursor = "default"
+                            curtainRef.current.to({
+                                width: 0,
+                                visible: false,
+                                duration: 0.15,
+                                onFinish: ()=>resetCallbackTaskId()
+                            });
+                        }
                     }, 4000));
                 }
             })
