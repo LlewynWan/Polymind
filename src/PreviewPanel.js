@@ -16,6 +16,7 @@ export function PreviewPanel ({
     tasks,
     visible,
     taskSummaryMap,
+    taskKeypointsMap,
     expandAll
 }) {
 
@@ -28,9 +29,9 @@ export function PreviewPanel ({
     opacity={0.75}>
         <Rect
         x={0}
-        y={-12}
-        width={width+40}
-        height={12}
+        y={-15*tasks.length-15}
+        width={width+60}
+        height={15*tasks.length+22}
         fill={"transparent"}/>
         {/* <Rect
         x={0}
@@ -43,10 +44,12 @@ export function PreviewPanel ({
         {tasks.map((task,index)=>{
         return (
             <NewsTicker
+            key={task.id}
             x={0}
             y={-20-index*15}
             width={width}
-            text={taskSummaryMap[task.id]?taskSummaryMap[task.id]:""}
+            summary={taskSummaryMap[task.id]!==""?taskSummaryMap[task.id]:" "}
+            keypoints={taskKeypointsMap[task.id]!==""?taskKeypointsMap[task.id]:" "}
             color={colorPalette[task.id%colorPalette.length]}
             fontSize={10}/>
         )})}
@@ -57,7 +60,7 @@ export function PreviewPanel ({
         height={tasks.length*15+10}
         fill={"transparent"}/>:null}
         {tasks.length!==0?<Icon
-        x={width+45}
+        x={width+48}
         y={-tasks.length*15/2-5}
         type={"forward"}
         onClick={expandAll}/>:null}

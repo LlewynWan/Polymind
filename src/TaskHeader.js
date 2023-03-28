@@ -3,7 +3,7 @@ import React, { useState, useContext, useEffect, useRef } from "react";
 import Konva from "konva";
 
 import { colorPalette } from "./utils/color_utils";
-import { summarize } from "./utils/GPT_utils";
+import { extractKeywords, summarize } from "./utils/GPT_utils";
 import { Group, Label, Tag, Text, Rect, Arrow, Circle } from "react-konva";
 
 import { Icon } from "./Icon";
@@ -61,6 +61,7 @@ export function TaskHeader({
     const [requestingSet, setRequestingSet] = useState(new Set());
     const [summary, setSummary] = useState("");
     const [taskSummaryMap, setTaskSummaryMap] = useState({});
+    const [taskKeypointsMap, setTaskKeypointsMap] = useState({});
     // const [notificationSet, setNotificationSet] = useState(new Set());
 
 
@@ -114,14 +115,22 @@ export function TaskHeader({
                 node.task_id===callbackTaskId && node.attached_to_id===id &&
                 (node.attached_to_type===type || (node.attached_to_type==="node" && type!="section")));
             const prevOutput = newNodes.reduce((prevText,node)=>prevText+node.text+"\n","")
-            const summaryThread = summarize(newNodes[0].prompt, prevOutput, (result)=>{
+           summarize(newNodes[0].prompt, prevOutput, (result)=>{
                 setTaskSummaryMap(prevState=>{
                     let tmp = prevState;
                     tmp[callbackTaskId] = result;
                     return tmp;
                 })
-                setSummary(result);
+                // setSummary(result);
             });
+            extractKeywords(newNodes[0].prompt, prevOutput, (result=>{
+                setTaskKeypointsMap(prevState=>{
+                    let tmp = prevState;
+                    tmp[callbackTaskId] = result;
+                    return tmp;
+                });
+                setSummary(result);
+            }))
             curtainRef.current.to({
                 fill: colorPalette[callbackTaskId%colorPalette.length],
                 width: width,
@@ -298,8 +307,10 @@ export function TaskHeader({
         width={width}
         height={width*0.5}
         visible={notificationSet.size!==0&&isHover}
-        tasks={tasks.filter(task=>notificationSet.has(task.id)&&taskSummaryMap[task.id])}
+        tasks={tasks.filter(task=>notificationSet.has(task.id)
+            &&taskSummaryMap[task.id]&&taskKeypointsMap[task.id])}
         taskSummaryMap={taskSummaryMap}
+        taskKeypointsMap={taskKeypointsMap}
         expandAll={expandAll}/>
         {/* <Rect
         x={0}
@@ -721,6 +732,7 @@ export function TaskHeader({
     y={-4}
     width={width-25}
     height={fontHeight+8}
+    align={"center"}
     verticalAlign={"middle"}
     fontSize={10}
     ellipsis={true}

@@ -154,7 +154,9 @@ export async function explain(prevPrompt, prevOutput, handleResponse) {
 
 export async function summarize(prevPrompt, prevOutput, handleResponse) {
   const GPT35TurboMessage = [
-    { role: "system", content: `You are a writing expert and you are assisting users in prewriting process. You should strictly follow the output specification given by the user.` },
+    { role: "system", content: `You are processing users' questions,
+    and meanwhile summarising answers so that users can have a preview of the answers when they are read.\
+    You should strictly follow the output specification given by the user.` },
     {   
       role: "user",
       content: prevPrompt,
@@ -165,7 +167,9 @@ export async function summarize(prevPrompt, prevOutput, handleResponse) {
     },
     {
       role: "user",
-      content: "Summarise the answer in 10 words."
+      // content: "Summarise the answer in 10 words."
+      content: "Write an overview of the answer in 12 words."
+      // content: "Write three words to summarise the answer, seperated by semi-colon/"
     }
   ];
 
@@ -189,12 +193,63 @@ export async function summarize(prevPrompt, prevOutput, handleResponse) {
     //   'stop': ["\"\"\""],
     })
   };
-  fetchTimeout('https://api.openai.com/v1/chat/completions', 2000, requestOptions)
+  fetchTimeout('https://api.openai.com/v1/chat/completions', 3000, requestOptions)
       .then(response => response.json())
       .then(data => data.choices[0].message.content)
       .then(result => handleResponse(result))
     .catch(err => {
-      handleResponse("")
+      handleResponse(" ")
+      console.log("Request Timeout");
+    });
+}
+
+export async function extractKeywords(prevPrompt, prevOutput, handleResponse) {
+  const GPT35TurboMessage = [
+    { role: "system", content: `You are processing users' questions,
+    and meanwhile summarising answers so that users can have a preview of the answers when they are read.\
+    You should strictly follow the output specification given by the user.` },
+    {   
+      role: "user",
+      content: prevPrompt,
+    },
+    {
+      role: "assistant",
+      content: prevOutput,
+    },
+    {
+      role: "user",
+      // content: "Summarise the answer in 10 words."
+      // content: "Write key themes of the answer in 15 words."
+      content: "Write keypoints of the answer in 5 words."
+    }
+  ];
+
+  // console.log(GPT35TurboMessage)
+
+  const requestOptions = {
+    // mode: 'no-cors',
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer ' + String(process.env.REACT_APP_OPENAI_API_KEY)
+    },
+    body: JSON.stringify({
+      "model": "gpt-3.5-turbo",
+      'messages': GPT35TurboMessage,
+      'temperature': 0.7,
+      // 'max_tokens': maxTokens,
+      // 'top_p': 1,
+    //   'frequency_penalty': 0,
+    //   'presence_penalty': 0.5,
+    //   'stop': ["\"\"\""],
+    })
+  };
+  fetchTimeout('https://api.openai.com/v1/chat/completions', 3000, requestOptions)
+      .then(response => response.json())
+      .then(data => data.choices[0].message.content)
+      .then(result => handleResponse(result))
+    .catch(err => {
+      handleResponse(" ")
       console.log("Request Timeout");
     });
 }

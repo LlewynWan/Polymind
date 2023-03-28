@@ -1,16 +1,23 @@
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import { Group, Label, Tag, Text } from "react-konva";
 
 
 export function NewsTicker({
     x,
     y,
-    text,
+    summary,
+    keypoints,
     width,
     color,
     fontSize
 }) {
     const [isAnimating, setIsAnimating] = useState(false);
+    const tagRef = useRef(null);
+    const textRef = useRef(null);
+
+    // useEffect(()=>{
+    //     console.log(summary, keypoints);
+    // }, [summary,keypoints])
 
     return (
     <Group
@@ -23,46 +30,72 @@ export function NewsTicker({
     <Label
     x={2.5}
     y={0}
-    onMouseEnter={(e)=>{
-        if (!isAnimating) {
+    onMouseEnter={()=>{
+        if (!isAnimating && summary!==" ") {
             setIsAnimating(true);
-            e.target.setAttrs({width: width+text.length*10, ellipsis: false})
-            e.target.to({
-                x: -text.length*9,
-                duration: text.length/15,
-                onFinish: ()=>{
-                    e.target.setAttrs({x: width+35});
-                    e.target.to({
-                        x: 0,
-                        duration: 1,
+            if (tagRef.current) {
+                tagRef.current.to({fill: color});
+            }
+            if (textRef.current) {
+                textRef.current.setAttrs({text: summary, align: "left",
+                width: width+35+summary.length*7, fill: "white", textDecoration: "normal"})
+            }
+            setTimeout(()=>{
+                if (textRef.current) {
+                    textRef.current.to({
+                        x: -summary.length*5,
+                        duration: summary.length/10,
                         onFinish: ()=>{
-                            e.target.setAttrs({width: width+35});
-                            setIsAnimating(false);
+                            if (textRef.current) {
+                                textRef.current.setAttrs({
+                                x: 0, width: width+35, align: "center",
+                                text: keypoints, opacity: 0, fill: color
+                                , textDecoration: "underline"});
+                                if (textRef.current) {
+                                    textRef.current.to({
+                                    opacity: 1,
+                                    duration: 0.32,
+                                    onFinish: ()=>{
+                                        setIsAnimating(false);
+                                    }})
+                                }
+                            }
+                            if (tagRef.current) {
+                                tagRef.current.to({
+                                fill: "#FCFCFC",
+                                opacity: 1,
+                                duration: 0.25
+                            })}
                         }
                     })
                 }
-            })
+                
+            }, 1500)
         }
     }}>
         <Tag
         // fill={colorPalette[task.id%colorPalette.length]}
-        fill={"#EEEEEE"}
-        cornerRadius={0}
-        // stroke={"#010203"}
-        // strokeWidth={0.12}
+        ref={tagRef}
+        fill={"#FCFCFC"}
+        // fill={"#2A2A35"}
+        cornerRadius={2.5}
         lineJoin={'round'}
         perfectDrawEnabled={false}
+        // pointerDirection={"left"}
         />
         <Text
+        ref={textRef}
         x={0}
         y={0}
         width={width+35}
         height={15}
-        text={text}
+        text={keypoints}
         fontSize={fontSize}
         fontStyle={"bold"}
         fontFamily={"sans-serif"}
+        textDecoration={"underline"}
         fill={color}
+        align={"center"}
         verticalAlign={"middle"}
         padding={2.5}
         perfectDrawEnabled={false}
