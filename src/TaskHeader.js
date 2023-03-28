@@ -114,7 +114,7 @@ export function TaskHeader({
             });
             const newNodes = taskNodes.filter(node=>
                 node.task_id===callbackTaskId && node.attached_to_id===id &&
-                (node.attached_to_type===type || (node.attached_to_type==="node" && type!="section")));
+                (node.attached_to_type===type || (node.attached_to_type==="node" && type!=="section")));
             const prevOutput = newNodes.reduce((prevText,node)=>prevText+node.text+"\n","")
            summarize(newNodes[0].prompt, prevOutput, (result)=>{
                 setTaskSummaryMap(prevState=>{
