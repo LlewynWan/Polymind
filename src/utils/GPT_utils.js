@@ -14,7 +14,7 @@ const fetchTimeout = (url, ms, { signal, ...options } = {}) => {
 
 export async function promptGPT(prompt, num_results, max_words_per_result, handleResponse) {
   const GPT35TurboMessage = [ 
-    { role: "system", content: `You are a writing expert and you are assisting users in prewriting process. You should strictly follow the output specification given by the user.` },
+    { role: "system", content: `You are a writing expert and you are assisting users in the prewriting process. You should strictly follow the output specification given by the user.` },
     {   
       role: "user",
       content: prompt + `\n\nThe output should be a list of ${num_results} items separated by a new line. Each item in the list should be no more than ${max_words_per_result} words`,
@@ -63,7 +63,7 @@ export async function promptGPT(prompt, num_results, max_words_per_result, handl
 
 export async function regenerate(prevPrompt, prevOutput, prompt, handleResponse) {
   const GPT35TurboMessage = [
-    { role: "system", content: `You are a writing expert and you are assisting users in prewriting process. You should strictly follow the output specification given by the user.` },
+    { role: "system", content: `You are a writing expert and you are assisting users in the prewriting process. You should strictly follow the output specification given by the user.` },
     {   
       role: "user",
       content: prevPrompt,
@@ -108,7 +108,7 @@ export async function regenerate(prevPrompt, prevOutput, prompt, handleResponse)
 
 export async function explain(prevPrompt, prevOutput, handleResponse) {
   const GPT35TurboMessage = [
-    { role: "system", content: `You are a writing expert and you are assisting users in prewriting process. You should strictly follow the output specification given by the user.` },
+    { role: "system", content: `You are a writing expert and you are assisting users in the prewriting process. You should strictly follow the output specification given by the user.` },
     {   
       role: "user",
       content: prevPrompt,
@@ -154,9 +154,9 @@ export async function explain(prevPrompt, prevOutput, handleResponse) {
 
 export async function summarize(prevPrompt, prevOutput, handleResponse) {
   const GPT35TurboMessage = [
-    { role: "system", content: `You are processing users' questions,
-    and meanwhile summarising answers so that users can have a preview of the answers when they are read.\
-    You should strictly follow the output specification given by the user.` },
+    // { role: "system", content: `You are processing users' questions,
+    // and meanwhile summarising answers so that users can have a preview of answers.\
+    // You should strictly follow the output specification given by the user.` },
     {   
       role: "user",
       content: prevPrompt,
@@ -205,9 +205,9 @@ export async function summarize(prevPrompt, prevOutput, handleResponse) {
 
 export async function extractKeywords(prevPrompt, prevOutput, handleResponse) {
   const GPT35TurboMessage = [
-    { role: "system", content: `You are processing users' questions,
-    and meanwhile summarising answers so that users can have a preview of the answers when they are read.\
-    You should strictly follow the output specification given by the user.` },
+    // { role: "system", content: `You are processing users' questions,
+    // and meanwhile summarising key points so that users can have a preview of the answers.\
+    // You should strictly follow the output specification given by the user.` },
     {   
       role: "user",
       content: prevPrompt,
@@ -220,7 +220,7 @@ export async function extractKeywords(prevPrompt, prevOutput, handleResponse) {
       role: "user",
       // content: "Summarise the answer in 10 words."
       // content: "Write key themes of the answer in 15 words."
-      content: "Write keypoints of the answer in 5 words."
+      content: "Write the key point of the answer in 6 words."
     }
   ];
 

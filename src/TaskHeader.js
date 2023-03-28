@@ -733,7 +733,10 @@ export function TaskHeader({
     x={-12}
     y={fontHeight/2}
     type={"closeAll"}
-    onClick={closeAll}/>: null}
+    onClick={(e)=>{
+        e.target.getStage().container().style.cursor = "default";
+        closeAll();
+    }}/>: null}
     <Text
     x={2.5}
     y={-4}
@@ -741,7 +744,7 @@ export function TaskHeader({
     height={fontHeight+8}
     align={"center"}
     verticalAlign={"middle"}
-    fontSize={10}
+    fontSize={11}
     ellipsis={true}
     fill={"white"}
     fontStyle={"bold"}

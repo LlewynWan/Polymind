@@ -15,6 +15,8 @@ export function NewsTicker({
     const tagRef = useRef(null);
     const textRef = useRef(null);
 
+    const [animationTimeout, setAnimationTimeout] = useState(-1);
+
     // useEffect(()=>{
     //     console.log(summary, keypoints);
     // }, [summary,keypoints])
@@ -32,45 +34,73 @@ export function NewsTicker({
     y={0}
     onMouseEnter={()=>{
         if (!isAnimating && summary!==" ") {
-            setIsAnimating(true);
-            if (tagRef.current) {
-                tagRef.current.to({fill: color});
-            }
-            if (textRef.current) {
-                textRef.current.setAttrs({text: summary, align: "left",
-                width: width+35+summary.length*7, fill: "white", textDecoration: "normal"})
-            }
-            setTimeout(()=>{
+            const animThread = setTimeout(()=>{
+                setIsAnimating(true);
+                if (tagRef.current) {
+                    tagRef.current.to({
+                        fill: color,
+                        duration: 0.75
+                    });
+                }
                 if (textRef.current) {
                     textRef.current.to({
-                        x: -summary.length*5,
-                        duration: summary.length/10,
+                        opacity: 0,
+                        duration: 0.5,
                         onFinish: ()=>{
                             if (textRef.current) {
-                                textRef.current.setAttrs({
-                                x: 0, width: width+35, align: "center",
-                                text: keypoints, opacity: 0, fill: color
-                                , textDecoration: "underline"});
+                                textRef.current.setAttrs({text: summary, align: "left",
+                                width: width+35+summary.length*7,
+                                fill: "white", textDecoration: "normal"})
                                 if (textRef.current) {
                                     textRef.current.to({
-                                    opacity: 1,
-                                    duration: 0.32,
-                                    onFinish: ()=>{
-                                        setIsAnimating(false);
-                                    }})
+                                        opacity: 1,
+                                    });
                                 }
                             }
-                            if (tagRef.current) {
-                                tagRef.current.to({
-                                fill: "#FCFCFC",
-                                opacity: 1,
-                                duration: 0.25
-                            })}
                         }
                     })
+                    // textRef.current.setAttrs({text: summary, align: "left",
+                    // width: width+35+summary.length*7, fill: "white", textDecoration: "normal"})
                 }
-                
-            }, 1500)
+                setTimeout(()=>{
+                    if (textRef.current) {
+                        textRef.current.to({
+                        x: -summary.length*6.5,
+                        duration: summary.length/15,
+                        onFinish: ()=>{
+                        if (textRef.current) {
+                            textRef.current.setAttrs({
+                            x: 0, width: width+35, align: "center",
+                            text: keypoints, opacity: 0, fill: color
+                            , textDecoration: "underline"});
+                            if (textRef.current) {
+                                textRef.current.to({
+                                opacity: 1,
+                                duration: 0.32,
+                                onFinish: ()=>{
+                                    setIsAnimating(false);
+                                }})
+                            }
+                        }
+                        if (tagRef.current) {
+                            tagRef.current.to({
+                            fill: "#FCFCFC",
+                            opacity: 1,
+                            duration: 0.25
+                        })}
+                        }
+                        })
+                    }
+                    
+                }, 2500)
+            }, 750);
+            setAnimationTimeout(animThread);
+        }
+    }}
+    onMouseLeave={()=>{
+        if (!isAnimating) {
+            clearTimeout(animationTimeout);
+            setIsAnimating(false);
         }
     }}>
         <Tag
