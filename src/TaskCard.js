@@ -59,10 +59,12 @@ export function TaskCard({
     useEffect(()=>{
         if (pageNum===0) {
             page1Ref.current.setAttrs({opacity: 0});
-            page1Ref.current.to({opacity: active?1:0.75});
+            page1Ref.current.to({opacity: 1});
+            // page1Ref.current.to({opacity: active?1:0.75});
         } else {
             page2Ref.current.setAttrs({opacity: 0});
-            page2Ref.current.to({opacity: active?1:0.75});
+            page2Ref.current.to({opacity: 1});
+            // page2Ref.current.to({opacity: active?1:0.75});
         }
     }, [pageNum])
 
@@ -86,14 +88,16 @@ export function TaskCard({
         width={width}
         height={height}
         cornerRadius={10}
-        fill={"#F7F7F7"}
+        // opacity={isHover?1:0.8}
+        fill={isHover?"white":"#F7F7F7"}
+        // fill={"white"}
         strokeWidth={0.12}
         stroke={"#010203"}
         shadowColor={"grey"}
-        shadowOffsetY={1.5}
+        shadowOffsetY={isHover?2.5:1.5}
         shadowOffsetX={0}
-        shadowBlur={2.5}
-        shadowOpacity={0.32}
+        shadowBlur={isHover?7.5:2.5}
+        shadowOpacity={isHover?0.7:0.32}
         perfectDrawEnabled={false}
         // strokeWidth={0.25}
         // stroke={"grey"}

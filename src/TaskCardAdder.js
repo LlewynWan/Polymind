@@ -26,6 +26,8 @@ export function TaskCardAdder({
     setTaskName,
     handleTaskNameChange
 }) {
+    const [isHover, setIsHover] = useState(false);
+
     const handleTextHover = (e) => {
         e.target.getStage().container().style.cursor = "pointer"
         // e.target.setAttrs({fill: "black", stroke: "black"});
@@ -54,14 +56,24 @@ export function TaskCardAdder({
     <Group
     x={x}
     y={y}
-    visible={visible}>
+    visible={visible}
+    onMouseEnter={()=>setIsHover(true)}
+    onMouseLeave={()=>setIsHover(false)}>
         <Rect
         x={15}
         y={0}
         height={115}
         width={width-30}
-        fill={"silver"}
+        fill={isHover?"white":"#F7F7F7"}
         cornerRadius={5}
+        // fill={"white"}
+        strokeWidth={0.15}
+        stroke={"#010203"}
+        shadowColor={"grey"}
+        shadowOffsetY={isHover?4:2}
+        shadowOffsetX={0}
+        shadowBlur={isHover?7:3}
+        shadowOpacity={isHover?0.5:0.32}
         perfectDrawEnabled={false}
         />
                 
