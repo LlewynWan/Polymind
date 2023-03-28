@@ -1173,7 +1173,8 @@ export function Canvas({dimensions})
                         return prevState.map(state => {
                             let tmp = state;
                             if (tmp.id === node.id)
-                                tmp.radiusY = scrollHeight;
+                                tmp.radiusY = Math.max(scrollHeight,
+                                    sizeMap["concept"].radiusY);
                             return tmp;
                         });
                     })

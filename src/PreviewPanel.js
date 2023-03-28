@@ -51,7 +51,7 @@ export function PreviewPanel ({
             summary={taskSummaryMap[task.id]!==""?taskSummaryMap[task.id]:" "}
             keypoints={taskKeypointsMap[task.id]!==""?taskKeypointsMap[task.id]:" "}
             color={colorPalette[task.id%colorPalette.length]}
-            fontSize={10}/>
+            fontSize={12}/>
         )})}
         {tasks.length!==0?<Rect
         x={width+40}

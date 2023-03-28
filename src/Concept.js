@@ -66,7 +66,7 @@ export function Concept({
 
     const {canvasX, canvasY, canvasScale, microTasks} = useContext(CanvasContext);
 
-    const tmp = new Konva.Text({text: "test", fontSize: fontSize});
+    const tmp = new Konva.Text({text: text, width: radiusX*2, fontSize: fontSize});
     const fontWidth = tmp.width()
     const fontHeight = tmp.height();
 
