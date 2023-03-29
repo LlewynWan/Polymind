@@ -16,6 +16,7 @@ export function Textbox({
     width,
     height,
     fontSize,
+    fontStyle,
     text,
     // onTextChange,
     // onDragStart,
@@ -56,12 +57,14 @@ export function Textbox({
         x={x}
         y={y}
         onMouseEnter={(e) => {
+            e.cancelBubble = true;
             setIsHover(true)
             if (onHover) {
                 onHover(prompterRef.current);
             }
         }}
         onMouseLeave={(e) => {
+            e.cancelBubble = true;
             setIsHover(false)
             if (onUnhover) {
                 onUnhover(prompterRef.current);
@@ -89,6 +92,15 @@ export function Textbox({
             shadowOpacity={0.32}
             shadowColor={"gray"}
             perfectDrawEnabled={false}
+            listening={isHover}
+        />
+        <Rect
+            x={width/2-30}
+            y={0}
+            width={80}
+            height={20}
+            fill={"transparent"}
+            perfectDrawEnabled={false}
         />
         <Text
         x={20}
@@ -96,9 +108,10 @@ export function Textbox({
         width={width}
         height={height}
         text={text}
-        fill="black"
+        fill="#2A2A35"
         fontFamily="sans-serif"
         fontSize={fontSize}
+        fontStyle={fontStyle}
         perfectDrawEnabled={false}
         // onClick={()=>setIsEditing(true)}
         />

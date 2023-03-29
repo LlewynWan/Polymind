@@ -2,7 +2,7 @@ import React, { createRef, useContext, useEffect, useState } from "react";
 import { HotKeys } from "react-hotkeys";
 
 import { MyLine } from "./MyLine";
-import { Stage, Layer, Group, Line, Rect, Text } from "react-konva";
+import { Stage, Layer, Group, Line, Rect, Label, Tag, Text } from "react-konva";
 
 import { ToolBar } from "./ToolBar";
 import { Keyword } from "./Keyword"
@@ -58,7 +58,7 @@ export function Canvas({dimensions})
     const [isAddingKeyword, setIsAddingKeyword] = React.useState(false);
     const [arrowFrom, setArrowFrom] = React.useState({id: -1, anchor: -1});
     const [arrowTo, setArrowTo] = React.useState({id: -1, anchor: -1});
-    const [isMultiSelecting, setIsMultiSelecting] = React.useState(false);
+    // const [isMultiSelecting, setIsMultiSelecting] = React.useState(false);
 
     const [isTaskHeaderVisible, setIsTaskHeaderVisible] = React.useState(true);
     const [isHoverToolBar, setIsHoverToolBar] = React.useState(false);
@@ -66,7 +66,7 @@ export function Canvas({dimensions})
 
     const [promptPanelPosition, setPromptPanelPosition] = React.useState({});
     const [promptPanelVisibility, setPromptPanelVisibility] = React.useState(false);
-
+    
     const [inFocus, setInFocus] = React.useState({
         "node": -1,
         "sticky_note": -1,
@@ -150,28 +150,7 @@ export function Canvas({dimensions})
         }, 25);
         // setPointerTracker(_pointerTracker);
         // clearInterval(fittsLawTracker)
-        const fittsLawTracker = setInterval(()=>{
-            // const position = pointer2CanvasPosition(stageRef.current.getPointerPosition());
-            // var ID_inv = nodes.map(node=>1/node_utils.calcFittsLawID(node,position));
-            // const sumIDInv = ID_inv.reduce((sum,id_inv)=>sum+id_inv,0);
-            // ID_inv = ID_inv.map(id_inv=>id_inv/sumIDInv);
-            
-            // const split = Math.random();
-            // var tmpSum = 0.;
-            // var sample_id = -1;
-            // for (var i = 0; i < ID_inv.length; i++) {
-            //     tmpSum += ID_inv[i];
-            //     if (tmpSum > split) {
-            //         sample_id = i;
-            //         break;
-            //     }
-            // }
-
-            // const unshuffled = nodes.filter(node=>node.display).map((node,index)=>index);
-            // const shuffled = unshuffled.map(value => ({ value, sort: Math.random() }))
-            // .sort((a, b) => a.sort - b.sort)
-            // .map(({ value }) => value)
-
+        function fittsLawIDCalculator() {
             setInFocus({
                 "node": sampleFittsLawIDMin(nodes.filter(node=>node.display)),
                 "keyword": sampleFittsLawIDMin(nodes.filter(node=>node.display && node.type==="keyword")),
@@ -179,10 +158,43 @@ export function Canvas({dimensions})
                 "concept": sampleFittsLawIDMin(nodes.filter(node=>node.display && node.type==="concept")),
                 "section": sampleFittsLawIDMin(sections, "section")
             });
-            // return trackFittsLaw;
-            // setInFocus({node: ID_inv.indexOf(Math.min(...ID_inv))});
-            // console.log(ID.indexOf(Math.min(...ID)));
-        }, 5000);
+        }
+        const fittsLawTracker = setInterval(fittsLawIDCalculator, 5000);
+        const trackerStarter = setTimeout(fittsLawIDCalculator, 500);
+        // const fittsLawTracker = setInterval(function calcFittsLawID() {
+        //     // const position = pointer2CanvasPosition(stageRef.current.getPointerPosition());
+        //     // var ID_inv = nodes.map(node=>1/node_utils.calcFittsLawID(node,position));
+        //     // const sumIDInv = ID_inv.reduce((sum,id_inv)=>sum+id_inv,0);
+        //     // ID_inv = ID_inv.map(id_inv=>id_inv/sumIDInv);
+            
+        //     // const split = Math.random();
+        //     // var tmpSum = 0.;
+        //     // var sample_id = -1;
+        //     // for (var i = 0; i < ID_inv.length; i++) {
+        //     //     tmpSum += ID_inv[i];
+        //     //     if (tmpSum > split) {
+        //     //         sample_id = i;
+        //     //         break;
+        //     //     }
+        //     // }
+
+        //     // const unshuffled = nodes.filter(node=>node.display).map((node,index)=>index);
+        //     // const shuffled = unshuffled.map(value => ({ value, sort: Math.random() }))
+        //     // .sort((a, b) => a.sort - b.sort)
+        //     // .map(({ value }) => value)
+
+        //     setInFocus({
+        //         "node": sampleFittsLawIDMin(nodes.filter(node=>node.display)),
+        //         "keyword": sampleFittsLawIDMin(nodes.filter(node=>node.display && node.type==="keyword")),
+        //         "sticky_note": sampleFittsLawIDMin(nodes.filter(node=>node.display && node.type==="sticky_note")),
+        //         "concept": sampleFittsLawIDMin(nodes.filter(node=>node.display && node.type==="concept")),
+        //         "section": sampleFittsLawIDMin(sections, "section")
+        //     });
+
+        //     // return trackFittsLaw;
+        //     // setInFocus({node: ID_inv.indexOf(Math.min(...ID_inv))});
+        //     // console.log(ID.indexOf(Math.min(...ID)));
+        // }, 3500);
 
         setGlobalTextbox(prevState=>{
             let tmp = prevState;
@@ -193,6 +205,7 @@ export function Canvas({dimensions})
         return () => {
             clearInterval(pointerTracker);
             clearInterval(fittsLawTracker);
+            clearTimeout(trackerStarter);
         };
     }, [nodes, sections, arrows]);
 
@@ -630,25 +643,25 @@ export function Canvas({dimensions})
         }
     }
 
-    const promptPanelPopup = () => {
-        setPromptPanelVisibility(true);
-        setPromptPanelPosition(pointerPosition);
-    }
+    // const promptPanelPopup = () => {
+    //     setPromptPanelVisibility(true);
+    //     setPromptPanelPosition(pointerPosition);
+    // }
 
-    const setPrompterPosition = (e, id) => {
-        setPromptCards(prevState => {
-            return prevState.map((state) => {
-                if (state.id === id) {
-                    let tmp = state;
-                    tmp.x = e.target.x();
-                    tmp.y = e.target.y();
-                    return tmp;
-                } else {
-                    return state;
-                }
-            })
-        });
-    }
+    // const setPrompterPosition = (e, id) => {
+    //     setPromptCards(prevState => {
+    //         return prevState.map((state) => {
+    //             if (state.id === id) {
+    //                 let tmp = state;
+    //                 tmp.x = e.target.x();
+    //                 tmp.y = e.target.y();
+    //                 return tmp;
+    //             } else {
+    //                 return state;
+    //             }
+    //         })
+    //     });
+    // }
 
     const getSectionById = (id) => {
         return sections.filter(section=>section.id===id)[0];
@@ -1678,6 +1691,7 @@ export function Canvas({dimensions})
             width={globalTextbox.width}
             height={globalTextbox.height}
             fontSize={14}
+            fontStyle={"bold"}
             text={globalTextbox.text}
             onHover={onMainTextboxHover}
             onUnhover={onMainTextboxUnhover}
@@ -1686,7 +1700,7 @@ export function Canvas({dimensions})
             />
             <Text
             x={globalTextbox.x}
-            y={globalTextbox.y+5}
+            y={dimensions.height-12.5}
             width={globalTextbox.width+20}
             text={"see outline"}
             fill={"gray"}
