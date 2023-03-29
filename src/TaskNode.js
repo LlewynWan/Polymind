@@ -40,7 +40,7 @@ export function TaskNode({
     const [isHover, setIsHover] = useState(false);
     const [isHoverIcons, setIsHoverIcons] = useState(false);
     const [needsExplanation, setNeedsExplanation] = useState(false);
-    const [explanation, setExplanation] = useState("");
+    const [explanation, setExplanation] = useState("......");
 
     const nodeRef = useRef(null);
     const suggestionRef = useRef(null);
@@ -141,7 +141,7 @@ export function TaskNode({
         >
             {needsExplanation ? 
             <Label
-            x={20}
+            x={30}
             y={-5}>
                 <Tag
                 fill={"white"}
@@ -152,8 +152,8 @@ export function TaskNode({
                 perfectDrawEnabled={false}/>
                 <Text
                 text={explanation}
-                fontSize={13}
-                fontStyle={"bold"}
+                fontSize={13.5}
+                // fontStyle={"bold"}
                 padding={5}
                 perfectDrawEnabled={false}/>
             </Label> :
@@ -205,11 +205,15 @@ export function TaskNode({
         type={"question"}
         enabled={needsExplanation}
         onClick={()=>{
-            explain(prompt, text, (result)=>{
-                // console.log(result.replace(/(.{30})/g,"$1\n"))
-                // setExplanation(result.replace(/(.{30})/g,"$1\n"));
-                setExplanation(handleLongText(result));
-            });
+            if (!needsExplanation) {
+                explain(prompt, text, (result)=>{
+                    // console.log(result.replace(/(.{30})/g,"$1\n"))
+                    // setExplanation(result.replace(/(.{30})/g,"$1\n"));
+                    setExplanation(handleLongText(result));
+                });
+            } else {
+                setExplanation("......")
+            }
             setNeedsExplanation(!needsExplanation);
         }}
         />
@@ -327,8 +331,8 @@ export function TaskNode({
                 perfectDrawEnabled={false}/>
                 <Text
                 text={explanation}
-                fontSize={13}
-                fontStyle={"bold"}
+                fontSize={13.5}
+                // fontStyle={"bold"}
                 padding={5}
                 perfectDrawEnabled={false}/>
             </Label> :
@@ -380,11 +384,15 @@ export function TaskNode({
         type={"question"}
         enabled={needsExplanation}
         onClick={()=>{
-            explain(prompt, text, (result)=>{
+            if (!needsExplanation) {
+                explain(prompt, text, (result)=>{
                 // console.log(result.replace(/(.{30})/g,"$1\n"))
                 // setExplanation(result.replace(/(.{30})/g,"$1\n"));
                 setExplanation(handleLongText(result));
-            });
+                });
+            } else {
+                setExplanation("......")
+            }
             setNeedsExplanation(!needsExplanation);
         }}
         />
