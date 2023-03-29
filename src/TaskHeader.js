@@ -148,6 +148,7 @@ export function TaskHeader({
                         setCallbackTimeout(setTimeout(()=>{
                             setSummary("");
                             setIsCurtainDrawn(false);
+                            setIsCurtainFixed(false);
                             if (curtainRef.current) {
                                 curtainRef.current.getStage().container().style.cursor = "default"
                                 curtainRef.current.to({
