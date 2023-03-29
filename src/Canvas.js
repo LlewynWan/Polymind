@@ -873,8 +873,7 @@ export function Canvas({dimensions})
     onMouseMove={handleStageMouseMove}
     onMouseUp={handleStageMouseUp}
     // onDblClick={toggleFollowerMode}
-    ref={stageRef}
-    >
+    ref={stageRef}>
 
         <Layer
         x={canvasX}
@@ -1589,15 +1588,17 @@ export function Canvas({dimensions})
             toggleTaskHeaderSwitch={()=>{
                 if (isTaskHeaderVisible) {
                     setObjectsCurtainClicked(new Set());
-                    setTaskNodes([]);
+                    // setTaskNodes([]);
                     setNodes(prevState=>prevState.map(state=>{
                         let tmp = state;
+                        tmp.callbackTaskId = -1;
                         tmp.displaySet = new Set();
                         tmp.notificationSet = new Set();
                         return tmp;
                     }));
                     setSections(prevState=>prevState.map(state=>{
                         let tmp = state;
+                        tmp.callbackTaskId = -1;
                         tmp.displaySet = new Set();
                         tmp.notificationSet = new Set();
                         return tmp;

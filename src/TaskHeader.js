@@ -116,47 +116,51 @@ export function TaskHeader({
                 node.task_id===callbackTaskId && node.attached_to_id===id &&
                 (node.attached_to_type===type || (node.attached_to_type==="node" && type!=="section")));
             const prevOutput = newNodes.reduce((prevText,node)=>prevText+node.text+"\n","")
-           summarize(newNodes[0].prompt, prevOutput, (result)=>{
-                setTaskSummaryMap(prevState=>{
-                    let tmp = prevState;
-                    tmp[callbackTaskId] = result;
-                    return tmp;
-                })
-                // setSummary(result);
-            });
-            extractKeywords(newNodes[0].prompt, prevOutput, (result=>{
-                setTaskKeypointsMap(prevState=>{
-                    let tmp = prevState;
-                    tmp[callbackTaskId] = result;
-                    return tmp;
+            if (newNodes.length > 0) {
+                summarize(newNodes[0].prompt, prevOutput, (result)=>{
+                    setTaskSummaryMap(prevState=>{
+                        let tmp = prevState;
+                        tmp[callbackTaskId] = result;
+                        return tmp;
+                    })
+                    // setSummary(result);
                 });
-                setSummary(result);
-            }))
-            curtainRef.current.to({
-                fill: colorPalette[callbackTaskId%colorPalette.length],
-                width: width,
-                visible: true,
-                duration: 0.25,
-                easing: Konva.Easings.EaseOut,
-                onFinish: ()=>{
-                    setIsAnimating(false);
-                    setIsCurtainDrawn(true);
-                    setCurtainId(callbackTaskId);
-                    setCallbackTimeout(setTimeout(()=>{
-                        setSummary("");
-                        setIsCurtainDrawn(false);
-                        if (curtainRef.current) {
-                            curtainRef.current.getStage().container().style.cursor = "default"
-                            curtainRef.current.to({
-                                width: 0,
-                                visible: false,
-                                duration: 0.15,
-                                onFinish: ()=>resetCallbackTaskId()
-                            });
-                        }
-                    }, 4000));
-                }
-            })
+                extractKeywords(newNodes[0].prompt, prevOutput, (result=>{
+                    setTaskKeypointsMap(prevState=>{
+                        let tmp = prevState;
+                        tmp[callbackTaskId] = result;
+                        return tmp;
+                    });
+                    setSummary(result);
+                }))
+           }
+            if (curtainRef.current) {
+                curtainRef.current.to({
+                    fill: colorPalette[callbackTaskId%colorPalette.length],
+                    width: width,
+                    visible: true,
+                    duration: 0.25,
+                    easing: Konva.Easings.EaseOut,
+                    onFinish: ()=>{
+                        setIsAnimating(false);
+                        setIsCurtainDrawn(true);
+                        setCurtainId(callbackTaskId);
+                        setCallbackTimeout(setTimeout(()=>{
+                            setSummary("");
+                            setIsCurtainDrawn(false);
+                            if (curtainRef.current) {
+                                curtainRef.current.getStage().container().style.cursor = "default"
+                                curtainRef.current.to({
+                                    width: 0,
+                                    visible: false,
+                                    duration: 0.15,
+                                    onFinish: ()=>resetCallbackTaskId()
+                                });
+                            }
+                        }, 4000));
+                    }
+                });
+            }
         }
     }, [callbackTaskId]);
 
