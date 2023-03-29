@@ -252,8 +252,8 @@ export function TaskNode({
                 perfectDrawEnabled={false}/>
                 <Text
                 text={explanation}
-                fontSize={13}
-                fontStyle={"bold"}
+                fontSize={13.5}
+                // fontStyle={"bold"}
                 padding={5}
                 perfectDrawEnabled={false}/>
             </Label>

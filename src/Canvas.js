@@ -2,7 +2,7 @@ import React, { createRef, useContext, useEffect, useState } from "react";
 import { HotKeys } from "react-hotkeys";
 
 import { MyLine } from "./MyLine";
-import { Stage, Layer, Group, Line, Rect, Label, Tag, Text } from "react-konva";
+import { Stage, Layer, Group, Line, Rect, Text } from "react-konva";
 
 import { ToolBar } from "./ToolBar";
 import { Keyword } from "./Keyword"
