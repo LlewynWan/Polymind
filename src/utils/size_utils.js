@@ -18,7 +18,9 @@ const sizeMap = {
 const getTextWidth = (text, fontSize, fontStyle, padding) => {
     const tmp = new Konva.Text({text: text, fontSize: fontSize,
         fontStyle: fontStyle, padding: padding});
-    return tmp.width();
+    const width = tmp.width();
+    tmp.destroy();
+    return width;
 }
 
 export {sizeMap, getTextWidth}

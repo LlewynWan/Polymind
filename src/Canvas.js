@@ -1336,7 +1336,8 @@ export function Canvas({dimensions})
                 const section = node.attached_to_type==="section" ? 
                 getSectionById(node.attached_to_id) : null;
                 const anchorPosition = anchor_utils.calcAnchorPosition(
-                    isLeft?from_anchor:to_anchor, node, canvasScale);
+                    (node.attached_to_type==="section"||node.attached_from_id===-1||
+                    isLeft)?from_anchor:to_anchor, node, canvasScale);
                 const anchorOffsetPosition = anchor_utils.calcAnchorOffsetPositions(
                     node, canvasScale)[from_anchor];
                 // console.log(anchorOffsetPosition)
