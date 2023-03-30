@@ -25,6 +25,8 @@ export function Keyword({
   isNull,
   onClick,
   isSelected,
+  isEditing,
+  setIsEditing,
   isConnecting,
   onConnectingHover,
   onConnectingUnhover,
@@ -50,7 +52,7 @@ export function Keyword({
   draggable=true,
   callbackTaskId=-1
 }) {
-  const [isEditing, setIsEditing] = useState(false);
+  // const [isEditing, setIsEditing] = useState(false);
   const [isHover, setIsHover] = useState(false);
   const [isHoverBoundingBox, setIsHoverBoundingBox] = useState(false);
   const [isDragging, setIsDragging] = useState(false);

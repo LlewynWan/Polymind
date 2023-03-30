@@ -152,15 +152,15 @@ export function Canvas({dimensions})
         // clearInterval(fittsLawTracker)
         function fittsLawIDCalculator() {
             setInFocus({
-                "node": sampleFittsLawIDMin(nodes.filter(node=>node.display)),
-                "keyword": sampleFittsLawIDMin(nodes.filter(node=>node.display && node.type==="keyword")),
-                "sticky_note": sampleFittsLawIDMin(nodes.filter(node=>node.display && node.type==="sticky_note")),
-                "concept": sampleFittsLawIDMin(nodes.filter(node=>node.display && node.type==="concept")),
-                "section": sampleFittsLawIDMin(sections, "section")
+                "node": sampleFittsLawIDMin(nodes.filter(node=>node.display&&!node.isEditing)),
+                "keyword": sampleFittsLawIDMin(nodes.filter(node=>node.display&&!node.isEditing&&node.type==="keyword")),
+                "sticky_note": sampleFittsLawIDMin(nodes.filter(node=>node.display&&!node.isEditing&&node.type==="sticky_note")),
+                "concept": sampleFittsLawIDMin(nodes.filter(node=>node.display&&!node.isEditing&&node.type==="concept")),
+                "section": sampleFittsLawIDMin(sections.filter(section=>!section.isEditing), "section")
             });
         }
         const fittsLawTracker = setInterval(fittsLawIDCalculator, 5000);
-        const trackerStarter = setTimeout(fittsLawIDCalculator, 500);
+        const trackerStarter = setTimeout(fittsLawIDCalculator, 200);
         // const fittsLawTracker = setInterval(function calcFittsLawID() {
         //     // const position = pointer2CanvasPosition(stageRef.current.getPointerPosition());
         //     // var ID_inv = nodes.map(node=>1/node_utils.calcFittsLawID(node,position));
@@ -308,12 +308,13 @@ export function Canvas({dimensions})
         //     console.log(object_type)
         // console.log(taskNodes.filter(node=>node.task_id===task.id
         //     &&node.attached_to_type===object_type&&node.attached_to_id===object.id).length)
-        if (!objectsCurtainClicked.has(object.id.toString()+task.id.toString()+object_type)
+        if (object.disabledSet.has(task.id) ||
+        (!objectsCurtainClicked.has(object.id.toString()+task.id.toString()+object_type)
         // && !object.notificationSet.has(task.id)
         && !promptGPTThreads.has(object.id.toString()+task.id.toString()+object_type)
         && ((!task.display && !object.displaySet.has(task.id)) ||
             !taskNodes.filter(node=>node.task_id===task.id
-            &&node.attached_to_type===object_type&&node.attached_to_id===object.id).length))
+            &&node.attached_to_type===object_type&&node.attached_to_id===object.id).length)))
         {
             promptGPTThreads.add(object.id.toString()+task.id.toString()+object_type)
             if (object_type!=="section") {
@@ -554,6 +555,7 @@ export function Canvas({dimensions})
                 width: 0, height: 0, fontSize: 20,
                 scaleX: 1/canvasScale, scaleY: 1/canvasScale,
                 selected: true, text: "", display: true,
+                isEditing: false,
                 disabledSet: new Set(
                     microTasks.filter(task=>!task.active).map(task=>task.id)
                 ),
@@ -680,6 +682,20 @@ export function Canvas({dimensions})
                     tmp.selected = true;
                 } else {
                     tmp.selected = false;
+                }
+                return tmp;
+            });
+        });
+    }
+    const onNodeEdit = (id,value) => {
+        setNodes(
+        prevState => {
+            return prevState.map(state => {
+                let tmp = state;
+                if (tmp.id === id) {
+                    tmp.isEditing = value;
+                } else {
+                    tmp.isEditing = false;
                 }
                 return tmp;
             });
@@ -898,6 +914,93 @@ export function Canvas({dimensions})
         >
             <Group>
             <CanvasContext.Provider value={{canvasX, canvasY, canvasScale, microTasks, taskNodes}}>
+            {arrows.map((arrow,index)=>{
+                const arrow_size = 10 / canvasScale;
+                const arrow_dy = arrow.to_anchor===0 ? 1 : arrow.to_anchor===2 ? -1 : 0;
+                const arrow_dx = arrow.to_anchor===1 ? 1 : arrow.to_anchor===3 ? -1 : 0;
+                const finalAnchor = anchor_utils.calcAnchorPosition(
+                    arrow.to_anchor, getNodeById(arrow.to_id), canvasScale);
+                return (
+                <Group
+                key={index}>
+                <MyLine
+                points={[
+                    ...anchor_utils.calcAnchorPosition(
+                        arrow.from_anchor, getNodeById(arrow.from_id), canvasScale),
+                    ...anchor_utils.findPathBetweenNodes(arrow.from_anchor, arrow.to_anchor,
+                        getNodeById(arrow.from_id),getNodeById(arrow.to_id), canvasScale),
+                    // ...calcAnchorOffset(arrow.from_anchor, nodes[arrow.from_id]),
+                    // ...calcAnchorOffset(arrow.to_anchor, nodes[arrow.to_id]),
+                    ...finalAnchor
+                ]}
+                tension={0}
+                stroke={arrow.selected?"#A9A9A9":"silver"}
+                strokeWidth={arrow.selected?4/canvasScale:2/canvasScale}
+                isSelected={arrow.selected}
+                onClick={()=>setArrows(prevState=>prevState.map(state=>{
+                    let tmp = state;
+                    if (tmp.id === arrow.id) {
+                        tmp.selected = !tmp.selected;
+                    }
+                    return tmp;
+                }))}
+                listening={!isAddingKeyword&&!isSectioning}
+                />
+                {/* <Line
+                points={[...finalAnchor,
+                finalAnchor[0]+arrow_dx*5, finalAnchor[1]+arrow_dy*5]}
+                tension={0}
+                stroke={"gray"}
+                strokeWidth={2/canvasScale}
+                /> */}
+                {arrow.directed ? <Group>
+                <Line
+                points={[finalAnchor[0]-arrow_dx*arrow_size+arrow_dy*arrow_size,
+                    finalAnchor[1]-arrow_dy*arrow_size+arrow_dx*arrow_size,
+                    ...finalAnchor]}
+                    // finalAnchor[0]+arrow_dx*10, finalAnchor[1]+arrow_dy*10]}
+                tension={0}
+                stroke={arrow.selected?"#A9A9A9":"silver"}
+                strokeWidth={arrow.selected?3/canvasScale:2/canvasScale}
+                perfectDrawEnabled={false}/>
+                <Line
+                points={[finalAnchor[0]-arrow_dx*arrow_size-arrow_dy*arrow_size,
+                    finalAnchor[1]-arrow_dy*arrow_size-arrow_dx*arrow_size,
+                    ...finalAnchor]}
+                    // finalAnchor[0]+arrow_dx*10, finalAnchor[1]+arrow_dy*10]}
+                tension={0}
+                stroke={arrow.selected?"#A9A9A9":"silver"}
+                strokeWidth={arrow.selected?3/canvasScale:2/canvasScale}
+                perfectDrawEnabled={false}/>
+                </Group>: null}
+                </Group>
+                )
+            })}
+            {
+                arrowFrom.id!==-1 ? (
+                arrowTo.id===-1 ?
+                <MyLine
+                points={[
+                    ...anchor_utils.calcAnchorPosition(arrowFrom.anchor,getNodeById(arrowFrom.id), canvasScale),
+                    ...findPathBetweenNodeAndPointer(arrowFrom.anchor,getNodeById(arrowFrom.id)),
+                    ]}
+                stroke={"silver"}
+                listening={false}
+                strokeWidth={2/canvasScale}
+                /> :
+                <MyLine
+                points={[
+                    ...anchor_utils.calcAnchorPosition(arrowFrom.anchor,getNodeById(arrowFrom.id),canvasScale),
+                    ...anchor_utils.findPathBetweenNodes(arrowFrom.anchor,arrowTo.anchor,
+                        getNodeById(arrowFrom.id), getNodeById(arrowTo.id), canvasScale),
+                    ...anchor_utils.calcAnchorPosition(arrowTo.anchor,getNodeById(arrowTo.id),canvasScale)
+                    ]}
+                stroke={"silver"}
+                listening={false}
+                strokeWidth={2/canvasScale}
+                />)
+                : null
+            }
             {sections.map(section=>{
                 return (<Section
                 key={section.id}
@@ -905,6 +1008,18 @@ export function Canvas({dimensions})
                 x={section.x}
                 y={section.y}
                 isSelected={section.selected}
+                isEditing={section.isEditing}
+                setIsEditing={(value)=>{
+                    setSections(prevState=>prevState.map(state=>{
+                        let tmp = state;
+                        if (state.id === section.id) {
+                            tmp.isEditing = true;
+                        } else {
+                            tmp.isEditing = false;
+                        }
+                        return tmp;
+                    }))
+                }}
                 scaleX={section.scaleX}
                 scaleY={section.scaleY}
                 width={section.width}
@@ -1048,6 +1163,8 @@ export function Canvas({dimensions})
                 onDragEnd={(e)=>{handleDragNodeEnd(e,node.id)}}
                 onTextChange={(value)=>onNodeTextChange(value,node.id)}
                 isSelected={node.selected}
+                isEditing={node.isEditing}
+                setIsEditing={(value)=>onNodeEdit(node.id, value)}
                 headerListening={!isDrawingArrow &&
                     !isDrawingDoubleArrow&&!isSectioning&&!isAddingKeyword}
                 onOverflow={(scrollHeight)=>{
@@ -1096,6 +1213,8 @@ export function Canvas({dimensions})
                 padding={10}
                 isNull={node.text===""}
                 isSelected={node.selected}
+                isEditing={node.isEditing}
+                setIsEditing={(value)=>onNodeEdit(node.id, value)}
                 isConnecting={isDrawingArrow || isDrawingDoubleArrow}
                 onClick={(e)=>onNodeSelect(e,node.id)}
                 onDragMove={(e)=>{handleDragNodeMove(e,node.id)}}
@@ -1165,6 +1284,8 @@ export function Canvas({dimensions})
                 color={"#FFB5B7"}
                 isNull={node.text===""}
                 isSelected={node.selected}
+                isEditing={node.isEditing}
+                setIsEditing={(value)=>onNodeEdit(node.id, value)}
                 onClick={(e)=>onNodeSelect(e,node.id)}
                 onScale={(newScale, newX, newY)=>onNodeScale(node.id, newScale, newX, newY)}
                 onResize={(offsetW,offsetH)=>{
@@ -1231,93 +1352,7 @@ export function Canvas({dimensions})
                 listening={!isAddingKeyword&&!isSectioning}
                 /> : null : null
             })}
-            {arrows.map((arrow,index)=>{
-                const arrow_size = 10 / canvasScale;
-                const arrow_dy = arrow.to_anchor===0 ? 1 : arrow.to_anchor===2 ? -1 : 0;
-                const arrow_dx = arrow.to_anchor===1 ? 1 : arrow.to_anchor===3 ? -1 : 0;
-                const finalAnchor = anchor_utils.calcAnchorPosition(
-                    arrow.to_anchor, getNodeById(arrow.to_id), canvasScale);
-                return (
-                <Group
-                key={index}>
-                <MyLine
-                points={[
-                    ...anchor_utils.calcAnchorPosition(
-                        arrow.from_anchor, getNodeById(arrow.from_id), canvasScale),
-                    ...anchor_utils.findPathBetweenNodes(arrow.from_anchor, arrow.to_anchor,
-                        getNodeById(arrow.from_id),getNodeById(arrow.to_id), canvasScale),
-                    // ...calcAnchorOffset(arrow.from_anchor, nodes[arrow.from_id]),
-                    // ...calcAnchorOffset(arrow.to_anchor, nodes[arrow.to_id]),
-                    ...finalAnchor
-                ]}
-                tension={0}
-                stroke={arrow.selected?"#A9A9A9":"silver"}
-                strokeWidth={arrow.selected?4/canvasScale:2/canvasScale}
-                isSelected={arrow.selected}
-                onClick={()=>setArrows(prevState=>prevState.map(state=>{
-                    let tmp = state;
-                    if (tmp.id === arrow.id) {
-                        tmp.selected = !tmp.selected;
-                    }
-                    return tmp;
-                }))}
-                listening={!isAddingKeyword&&!isSectioning}
-                />
-                {/* <Line
-                points={[...finalAnchor,
-                finalAnchor[0]+arrow_dx*5, finalAnchor[1]+arrow_dy*5]}
-                tension={0}
-                stroke={"gray"}
-                strokeWidth={2/canvasScale}
-                /> */}
-                {arrow.directed ? <Group>
-                <Line
-                points={[finalAnchor[0]-arrow_dx*arrow_size+arrow_dy*arrow_size,
-                    finalAnchor[1]-arrow_dy*arrow_size+arrow_dx*arrow_size,
-                    ...finalAnchor]}
-                    // finalAnchor[0]+arrow_dx*10, finalAnchor[1]+arrow_dy*10]}
-                tension={0}
-                stroke={arrow.selected?"#A9A9A9":"silver"}
-                strokeWidth={arrow.selected?3/canvasScale:2/canvasScale}
-                perfectDrawEnabled={false}/>
-                <Line
-                points={[finalAnchor[0]-arrow_dx*arrow_size-arrow_dy*arrow_size,
-                    finalAnchor[1]-arrow_dy*arrow_size-arrow_dx*arrow_size,
-                    ...finalAnchor]}
-                    // finalAnchor[0]+arrow_dx*10, finalAnchor[1]+arrow_dy*10]}
-                tension={0}
-                stroke={arrow.selected?"#A9A9A9":"silver"}
-                strokeWidth={arrow.selected?3/canvasScale:2/canvasScale}
-                perfectDrawEnabled={false}/>
-                </Group>: null}
-                </Group>
-                )
-            })}
-            {
-                arrowFrom.id!==-1 ? (
-                arrowTo.id===-1 ?
-                <MyLine
-                points={[
-                    ...anchor_utils.calcAnchorPosition(arrowFrom.anchor,getNodeById(arrowFrom.id), canvasScale),
-                    ...findPathBetweenNodeAndPointer(arrowFrom.anchor,getNodeById(arrowFrom.id)),
-                    ]}
-                stroke={"silver"}
-                listening={false}
-                strokeWidth={2/canvasScale}
-                /> :
-                <MyLine
-                points={[
-                    ...anchor_utils.calcAnchorPosition(arrowFrom.anchor,getNodeById(arrowFrom.id),canvasScale),
-                    ...anchor_utils.findPathBetweenNodes(arrowFrom.anchor,arrowTo.anchor,
-                        getNodeById(arrowFrom.id), getNodeById(arrowTo.id), canvasScale),
-                    ...anchor_utils.calcAnchorPosition(arrowTo.anchor,getNodeById(arrowTo.id),canvasScale)
-                    ]}
-                stroke={"silver"}
-                listening={false}
-                strokeWidth={2/canvasScale}
-                />)
-                : null
-            }
+           
             {taskNodes.map(node=>{
                 const from_anchor = 1;
                 const to_anchor = 3;
@@ -1871,7 +1906,8 @@ export function Canvas({dimensions})
                         x: (x-canvasX)/canvasScale, y: (y-canvasY)/canvasScale,
                         radiusX: radiusX, radiusY: radiusY,
                         scaleX: 1/canvasScale, scaleY: 1/canvasScale,
-                        selected: false, text: "", fontSize: 20, display: true,
+                        selected: false, isEditing: false,
+                        text: "", fontSize: 20, display: true,
                         disabledSet: new Set(
                             microTasks.filter(task=>!task.active).map(task=>task.id)
                         ),
@@ -1888,7 +1924,8 @@ export function Canvas({dimensions})
                         x: (x-canvasX)/canvasScale, y: (y-canvasY)/canvasScale,
                         width: width, height: height, fontSize: 16,
                         scaleX: 1/canvasScale, scaleY: 1/canvasScale,
-                        selected: false, text: "", display: true,
+                        selected: false, isEditing: false,
+                        text: "", display: true,
                         disabledSet: new Set(
                             microTasks.filter(task=>!task.active).map(task=>task.id)
                         ),

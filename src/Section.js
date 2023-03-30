@@ -35,13 +35,15 @@ export function Section({
     onScale,
     onTextChange,
     isSelected,
+    isEditing,
+    setIsEditing,
     handleDragMove,
     handleDragEnd,
     callbackTaskId,
     resetCallbackTaskId
 }) {
     const [isHover, setIsHover] = useState(false);
-    const [isEditing, setIsEditing] = useState(false);
+    // const [isEditing, setIsEditing] = useState(false);
     const { canvasScale, microTasks } = useContext(CanvasContext);
 
     const [textInputHeight, setTextInputHeight] = useState(20);

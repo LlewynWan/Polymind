@@ -26,6 +26,8 @@ export function Concept({
     isNull,
     onClick,
     isSelected,
+    isEditing,
+    setIsEditing,
     isConnecting,
     onConnectingHover,
     onConnectingUnhover,
@@ -51,7 +53,7 @@ export function Concept({
     draggable=true,
     callbackTaskId=-1
 }) {
-    const [isEditing, setIsEditing] = useState(false);
+    // const [isEditing, setIsEditing] = useState(false);
     const [isHover, setIsHover] = useState(false);
     const [isDragging, setIsDragging] = useState(false);
     const [isResizing, setIsResizing] = useState(false);

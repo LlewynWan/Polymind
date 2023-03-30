@@ -29,6 +29,8 @@ export function StickyNote({
   onConnectingUnhover,
   onConnected,
   isSelected,
+  isEditing,
+  setIsEditing,
   onTextChange,
   onDragStart,
   onDragMove,
@@ -50,7 +52,7 @@ export function StickyNote({
   draggable=true,
   callbackTaskId=-1
 }) {
-  const [isEditing, setIsEditing] = useState(false);
+  // const [isEditing, setIsEditing] = useState(false);
   const [isHover, setIsHover] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
   const [isResizing, setIsResizing] = useState(false);
