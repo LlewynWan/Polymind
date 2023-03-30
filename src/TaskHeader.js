@@ -98,7 +98,6 @@ export function TaskHeader({
     }
 
     useEffect(()=>{
-        console.log(isHover)
         if (callbackTaskId !== -1 &&
             !disabledSet.has(callbackTaskId)
             // && !notificationSet.has(callbackTaskId)

@@ -342,7 +342,6 @@ export function Canvas({dimensions})
                 // const results = object_type === "keyword" ?
                 // (await promptGPT(prompt, 3, 3)) : null;
                 let handleResponse = (results) => {
-                    console.log(results)
                     // console.log(results.length, num_items, results)
                     if (results.length === num_items) {
                         // results = results.slice(0,num_items);
@@ -1328,13 +1327,16 @@ export function Canvas({dimensions})
                 // const arrow_size = 10 / canvasScale;
                 const arrow_dy = to_anchor===0 ? 1 : to_anchor===2 ? -1 : 0;
                 const arrow_dx = to_anchor===1 ? 1 : to_anchor===3 ? -1 : 0;
+                const isLeft = node.attached_to_type!=="section" &&
+                    node.attached_from_id!==-1 &&
+                    getNodeById(node.attached_to_id).x < getNodeById(node.attached_from_id).x;
                 const finalAnchor = node.attached_to_type!=="section" ?
-                    anchor_utils.calcAnchorPosition(to_anchor,
-                        getNodeById(node.attached_to_id), canvasScale) : null;
+                    anchor_utils.calcAnchorPosition(
+                        to_anchor, getNodeById(node.attached_to_id), canvasScale) : null;
                 const section = node.attached_to_type==="section" ? 
                 getSectionById(node.attached_to_id) : null;
                 const anchorPosition = anchor_utils.calcAnchorPosition(
-                    from_anchor, node, canvasScale);
+                    isLeft?from_anchor:to_anchor, node, canvasScale);
                 const anchorOffsetPosition = anchor_utils.calcAnchorOffsetPositions(
                     node, canvasScale)[from_anchor];
                 // console.log(anchorOffsetPosition)
@@ -1348,46 +1350,7 @@ export function Canvas({dimensions})
                 key={node.id}>
                     {node.attached_to_type!=="section" ?
                     <Group>
-                    {node.attached_from_id===-1 ? null
-                    : getNodeById(node.attached_to_id).x < getNodeById(node.attached_from_id).x ?
-                    <MyLine
-                    points={[
-                        // ...anchorPosition,
-                        ...anchor_utils.calcAnchorPosition(
-                            to_anchor, node, canvasScale),
-                        ...anchor_utils.findPathBetweenNodes(to_anchor, from_anchor,
-                            node, getNodeById(node.attached_from_id), canvasScale),
-                        // ...calcAnchorOffset(arrow.from_anchor, nodes[arrow.from_id]),
-                        // ...calcAnchorOffset(arrow.to_anchor, nodes[arrow.to_id]),
-                        ...anchor_utils.calcAnchorPosition(from_anchor,
-                            getNodeById(node.attached_from_id), canvasScale)
-                    ]}
-                    tension={0}
-                    // stroke={"gray"}
-                    opacity={0.5}
-                    stroke={colorPalette[node.task_id%colorPalette.length]}
-                    strokeWidth={1.5/canvasScale}
-                    listening={false}
-                    /> : <MyLine
-                    points={[
-                        // ...anchorPosition,
-                        ...anchor_utils.calcAnchorPosition(
-                            2, node, canvasScale),
-                        ...anchor_utils.findPathBetweenNodes(2, from_anchor,
-                            node, getNodeById(node.attached_from_id), canvasScale),
-                        // ...calcAnchorOffset(arrow.from_anchor, nodes[arrow.from_id]),
-                        // ...calcAnchorOffset(arrow.to_anchor, nodes[arrow.to_id]),
-                        ...anchor_utils.calcAnchorPosition(from_anchor,
-                            getNodeById(node.attached_from_id), canvasScale)
-                    ]}
-                    tension={0}
-                    // stroke={"gray"}
-                    opacity={0.5}
-                    stroke={colorPalette[node.task_id%colorPalette.length]}
-                    strokeWidth={1.5/canvasScale}
-                    listening={false}
-                    />
-                    }
+                    {node.attached_from_id===-1 ?
                     <MyLine
                     points={[
                         ...anchorPosition,
@@ -1406,6 +1369,102 @@ export function Canvas({dimensions})
                     strokeWidth={1.5/canvasScale}
                     listening={false}
                     />
+                    : isLeft ?
+                    <Group>
+                    <MyLine
+                    points={[
+                        // ...anchorPosition,
+                        ...anchor_utils.calcAnchorPosition(
+                            to_anchor, node, canvasScale),
+                        ...anchor_utils.findPathBetweenNodes(to_anchor, from_anchor,
+                            node, getNodeById(node.attached_from_id), canvasScale),
+                        // ...calcAnchorOffset(arrow.from_anchor, nodes[arrow.from_id]),
+                        // ...calcAnchorOffset(arrow.to_anchor, nodes[arrow.to_id]),
+                        ...anchor_utils.calcAnchorPosition(from_anchor,
+                            getNodeById(node.attached_from_id), canvasScale)
+                    ]}
+                    tension={0}
+                    // stroke={"gray"}
+                    opacity={0.5}
+                    stroke={colorPalette[node.task_id%colorPalette.length]}
+                    strokeWidth={1.5/canvasScale}
+                    listening={false}
+                    />
+                    <MyLine
+                    points={[
+                        ...anchorPosition,
+                        // ...anchor_utils.calcAnchorPosition(
+                        //     from_anchor, node, canvasScale),
+                        ...anchor_utils.findPathBetweenNodes(from_anchor, to_anchor,
+                            node, getNodeById(node.attached_to_id), canvasScale),
+                        // ...calcAnchorOffset(arrow.from_anchor, nodes[arrow.from_id]),
+                        // ...calcAnchorOffset(arrow.to_anchor, nodes[arrow.to_id]),
+                        ...finalAnchor
+                    ]}
+                    tension={0}
+                    // stroke={"gray"}
+                    opacity={0.5}
+                    stroke={colorPalette[node.task_id%colorPalette.length]}
+                    strokeWidth={1.5/canvasScale}
+                    listening={false}
+                    />
+                    </Group> : <Group>
+                    <MyLine
+                    points={[
+                        // ...anchorPosition,
+                        ...anchor_utils.calcAnchorPosition(
+                            from_anchor, node, canvasScale),
+                        ...anchor_utils.findPathBetweenNodes(from_anchor, to_anchor,
+                            node, getNodeById(node.attached_from_id), canvasScale),
+                        // ...calcAnchorOffset(arrow.from_anchor, nodes[arrow.from_id]),
+                        // ...calcAnchorOffset(arrow.to_anchor, nodes[arrow.to_id]),
+                        ...anchor_utils.calcAnchorPosition(to_anchor,
+                            getNodeById(node.attached_from_id), canvasScale)
+                    ]}
+                    tension={0}
+                    // stroke={"gray"}
+                    opacity={0.5}
+                    stroke={colorPalette[node.task_id%colorPalette.length]}
+                    strokeWidth={1.5/canvasScale}
+                    listening={false}
+                    />
+                    <MyLine
+                    points={[
+                        ...anchorPosition,
+                        // ...anchor_utils.calcAnchorPosition(
+                        //     from_anchor, node, canvasScale),
+                        ...anchor_utils.findPathBetweenNodes(to_anchor, to_anchor,
+                            node, getNodeById(node.attached_to_id), canvasScale),
+                        // ...calcAnchorOffset(arrow.from_anchor, nodes[arrow.from_id]),
+                        // ...calcAnchorOffset(arrow.to_anchor, nodes[arrow.to_id]),
+                        ...finalAnchor
+                    ]}
+                    tension={0}
+                    // stroke={"gray"}
+                    opacity={0.5}
+                    stroke={colorPalette[node.task_id%colorPalette.length]}
+                    strokeWidth={1.5/canvasScale}
+                    listening={false}
+                    />
+                    </Group>}
+                    {/* <MyLine
+                    points={[
+                        ...anchorPosition,
+                        // ...anchor_utils.calcAnchorPosition(
+                        //     from_anchor, node, canvasScale),
+                        ...anchor_utils.findPathBetweenNodes(from_anchor, to_anchor,
+                            node, getNodeById(node.attached_to_id), canvasScale),
+                        // ...calcAnchorOffset(arrow.from_anchor, nodes[arrow.from_id]),
+                        // ...calcAnchorOffset(arrow.to_anchor, nodes[arrow.to_id]),
+                        ...finalAnchor
+                    ]}
+                    tension={0}
+                    // stroke={"gray"}
+                    opacity={0.5}
+                    stroke={colorPalette[node.task_id%colorPalette.length]}
+                    strokeWidth={1.5/canvasScale}
+                    listening={false}
+                    /> */}
                     </Group> : <MyLine
                     points={[
                         ...anchorPosition,
@@ -1519,6 +1578,48 @@ export function Canvas({dimensions})
                         setNodes(prevState => {
                             return [...prevState,newNode];
                         })
+                        
+                        if (node.attached_to_type !== "section") {
+                            if (node.attached_from_id === -1) {
+                                setArrows(prevState=>{
+                                    return [...prevState, {
+                                        id: prevState.length===0 ? 0 : 
+                                        Math.max(...prevState.map(state=>state.id))+1,
+                                        from_id: numNodes,
+                                        from_anchor: 1,
+                                        to_id: node.attached_to_id,
+                                        to_anchor: 3,
+                                        directed: false,
+                                        selected: false
+                                    }]
+                                });
+                            } else {
+                                const isLeft = getNodeById(node.attached_to_id).x
+                                    < getNodeById(node.attached_from_id).x;
+                                setArrows(prevState=>{
+                                    return [...prevState, {
+                                        id: prevState.length===0 ? 0 : 
+                                        Math.max(...prevState.map(state=>state.id))+1,
+                                        from_id: numNodes,
+                                        from_anchor: isLeft?1:3,
+                                        to_id: node.attached_to_id,
+                                        to_anchor: 3,
+                                        directed: false,
+                                        selected: false
+                                    }, {
+                                        id: prevState.length===0 ? 0 : 
+                                        Math.max(...prevState.map(state=>state.id))+2,
+                                        from_id: numNodes,
+                                        from_anchor: isLeft?3:1,
+                                        to_id: node.attached_from_id,
+                                        to_anchor: isLeft?1:3,
+                                        directed: false,
+                                        selected: false
+                                    }]
+                                });
+                            }
+                        }
+                        
                         setNumNodes(numNodes+1);
 
                         setTaskNodes(prevState => prevState.filter(state=>state.id!==node.id));
