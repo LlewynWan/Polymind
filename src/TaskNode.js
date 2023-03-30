@@ -20,6 +20,8 @@ export function TaskNode({
     height,
     radiusX,
     radiusY,
+    scaleX,
+    scaleY,
     color,
     text,
     prompt,
@@ -101,6 +103,8 @@ export function TaskNode({
     <Group
     x={x}
     y={y}
+    scaleX={scaleX}
+    scaleY={scaleY}
     onDragMove={(e)=>{
         if (onDragMove)
             onDragMove(e);

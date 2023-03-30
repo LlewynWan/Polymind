@@ -366,15 +366,15 @@ export function Canvas({dimensions})
                                 return {id: prevState.length === 0 ? index :
                                 Math.max(...prevState.map(state=>state.id))+1+index,
                             ...sizeMap[toLowerCase(task.outputType)],
-                            scaleX: 1, scaleY: 1, attached_from_id: attached_from_id,
+                            scaleX: object.scaleX, scaleY: object.scaleY, attached_from_id: attached_from_id,
                             attached_to_type: object_type, task_id: task.id,
                             attached_to_id: object.id, type: toLowerCase(task.outputType),
-                            x: object.x+150*canvasScale+Math.random()*120+object.scaleX*
+                            x: object.x+(150+Math.random()*120)/canvasScale+object.scaleX*
                                 (object.type==="concept"?object.radiusX*2:object.width),
                             y: object.type==="concept"?
-                                object.y+object.scaleY*object.radiusY+(200*index-200)*canvasScale+
+                                object.y+object.scaleY*object.radiusY+(200*index-200)/canvasScale+
                                 Math.ceil(Math.random()*99) * (Math.round(Math.random())?1:-1)
-                                : object.y+(125*index-125)*canvasScale+Math.random()*120+object.scaleY*object.height,
+                                : object.y+(125*index-125+Math.random()*120)/canvasScale+object.scaleY*object.height,
                             fontSize: (task.outputType==="Sticky Note"?16:20), text: result, display: false,
                             prompt: prompt
                             }})]
@@ -412,7 +412,7 @@ export function Canvas({dimensions})
                             {id: prevState.length === 0 ? 0 :
                                 Math.max(...prevState.map(state=>state.id))+1,
                             ...sizeMap[toLowerCase(task.outputType)],
-                            scaleX: 1, scaleY: 1,
+                            scaleX: 1/canvasScale, scaleY: 1/canvasScale,
                             attached_to_type: object_type, task_id: task.id,
                             attached_to_id: object.id, type: toLowerCase(task.outputType),
                             x: object.x+75*canvasScale+Math.random()*100+object.scaleX*object.width/2,
@@ -1556,6 +1556,8 @@ export function Canvas({dimensions})
                     y={node.y}
                     width={node.width}
                     height={node.height}
+                    scaleX={node.scaleX}
+                    scaleY={node.scaleY}
                     radiusX={node.radiusX}
                     radiusY={node.radiusY}
                     text={node.text}
