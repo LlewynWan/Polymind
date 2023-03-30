@@ -1013,7 +1013,7 @@ export function Canvas({dimensions})
                     setSections(prevState=>prevState.map(state=>{
                         let tmp = state;
                         if (state.id === section.id) {
-                            tmp.isEditing = true;
+                            tmp.isEditing = value;
                         } else {
                             tmp.isEditing = false;
                         }
