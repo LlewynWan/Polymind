@@ -342,6 +342,7 @@ export function Canvas({dimensions})
                 // const results = object_type === "keyword" ?
                 // (await promptGPT(prompt, 3, 3)) : null;
                 let handleResponse = (results) => {
+                    console.log(results)
                     // console.log(results.length, num_items, results)
                     if (results.length === num_items) {
                         // results = results.slice(0,num_items);

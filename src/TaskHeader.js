@@ -98,6 +98,7 @@ export function TaskHeader({
     }
 
     useEffect(()=>{
+        console.log(isHover)
         if (callbackTaskId !== -1 &&
             !disabledSet.has(callbackTaskId)
             // && !notificationSet.has(callbackTaskId)
@@ -319,7 +320,10 @@ export function TaskHeader({
             &&taskSummaryMap[task.id]&&taskKeypointsMap[task.id])}
         taskSummaryMap={taskSummaryMap}
         taskKeypointsMap={taskKeypointsMap}
-        expandAll={expandAll}/>
+        expandAll={()=>{
+            setIsHover(false);
+            expandAll();
+        }}/>
         {/* <Rect
         x={0}
         y={-8-fontHeight}
@@ -741,6 +745,7 @@ export function TaskHeader({
     y={fontHeight/2}
     type={"closeAll"}
     onClick={(e)=>{
+        setIsHover(false);
         e.target.getStage().container().style.cursor = "default";
         closeAll();
     }}/>: null}
