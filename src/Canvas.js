@@ -1590,7 +1590,7 @@ export function Canvas({dimensions})
                     }}
                     onConfirm={()=>{
                         const newNode = node.type === "sticky_note" ?
-                        {id: nodes.length, type: node.type, scaleX: 1, scaleY: 1,
+                        {id: nodes.length, type: node.type, scaleX: node.scaleX, scaleY: node.scaleY,
                         x: node.x, y: node.y, display: true, text: node.text,
                         width: node.width, height: node.height, fontSize: 16,
                         selected: false, disabledSet: new Set(
@@ -1599,14 +1599,14 @@ export function Canvas({dimensions})
                         notificationSet: new Set(),
                         callbackTaskId: -1}
                         : node.type === "concept" ? {id: nodes.length, type: node.type,
-                        scaleX: 1, scaleY: 1, x: node.x, y: node.y,
+                        scaleX: node.scaleX, scaleY: node.scaleY, x: node.x, y: node.y,
                         radiusX: node.radiusX, radiusY: node.radiusY,
                         selected: false, text: node.text, fontSize: 20, display: true,
                         disabledSet: new Set(
                             microTasks.filter(task=>!task.active).map(task=>task.id)
                         ), displaySet: new Set(), notificationSet: new Set(), callbackTaskId: -1}
                         : node.type === "keyword" ? {id: nodes.length, type: node.type,
-                        scaleX: 1, scaleY: 1, x: node.x, y: node.y,
+                        scaleX: node.scaleX, scaleY: node.scaleY, x: node.x, y: node.y,
                         width: node.width, height: node.height, fontSize: 20,
                         selected: false, text: node.text, display: true,
                         disabledSet: new Set(
