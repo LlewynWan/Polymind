@@ -247,6 +247,9 @@ export function TaskCard({
         >
             <Tag
             fill={colorMap[inputType]}
+            stroke={"#010203"}
+            strokeWidth={inputType==="Keyword"?0.5:0}
+            opacity={inputType==="Keyword"||inputType==="Section"?0.3:1}
             // fill={inputType==="Sticky Note" ? "#003A6B"
             // : inputType==="Concept" ? "#5880A2"
             // : inputType==="Keyword" ? "#AFC6D9" : "#80D8FF"}
@@ -264,7 +267,7 @@ export function TaskCard({
             fontSize={14}
             fontStyle={"bold"}
             fontFamily={"sans-serif"}
-            fill={"white"}
+            fill={inputType==="Keyword"?"#888888":"white"}
             padding={5}
             perfectDrawEnabled={false}/>
         </Label>
@@ -303,6 +306,9 @@ export function TaskCard({
             // fill={outputType==="Sticky Note" ? "#003A6B"
             // : outputType==="Concept" ? "#5880A2"
             // : outputType==="Keyword" ? "#AFC6D9"  : "#80D8FF"}
+            stroke={"#010203"}
+            strokeWidth={outputType==="Keyword"?0.5:0}
+            opacity={outputType==="Keyword"?0.3:1}
             cornerRadius={5}
             pointerDirection={"left"}
             // pointerWidth={5}
@@ -317,7 +323,7 @@ export function TaskCard({
             fontSize={14}
             fontStyle={"bold"}
             fontFamily={"sans-serif"}
-            fill={"white"}
+            fill={outputType==="Keyword"?"#888888":"white"}
             padding={5}
             perfectDrawEnabled={false}/>
         </Label>

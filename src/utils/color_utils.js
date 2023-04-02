@@ -1,8 +1,12 @@
 const colorMap = {
-    "Keyword": "#AFC6D9",
-    "Concept": "#5880A2",
-    "Sticky Note": "#003A6B",
-    "Section": "#80D8FF",
+    // "Keyword": "#AFC6D9",
+    // "Concept": "#5880A2",
+    // "Sticky Note": "#003A6B",
+    "Keyword": "#CED8DF",
+    "Concept": "#FFB5B7",
+    "Sticky Note": "#748B97",
+    // "Section": "#80D8FF",
+    "Section": "#0099FF",
     "Nodes": "#112233",
     "Line": "#C3E7FD"
 }
