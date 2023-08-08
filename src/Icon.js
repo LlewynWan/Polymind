@@ -377,9 +377,9 @@ export function Icon({
         :[-2.5,0,0,0,2.5,0]}
         fill={isHover?"#646464":"gray"}
         stroke={isHover?"#646464":"gray"}
-        pointerLength={8}
-        pointerWidth={12}
-        strokeWidth={1}
+        pointerLength={10}
+        pointerWidth={14}
+        strokeWidth={0}
         perfectDrawEnabled={false}/>
     </Group>
     : type === "question" ?
