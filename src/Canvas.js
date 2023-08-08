@@ -903,7 +903,6 @@ export function Canvas({dimensions})
     onMouseUp={handleStageMouseUp}
     // onDblClick={toggleFollowerMode}
     ref={stageRef}>
-
         <Layer
         x={canvasX}
         y={canvasY}
