@@ -90,7 +90,8 @@ function App() {
   }, [dimensions])
 
   return (
-    <div className="container fullscreen" id="fullsccreen">
+    <div className="container fullscreen" id="fullsccreen"
+    style={{overflow: "hidden"}}>
       <GlobalContext.Provider value={{
         nodes, numNodes, arrows, sections, promptCards, globalTextbox,
         taskPrompts, microTasks, taskNodes,
