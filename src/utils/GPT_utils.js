@@ -88,7 +88,7 @@ export async function regenerate(prevPrompt, prevOutput, prompt, handleResponse)
       'Authorization': 'Bearer ' + String(process.env.REACT_APP_OPENAI_API_KEY)
     },
     body: JSON.stringify({
-      "model": "gpt-4-turbo",
+      "model": "gpt-4",
       'messages': GPT35TurboMessage,
       'temperature': 0.7,
       // 'max_tokens': maxTokens,
