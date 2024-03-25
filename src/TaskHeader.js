@@ -658,7 +658,7 @@ export function TaskHeader({
         opacity={isHoverLeftArrow?1:0.5}
         pointerLength={8}
         pointerWidth={12}
-        strokeWidth={1}
+        strokeWidth={0}
         onMouseEnter={()=>{
             setIsHoverLeftArrow(true);
             const interval = setInterval(()=>{
@@ -681,7 +681,7 @@ export function TaskHeader({
         opacity={isHoverRightArrow?1:0.5}
         pointerLength={8}
         pointerWidth={12}
-        strokeWidth={1}
+        strokeWidth={0}
         onMouseEnter={()=>{
             setIsHoverRightArrow(true);
             const interval = setInterval(()=>{

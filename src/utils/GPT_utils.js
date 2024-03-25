@@ -32,7 +32,8 @@ export async function promptGPT(prompt, num_results, max_words_per_result, handl
       'Authorization': 'Bearer ' + String(process.env.REACT_APP_OPENAI_API_KEY)
     },
     body: JSON.stringify({
-      "model": "gpt-3.5-turbo",
+      // "model": "gpt-3.5-turbo",
+      "model": "gpt-4",
       'messages': GPT35TurboMessage,
       'temperature': 0.7,
       // 'max_tokens': maxTokens,
@@ -87,7 +88,7 @@ export async function regenerate(prevPrompt, prevOutput, prompt, handleResponse)
       'Authorization': 'Bearer ' + String(process.env.REACT_APP_OPENAI_API_KEY)
     },
     body: JSON.stringify({
-      "model": "gpt-3.5-turbo",
+      "model": "gpt-4-turbo",
       'messages': GPT35TurboMessage,
       'temperature': 0.7,
       // 'max_tokens': maxTokens,
@@ -133,7 +134,7 @@ export async function explain(prevPrompt, prevOutput, handleResponse) {
       'Authorization': 'Bearer ' + String(process.env.REACT_APP_OPENAI_API_KEY)
     },
     body: JSON.stringify({
-      "model": "gpt-3.5-turbo",
+      "model": "gpt-4",
       'messages': GPT35TurboMessage,
       'temperature': 0.7,
       // 'max_tokens': maxTokens,
@@ -183,7 +184,7 @@ export async function summarize(prevPrompt, prevOutput, handleResponse) {
       'Authorization': 'Bearer ' + String(process.env.REACT_APP_OPENAI_API_KEY)
     },
     body: JSON.stringify({
-      "model": "gpt-3.5-turbo",
+      "model": "gpt-4",
       'messages': GPT35TurboMessage,
       'temperature': 0.7,
       // 'max_tokens': maxTokens,
@@ -234,7 +235,7 @@ export async function extractKeywords(prevPrompt, prevOutput, handleResponse) {
       'Authorization': 'Bearer ' + String(process.env.REACT_APP_OPENAI_API_KEY)
     },
     body: JSON.stringify({
-      "model": "gpt-3.5-turbo",
+      "model": "gpt-4",
       'messages': GPT35TurboMessage,
       'temperature': 0.7,
       // 'max_tokens': maxTokens,
@@ -285,7 +286,7 @@ export async function requestTaskPrompt(taskName, handleResponse) {
       'Authorization': 'Bearer ' + String(process.env.REACT_APP_OPENAI_API_KEY)
     },
     body: JSON.stringify({
-      "model": "gpt-3.5-turbo",
+      "model": "gpt-4",
       'messages': GPT35TurboMessage,
       'temperature': 0.7,
       // 'max_tokens': maxTokens,

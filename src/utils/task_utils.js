@@ -17,7 +17,7 @@ const outputTypes = [
 const outputMap = {
     "Keyword": [3,3],
     "Concept": [3,5],
-    "Sticky Note": [1,50],
+    "Sticky Note": [1,150],
     // "Line": [3,3]
 }
 

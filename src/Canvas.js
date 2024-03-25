@@ -1784,7 +1784,7 @@ export function Canvas({dimensions})
                 setMicroTasks(prevState=>{
                     return [
                         ...prevState,
-                        {id: Math.max(...prevState.map(state=>state.id))+1,
+                        {id: prevState.length===0?0:Math.max(...prevState.map(state=>state.id))+1,
                         goal: taskName, inputType: "Keyword", outputType: "Keyword",
                         active: true, display: false, suggestions: [], examplePrompt: examplePrompt}
                     ]
