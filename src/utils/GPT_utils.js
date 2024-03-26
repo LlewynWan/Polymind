@@ -14,7 +14,7 @@ const fetchTimeout = (url, ms, { signal, ...options } = {}) => {
 
 export async function promptGPT(prompt, num_results, max_words_per_result, handleResponse) {
   const GPT35TurboMessage = [ 
-    { role: "system", content: `You are a writing expert and you are assisting users in the prewriting process. You should strictly follow the output specification given by the user.` },
+    { role: "system", content: `You are a writing expert and you are assisting users in prewriting a creative story. You should strictly follow the output specification given by the user.` },
     {   
       role: "user",
       content: prompt + `\n\nThe output should be a list of ${num_results} items separated by a new line. Each item in the list should be no more than ${max_words_per_result} words`,
@@ -64,7 +64,7 @@ export async function promptGPT(prompt, num_results, max_words_per_result, handl
 
 export async function regenerate(prevPrompt, prevOutput, prompt, handleResponse) {
   const GPT35TurboMessage = [
-    { role: "system", content: `You are a writing expert and you are assisting users in the prewriting process. You should strictly follow the output specification given by the user.` },
+    { role: "system", content: `You are a writing expert and you are assisting users in prewriting a creative story. You should strictly follow the output specification given by the user.` },
     {   
       role: "user",
       content: prevPrompt,
@@ -109,7 +109,7 @@ export async function regenerate(prevPrompt, prevOutput, prompt, handleResponse)
 
 export async function explain(prevPrompt, prevOutput, handleResponse) {
   const GPT35TurboMessage = [
-    { role: "system", content: `You are a writing expert and you are assisting users in the prewriting process. You should strictly follow the output specification given by the user.` },
+    { role: "system", content: `You are a writing expert and you are assisting users in prewriting a creative story. You should strictly follow the output specification given by the user.` },
     {   
       role: "user",
       content: prevPrompt,
